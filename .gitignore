@@ -1,0 +1,10 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/Expenses.Api/.vs
+/Expenses.Api/bin/Debug/net8.0
+/Expenses.Api/obj
+/libs-auth/Libs.Auth/.vs
+/libs-auth/Libs.Auth/bin/Debug/net8.0
+/libs-auth/Libs.Auth/obj
