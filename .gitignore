@@ -8,3 +8,7 @@
 /libs-auth/Libs.Auth/.vs
 /libs-auth/Libs.Auth/bin/Debug/net8.0
 /libs-auth/Libs.Auth/obj
+.vscode
+*/obj
+*/bin/Debug
+*/.vs

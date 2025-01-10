@@ -1,8 +1,9 @@
-﻿using Libs.Auth.Dtos;
+﻿using Expenses.Api.Dtos;
 using Libs.Auth.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 
@@ -24,34 +25,44 @@ namespace Expenses.Api.Controllers
         }
 
         [HttpPost("register")]
-        public IActionResult Register(RegisterDto dto)
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.Conflict)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+        public IActionResult Register([FromBody] RegisterDto dto)
         {
-            if (Users.Any(u => u.Username == dto.Username))
+            if (Users.Any(u => u.Email == dto.Email))
             {
-                return Conflict(new { Message = "Username already exists." });
+                return Conflict(new { Message = "Email already exists." });
             }
 
-            Users.Add(new User { Username = dto.Username, Password = dto.Password, Role = dto.Role });
+            Users.Add(new User(dto.Email, dto.Username, dto.Password));
             return Ok(new { Message = "User registered successfully." });
         }
 
         [HttpPost("login")]
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public IActionResult Login(LoginDto dto)
         {
-            var user = Users.FirstOrDefault(u => u.Username == dto.Username && u.Password == dto.Password);
+            var user = Users.FirstOrDefault(u => u.Email == dto.Email && u.Password == dto.Password);
             if (user == null)
             {
-                return Unauthorized(new { Message = "Invalid username or password." });
+                return Unauthorized(new { Message = "Invalid email or password." });
             }
 
+            user.UpdateLoggedAt();
+
             var tokenHandler = new JwtSecurityTokenHandler();
+            var roles = user.Roles.Select(x => new Claim(ClaimTypes.Role, x.ToString()));
+            var claimIdentity = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, user.Username)});
+            claimIdentity.AddClaims(roles);
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim(ClaimTypes.Name, user.Username),
-                    new Claim(ClaimTypes.Role, user.Role)
-                }),
+                Subject = claimIdentity,
                 Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(_key), SecurityAlgorithms.HmacSha256Signature)
             };
