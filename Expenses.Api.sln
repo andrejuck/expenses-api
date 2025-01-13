@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Expenses.Api", "Expenses.Ap
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Libs.Auth", "libs-auth\Libs.Auth\Libs.Auth.csproj", "{9B9C05DA-4359-4373-828F-171035107583}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Expenses.Domain", "Expenses.Domain\Expenses.Domain.csproj", "{2A35374A-04F4-4684-B342-7EFAF7D3199B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Expenses.Infra", "Expenses.Infra\Expenses.Infra.csproj", "{C323E349-3D82-4A6F-8441-91FA9FDCB3CB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{9B9C05DA-4359-4373-828F-171035107583}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B9C05DA-4359-4373-828F-171035107583}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9B9C05DA-4359-4373-828F-171035107583}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A35374A-04F4-4684-B342-7EFAF7D3199B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A35374A-04F4-4684-B342-7EFAF7D3199B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A35374A-04F4-4684-B342-7EFAF7D3199B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A35374A-04F4-4684-B342-7EFAF7D3199B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C323E349-3D82-4A6F-8441-91FA9FDCB3CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C323E349-3D82-4A6F-8441-91FA9FDCB3CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C323E349-3D82-4A6F-8441-91FA9FDCB3CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C323E349-3D82-4A6F-8441-91FA9FDCB3CB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

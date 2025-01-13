@@ -28,6 +28,7 @@ namespace Libs.Auth.Models
         public DateTime? LoggedAt { get; private set; }    
         public DateTime? UpdatedAt { get;private set; }
         public DateTime CreatedAt { get; private set; }
+        public DateTime? DeletedAt { get; private set; }
 
         public virtual void UpdateRegistrationStatus(RegistrationStatus status) {
             RegistrationStatus = status;
@@ -50,6 +51,11 @@ namespace Libs.Auth.Models
 
         public virtual void UpdateUsername(string newUsername) {
             Username = newUsername;
+            SetUpdateAt();
+        }
+
+        public virtual void SetDeleted() {
+            DeletedAt = DateTime.Now;
             SetUpdateAt();
         }
 

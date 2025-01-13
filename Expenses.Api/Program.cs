@@ -1,6 +1,10 @@
+using Expenses.Api.Settings;
+using Expenses.Domain.DataContract;
+using Expenses.Infra.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Expenses.Api.ExtensionMethods;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +25,13 @@ if (builder.Environment.IsDevelopment())
 {
     builder.Configuration.AddUserSecrets<Program>();
 }
+
+//Dependency injection
+//TODO - Create an IServiceCollection to extend a method that resolves all DI
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+
+var mongoConn = builder.Configuration.GetSection("MongoDbSettings").Get<MongoDbSettings>();
+builder.Services.AddMongoDbContext(mongoConn);
 
 // Configure JWT Authentication
 var key = Encoding.ASCII.GetBytes(builder.Configuration.GetSection("JWT:key").Value);

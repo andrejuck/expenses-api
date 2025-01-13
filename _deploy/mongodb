@@ -1,0 +1,11 @@
+# Base image oficial do MongoDB
+FROM mongo:latest
+
+# Diretório de trabalho no contêiner
+WORKDIR /docker-entrypoint-initdb.d
+
+# Copia o script de inicialização para o diretório padrão do MongoDB
+COPY /scripts/init-mongo.js /docker-entrypoint-initdb.d/
+
+# Porta padrão do MongoDB
+EXPOSE 27017
