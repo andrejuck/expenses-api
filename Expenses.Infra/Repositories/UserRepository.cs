@@ -34,13 +34,8 @@ namespace Expenses.Infra.Repositories {
             await _dbContext.Users.UpdateOneAsync(filter, update);
         }
 
-        public async Task<User> GetByEmailAndPassword(string email, string password) {
-            var filter = _filter.And(
-                _filter.Eq(u => u.Email, email),
-                _filter.Eq(u => u.Password, password)
-            );
-
-            return await _dbContext.Users.Find(filter).FirstOrDefaultAsync();
+        public async Task<User> GetByEmail(string email) {
+            return await _dbContext.Users.Find(_filter.Eq(u => u.Email, email)).FirstOrDefaultAsync();
         }
 
         public async Task<User> GetByIdAsync(Guid id)

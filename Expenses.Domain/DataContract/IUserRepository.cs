@@ -4,5 +4,5 @@ namespace Expenses.Domain.DataContract;
 
 public interface IUserRepository : IBaseRepository<User>
 {
-    Task<User> GetByEmailAndPassword(string email, string password);
+    Task<User> GetByEmail(string email);
 }

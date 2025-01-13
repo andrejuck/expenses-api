@@ -40,7 +40,8 @@ namespace Expenses.Api.Controllers
                 return Conflict(new { Message = "Email already exists." });
             }
 
-            var user = new User(dto.Email, dto.Username, dto.Password); 
+            var user = new User(dto.Email, dto.Username); 
+            user.SetPassword(dto.Password);
             await _userRepository.AddAsync(user);
 
             Users.Add(user);
@@ -54,8 +55,13 @@ namespace Expenses.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> Login(LoginDto dto)
         {
-            var user = await _userRepository.GetByEmailAndPassword(dto.Email, dto.Password);
+            var user = await _userRepository.GetByEmail(dto.Email);
             if (user == null)
+            {
+                return Unauthorized(new { Message = "Invalid email or password." });
+            }
+
+            if(!user.VerifyPassword(dto.Password)) 
             {
                 return Unauthorized(new { Message = "Invalid email or password." });
             }
