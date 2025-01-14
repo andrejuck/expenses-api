@@ -27,9 +27,8 @@ if (builder.Environment.IsDevelopment())
 }
 
 //Dependency injection
-//TODO - Create an IServiceCollection to extend a method that resolves all DI
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-
+builder.Services.AddExpensesDependencies();
+builder.Services.Configure<EmailingSettings>(builder.Configuration.GetSection("EmailingSettings"));
 var mongoConn = builder.Configuration.GetSection("MongoDbSettings").Get<MongoDbSettings>();
 builder.Services.AddMongoDbContext(mongoConn);
 

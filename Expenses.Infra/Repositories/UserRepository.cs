@@ -34,7 +34,7 @@ namespace Expenses.Infra.Repositories {
             await _dbContext.Users.UpdateOneAsync(filter, update);
         }
 
-        public async Task<User> GetByEmail(string email) {
+        public async Task<User> GetByEmailAsync(string email) {
             return await _dbContext.Users.Find(_filter.Eq(u => u.Email, email)).FirstOrDefaultAsync();
         }
 
