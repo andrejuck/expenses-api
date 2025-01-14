@@ -50,7 +50,6 @@ namespace Libs.Auth.Models
 
         public virtual void SetPassword(string password) {
             CryptPassword(password);
-            SetUpdateAt();
         }
 
         public virtual void UpdateUsername(string newUsername) {
