@@ -1,17 +1,20 @@
 ﻿
+using System.Diagnostics;
+using System.Globalization;
+using System.Runtime.InteropServices;
+using Libs.Auth.Cryptography;
+
 namespace Libs.Auth.Models
 {
     public class User
     {
         public User(
             string email, 
-            string username,
-            string password)
+            string username)
         {
             Id = Guid.NewGuid();
             Email = email;
             Username = username;
-            Password = password;
             Roles = new List<UserRole>() { UserRole.GeneralUser };
             RegistrationStatus = RegistrationStatus.WaitingApproval;
             EmailConfirmed = false;
@@ -22,12 +25,14 @@ namespace Libs.Auth.Models
         public string Username { get; private set; }
         public string Email { get; private set; }
         public string Password { get; private set; }
+        public string Salt { get; private set; }
         public List<UserRole> Roles { get; private set; }
         public RegistrationStatus RegistrationStatus { get; private set; }
         public bool EmailConfirmed { get; private set; }
         public DateTime? LoggedAt { get; private set; }    
         public DateTime? UpdatedAt { get;private set; }
         public DateTime CreatedAt { get; private set; }
+        public DateTime? DeletedAt { get; private set; }
 
         public virtual void UpdateRegistrationStatus(RegistrationStatus status) {
             RegistrationStatus = status;
@@ -43,8 +48,8 @@ namespace Libs.Auth.Models
             LoggedAt = DateTime.Now;
         }
 
-        public virtual void SetNewPassword(string password) {
-            Password = password;
+        public virtual void SetPassword(string password) {
+            CryptPassword(password);
             SetUpdateAt();
         }
 
@@ -53,8 +58,28 @@ namespace Libs.Auth.Models
             SetUpdateAt();
         }
 
+        public virtual void SetDeleted() {
+            DeletedAt = DateTime.Now;
+            SetUpdateAt();
+        }
+
         private void SetUpdateAt() {
             UpdatedAt = DateTime.Now;
+        }
+
+        public bool VerifyPassword(string password) {
+            var salt = Convert.FromBase64String(Salt);
+            
+            return Password == HashingHelper.HashPassword(password, salt);
+        }
+
+        private void CryptPassword(string password) {
+            var salt = HashingHelper.GenerateSalt();
+            var pass = HashingHelper.HashPassword(password, salt);
+
+            Password = pass;
+            Salt = Convert.ToBase64String(salt);
+            Debug.WriteLine(string.Format("{0} cript: {1}", salt, Salt));
         }
 
     }
