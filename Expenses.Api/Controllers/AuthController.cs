@@ -1,5 +1,6 @@
 ﻿using Expenses.Api.DataContracts;
 using Expenses.Api.Dtos;
+using Expenses.Api.Settings;
 using Expenses.Domain.DataContract;
 using Libs.Auth.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -17,18 +18,23 @@ namespace Expenses.Api.Controllers
     //TODO - Remove repository from controller and implement an orchestration layer
     public class AuthController : ControllerBase
     {
-        // private static List<User> Users = new();
         private readonly IUserRepository _userRepository;
         private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
+        private readonly EmailingSettings _settings;
         private readonly byte[] _key;
 
-        public AuthController(IConfiguration configuration, IUserRepository userRepository, IEmailService emailService)
+        public AuthController(
+            IConfiguration configuration, 
+            IUserRepository userRepository, 
+            IEmailService emailService, 
+            EmailingSettings settings)
         {
             _configuration = configuration;
             _key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
             _userRepository = userRepository;
             _emailService = emailService;
+            _settings = settings;
         }
 
         [HttpPost("register")]
@@ -47,12 +53,15 @@ namespace Expenses.Api.Controllers
             user.SetPassword(dto.Password);
             await _userRepository.AddAsync(user);
 
-            var token = CreateJwtToken(user);
-            var confirmationLink = $"{Request.Scheme}://{Request.Host}/api/auth/confirm-email?token={token}";
-            var emailBody = $"<p>Olá {dto.Username},</p><p>Por favor, confirme seu e-mail clicando no link abaixo:</p>" +
-                            $"<a href='{confirmationLink}'>Confirmar e-mail</a>";
-
-            await _emailService.SendEmailAsync(dto.Email, "Confirmação de E-mail", emailBody);
+            if (_settings.IsEnabled)
+            {
+                var token = CreateJwtToken(user);
+                var confirmationLink = $"{Request.Scheme}://{Request.Host}/api/auth/confirm-email?token={token}";
+                var emailBody = $"<p>Olá {dto.Username},</p><p>Por favor, confirme seu e-mail clicando no link abaixo:</p>" +
+                                $"<a href='{confirmationLink}'>Confirmar e-mail</a>";
+    
+                await _emailService.SendEmailAsync(dto.Email, "Confirmação de E-mail", emailBody);
+            }
             return Ok(new { Message = $"User {user.Email} registered successfully." });
         }
 
