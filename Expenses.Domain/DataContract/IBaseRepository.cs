@@ -1,4 +1,4 @@
-namespace Expenses.Domain.DataContract;
+namespace Expenses.Domain.DataContracts;
 
 public interface IBaseRepository<T> {
 

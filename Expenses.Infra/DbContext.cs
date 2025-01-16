@@ -1,28 +1,20 @@
 ﻿
 using MongoDB.Driver;
-using MongoDB.Bson;
 using Libs.Auth.Models;
+using Libs.Api.Infra;
+using Expenses.Infra.Settings;
 
 namespace Expenses.Infra;
-    public class DBContext
+    public class DBContext : MongoDbContext
     {
-        public MongoClient Client { get; set; }
-        public IMongoDatabase Database { get; set; }
         public IMongoCollection<User> Users { get; set; }
 
-        public DBContext(string connectionString)
+        public DBContext(string connectionString, MongoDbSettings settings)
+            : base(connectionString, settings.DbName)
         {
-            var settings = MongoClientSettings.FromConnectionString(connectionString);
-            // settings.ServerApi = new ServerApi(ServerApiVersion.);
-            // settings. = GuidRepresentation.Standard
-
-            Client = new MongoClient(settings);
-            Database = Client.GetDatabase("expenses");
-
-            InitializeCollections();
         }
 
-        private void InitializeCollections()
+        protected override void InitializeCollections()
         {
             Users = Database.GetCollection<User>("users");
         }

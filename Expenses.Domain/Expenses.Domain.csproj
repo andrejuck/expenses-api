@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\libs-auth\Libs.Auth\Libs.Auth.csproj" />
+    <ProjectReference Include="..\libs-api\Libs.Api\Libs.Api.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

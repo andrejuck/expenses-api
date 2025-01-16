@@ -12,3 +12,6 @@
 */obj
 */bin/Debug
 */.vs
+*/*/obj
+*/*/bin/Debug
+*/*/.vs

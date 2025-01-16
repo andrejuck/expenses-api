@@ -1,5 +1,5 @@
-using Expenses.Api.Settings;
 using Expenses.Infra;
+using Expenses.Infra.Settings;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
@@ -15,7 +15,7 @@ public static class DbContextExtension {
             .Replace("__username__", settings.Username)
             .Replace("__password__", settings.Password)
             .Replace("__db__", settings.DbName);
-        services.AddSingleton(new DBContext(conString));
+        services.AddSingleton(new DBContext(conString, settings));
 
         return services;
     }
