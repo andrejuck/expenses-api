@@ -1,9 +1,10 @@
 ﻿using Expenses.Api.DataContracts;
 using Expenses.Api.Dtos;
 using Expenses.Api.Settings;
-using Expenses.Domain.DataContract;
+using Expenses.Domain.DataContracts;
 using Libs.Auth.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
@@ -21,20 +22,20 @@ namespace Expenses.Api.Controllers
         private readonly IUserRepository _userRepository;
         private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
-        private readonly EmailingSettings _settings;
+        private readonly EmailingSettings _emailSettings;
         private readonly byte[] _key;
 
         public AuthController(
             IConfiguration configuration, 
             IUserRepository userRepository, 
             IEmailService emailService, 
-            EmailingSettings settings)
+            IOptions<EmailingSettings> settings)
         {
             _configuration = configuration;
             _key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
             _userRepository = userRepository;
             _emailService = emailService;
-            _settings = settings;
+            _emailSettings = settings.Value;
         }
 
         [HttpPost("register")]
@@ -53,7 +54,7 @@ namespace Expenses.Api.Controllers
             user.SetPassword(dto.Password);
             await _userRepository.AddAsync(user);
 
-            if (_settings.IsEnabled)
+            if (_emailSettings.IsEnabled)
             {
                 var token = CreateJwtToken(user);
                 var confirmationLink = $"{Request.Scheme}://{Request.Host}/api/auth/confirm-email?token={token}";
@@ -119,6 +120,7 @@ namespace Expenses.Api.Controllers
             var user = await _userRepository.GetByEmailAsync(userEmail);
 
             user.UpdateRegistrationStatus(RegistrationStatus.Approved);
+            user.ConfirmEmail();
             await _userRepository.UpdateAsync(user);
 
             return Ok(new { Message = "E-mail confirmado com sucesso!" });

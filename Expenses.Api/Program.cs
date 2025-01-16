@@ -1,11 +1,10 @@
 using Expenses.Api.Settings;
-using Expenses.Domain.DataContract;
-using Expenses.Infra.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Expenses.Api.ExtensionMethods;
 using System.Text;
+using Expenses.Infra.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +30,8 @@ builder.Services.AddExpensesDependencies();
 builder.Services.Configure<EmailingSettings>(builder.Configuration.GetSection("EmailingSettings"));
 var mongoConn = builder.Configuration.GetSection("MongoDbSettings").Get<MongoDbSettings>();
 builder.Services.AddMongoDbContext(mongoConn);
+
+builder.Services.AddAutoMapper(typeof(Program));
 
 // Configure JWT Authentication
 var key = Encoding.ASCII.GetBytes(builder.Configuration.GetSection("JWT:key").Value);

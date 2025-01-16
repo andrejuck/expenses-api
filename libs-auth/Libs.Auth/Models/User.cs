@@ -1,7 +1,5 @@
 ﻿
 using System.Diagnostics;
-using System.Globalization;
-using System.Runtime.InteropServices;
 using Libs.Auth.Cryptography;
 
 namespace Libs.Auth.Models

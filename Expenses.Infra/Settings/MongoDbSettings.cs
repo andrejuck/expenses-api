@@ -1,4 +1,4 @@
-namespace Expenses.Api.Settings;
+namespace Expenses.Infra.Settings;
 
 public class MongoDbSettings {
     public string Uri { get; set; }
