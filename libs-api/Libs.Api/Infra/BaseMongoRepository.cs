@@ -11,8 +11,8 @@ public abstract class BaseMongoRepository<T>
     protected virtual UpdateDefinition<T> PrepareToUpdate(T newValue)
     {
         var updateDefinitionList = new List<UpdateDefinition<T>>();
-        var propriedades = typeof(T).GetProperties();
-        foreach (var property in propriedades)
+        var properties = typeof(T).GetProperties();
+        foreach (var property in properties)
         {
             var modifiedValue = property.GetValue(newValue);
 
