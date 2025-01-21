@@ -93,7 +93,11 @@ namespace Expenses.Api.Controllers
             return Ok(stringToken);
         }
 
-        [HttpGet("confirm-email")]
+        [HttpGet("confirm-email")]        
+        [ProducesResponseType((int)HttpStatusCode.OK)]
+        [ProducesResponseType((int)HttpStatusCode.Conflict)]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
         public async Task<IActionResult> ConfirmEmail(string token)
         {
             var key = new SymmetricSecurityKey(_key);
