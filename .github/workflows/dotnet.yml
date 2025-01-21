@@ -16,10 +16,17 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Setup dependencies
+    - name: Install OpenSSL 1.1 manually
       run: |
           sudo apt update
-          sudo apt install -y libssl1.1
+          sudo apt install -y build-essential wget
+          wget https://www.openssl.org/source/openssl-1.1.1u.tar.gz
+          tar -xvf openssl-1.1.1u.tar.gz
+          cd openssl-1.1.1u
+          ./config
+          make
+          sudo make install
+          sudo ldconfig
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
