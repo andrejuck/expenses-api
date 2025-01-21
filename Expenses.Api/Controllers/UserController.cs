@@ -84,6 +84,6 @@ public class UserController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     public ActionResult<List<string>> GetAllRegistrationStatus() {
         
-        return Enum.GetNames<RegistrationStatus>().ToList();
+        return Ok(Enum.GetNames<RegistrationStatus>().ToList());
     }
 }
