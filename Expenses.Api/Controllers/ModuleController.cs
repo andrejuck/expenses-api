@@ -1,7 +1,5 @@
 using System.Net;
-using System.Runtime.CompilerServices;
 using System.Security.Claims;
-using System.Threading.Tasks;
 using AutoMapper;
 using Expenses.Api.Helpers;
 using Expenses.Api.PresentationContracts;
