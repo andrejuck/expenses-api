@@ -10,6 +10,7 @@ public static class DependencyInjectionExtension {
 
     public static IServiceCollection AddExpensesDependencies(this IServiceCollection services) {
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IModuleRepository, ModuleRepository>();
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IPaginationAdapter, PaginationAdapter>();
 
