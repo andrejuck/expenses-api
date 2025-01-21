@@ -16,8 +16,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Install OpenSSL 1.1 manually
+    - name: Restore OpenSSL from cache
+      uses: actions/cache@v3
+      with:
+        path: /usr/local/openssl-1.1.1
+        key: openssl-1.1.1-${{ runner.os }}
+        restore-keys: openssl-1.1.1-
+    - name: Setup OpenSSL 1.1 if not cached
       run: |
+        if [ ! -d /usr/local/openssl-1.1.1 ]; then
           sudo apt update
           sudo apt install -y build-essential wget
           wget https://www.openssl.org/source/openssl-1.1.1u.tar.gz
@@ -27,6 +34,7 @@ jobs:
           make
           sudo make install
           sudo ldconfig
+        fi
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
