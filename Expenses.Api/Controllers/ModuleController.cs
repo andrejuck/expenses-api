@@ -75,7 +75,7 @@ public class ModuleController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     public async Task<ActionResult> DeleteModule([FromQuery] Guid moduleId)
     {
-        var existingModule = await _moduleRepository.GetByIdAsync(moduleId);
+        var existingModule = await _moduleRepository.FindByIdAsync(moduleId);
         if (existingModule is null)
         {
             return NotFound(

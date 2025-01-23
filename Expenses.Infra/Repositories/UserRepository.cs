@@ -4,10 +4,11 @@ using Libs.Api.Models;
 using Libs.Auth.Models;
 using MongoDB.Driver;
 
-namespace Expenses.Infra.Repositories {
+namespace Expenses.Infra.Repositories
+{
 
-    public class UserRepository : BaseMongoRepository<User>, IUserRepository {
-
+    public class UserRepository : BaseMongoRepository<User>, IUserRepository
+    {
         private readonly DBContext _dbContext;
 
         public UserRepository(DBContext dbContext)
@@ -20,7 +21,7 @@ namespace Expenses.Infra.Repositories {
         {
             return _filter.Eq(a => a.Id, id);
         }
-        
+
         public async Task AddAsync(User entity)
         {
             await _dbContext.Users.InsertOneAsync(entity);
@@ -34,11 +35,12 @@ namespace Expenses.Infra.Repositories {
             await _dbContext.Users.UpdateOneAsync(filter, update);
         }
 
-        public async Task<User> GetByEmailAsync(string email) {
+        public async Task<User> GetByEmailAsync(string email)
+        {
             return await _dbContext.Users.Find(_filter.Eq(u => u.Email, email)).FirstOrDefaultAsync();
         }
 
-        public async Task<User> GetByIdAsync(Guid id)
+        public async Task<User> FindByIdAsync(Guid id)
         {
             var filter = IdFilter(id);
 

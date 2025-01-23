@@ -1,6 +1,7 @@
 namespace Expenses.Api.PresentationContracts;
 
-public class UserResponse {
+public class UserResponse
+{
 
     public Guid Id { get; set; }
     public string Username { get; set; }
@@ -8,4 +9,10 @@ public class UserResponse {
     public List<string> Roles { get; set; }
     public RegistrationStatus RegistrationStatus { get; set; }
     public DateTime LoggedAt { get; set; }
+    public string Token { get; private set; }
+
+    public void SetToken(string token)
+    {
+        Token = token;
+    }
 }

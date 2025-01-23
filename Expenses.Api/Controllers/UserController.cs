@@ -36,7 +36,7 @@ public class UserController : ControllerBase
     public async Task<IActionResult> ApproveUserRegistration([FromQuery] Guid userId)
     {
 
-        var user = await _userRepository.GetByIdAsync(userId);
+        var user = await _userRepository.FindByIdAsync(userId);
         user.UpdateRegistrationStatus(RegistrationStatus.Approved);
         user.ConfirmEmail();
 
@@ -52,7 +52,7 @@ public class UserController : ControllerBase
     public async Task<IActionResult> DenyUserRegistration([FromQuery] Guid userId)
     {
 
-        var user = await _userRepository.GetByIdAsync(userId);
+        var user = await _userRepository.FindByIdAsync(userId);
         user.UpdateRegistrationStatus(RegistrationStatus.Denied);
 
         //TODO - Send an email to the user asking to get in contact with support.
