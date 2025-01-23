@@ -26,7 +26,7 @@ public class ModuleController : ControllerBase
         _mapper = mapper;
     }
 
-    [HttpGet("all")]
+    [HttpGet]
     [ProducesResponseType(typeof(List<ModuleResponse>), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.Conflict)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]

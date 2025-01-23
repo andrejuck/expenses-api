@@ -63,7 +63,7 @@ public class UserController : ControllerBase
         return Accepted();
     }
 
-    [HttpGet("all")]
+    [HttpGet]
     [ProducesResponseType(typeof(PagedResponse<UserResponse>), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
