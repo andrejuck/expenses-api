@@ -1,6 +1,7 @@
 using System.Net;
 using System.Security.Claims;
 using AutoMapper;
+using Expenses.Api.DataContracts.Applications;
 using Expenses.Api.Helpers;
 using Expenses.Api.PresentationContracts;
 using Expenses.Api.PresentationContracts.Forms;
@@ -16,14 +17,11 @@ namespace Expenses.Api.Controllers;
 [Authorize]
 public class ModuleController : ControllerBase
 {
+    private IModuleApplication _application;
 
-    public IModuleRepository _moduleRepository;
-    private IMapper _mapper;
-
-    public ModuleController(IModuleRepository moduleRepository, IMapper mapper)
+    public ModuleController(IModuleApplication moduleApplication)
     {
-        _moduleRepository = moduleRepository;
-        _mapper = mapper;
+        _application = moduleApplication;
     }
 
     [HttpGet]
@@ -33,11 +31,7 @@ public class ModuleController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     public async Task<ActionResult<List<ModuleResponse>>> FetchAllModulesByRoleAsync()
     {
-        var userRoles = User.FindAll(x => x.Type == ClaimTypes.Role).Select(x => x.Value);
-        var modules = await _moduleRepository.FindAllByRolesAsync(userRoles);
-
-        var result = _mapper.Map<List<ModuleResponse>>(modules);
-
+        var result = await _application.FetchAllAsync(User);
         return Ok(result);
     }
 
@@ -49,47 +43,19 @@ public class ModuleController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     public async Task<ActionResult> CreateModule([FromBody] ModuleForm form)
     {
-        var entity = _mapper.Map<Module>(form);
-
-        if (await _moduleRepository.FindByNameAsync(form.Name) is not null)
-        {
-            return Conflict(
-                string.Format(
-                    Messages.CONFLICT_MESSAGE_PATTERN,
-                    nameof(Module),
-                    nameof(ModuleForm.Name),
-                    form.Name
-                ));
-        }
-
-        await _moduleRepository.AddAsync(entity);
-
+        await _application.CreateModuleAsync(form);
         return Accepted();
     }
 
-    [HttpDelete]
+    [HttpDelete("id")]
     [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType((int)HttpStatusCode.Accepted)]
     [ProducesResponseType((int)HttpStatusCode.Conflict)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult> DeleteModule([FromQuery] Guid moduleId)
+    public async Task<ActionResult> DeleteModule(Guid id)
     {
-        var existingModule = await _moduleRepository.FindByIdAsync(moduleId);
-        if (existingModule is null)
-        {
-            return NotFound(
-                string.Format(
-                    Messages.NOT_FOUND_MESSAGE_PATTERN,
-                    nameof(Module),
-                    nameof(Module.Id),
-                    moduleId
-                ));
-        }
-
-        existingModule.SetDeleted();
-        await _moduleRepository.UpdateAsync(existingModule);
-
+        await _application.DeleteByIdAsync(id);
         return Accepted();
     }
 }

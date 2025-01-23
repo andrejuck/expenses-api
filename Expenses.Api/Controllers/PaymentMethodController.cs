@@ -20,19 +20,14 @@ namespace Expenses.Api.Controllers;
 [Authorize]
 public class PaymentMethodController : ControllerBase
 {
-    private readonly IPaymentMethodRepository _repository;
-    private readonly IMapper _mapper;
     private readonly IPaymentMethodApplication _application;
     private readonly CustomClaimSettings _claimSettings;
     private Guid UserId => UserClaimsHelper.GetUserGuidIdFromClaims(User, _claimSettings);
 
-    public PaymentMethodController(IPaymentMethodRepository repository,
-        IMapper mapper,
+    public PaymentMethodController(
         IOptions<CustomClaimSettings> claimSettings,
         IPaymentMethodApplication application)
     {
-        _repository = repository;
-        _mapper = mapper;
         _application = application;
         _claimSettings = claimSettings.Value;
     }
@@ -40,26 +35,10 @@ public class PaymentMethodController : ControllerBase
     [HttpPost]
     [ProducesResponseType((int)HttpStatusCode.Accepted)]
     [ProducesResponseType((int)HttpStatusCode.Conflict)]
-    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     public async Task<ActionResult> CreatePaymentMethod([FromBody] PaymentMethodForm form)
     {
-        var entity = _mapper.Map<PaymentMethod>(form);
-
-        if (await _repository.FindByNameAsync(form.Name, UserId) is not null)
-        {
-            return Conflict(
-                string.Format(
-                    Messages.CONFLICT_MESSAGE_PATTERN,
-                    nameof(PaymentMethod),
-                    nameof(PaymentMethodForm.Name),
-                    form.Name
-                ));
-        }
-
-        entity.BindUser(UserId);
-        await _repository.AddAsync(entity);
-
+        await _application.CreateNewPaymentMethodAsync(UserId, form);
         return Accepted();
     }
 
@@ -67,31 +46,12 @@ public class PaymentMethodController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.Accepted)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult> InactivatePaymentMethod(
+    public async Task<ActionResult> UpdatePaymentMethod(
         Guid id,
         [FromBody] JsonPatchDocument<PaymentMethodForm> partialEntity
         )
     {
-
-        var payment = await _repository.FindByIdAsync(id, UserId);
-
-        if (payment is null)
-        {
-            return NotFound(
-                string.Format(
-                    Messages.NOT_FOUND_MESSAGE_PATTERN,
-                    nameof(PaymentMethod),
-                    nameof(PaymentMethod.Id),
-                    id
-                ));
-        }
-
-        var paymentEntityForm = _mapper.Map<PaymentMethodForm>(payment);
-
-        partialEntity.ApplyTo(paymentEntityForm);
-        payment.PrepareToUpdate(paymentEntityForm.Name, paymentEntityForm.PaymentType, paymentEntityForm.IsActive);
-        await _repository.UpdateAsync(payment);
-
+        await _application.UpdatePaymentMethodAsync(id, UserId, partialEntity);
         return Accepted();
     }
 
@@ -101,19 +61,7 @@ public class PaymentMethodController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     public async Task<ActionResult<PaymentMethodResponse>> FetchByIdAsync(Guid id)
     {
-        var payment = await _application.FetchByIdAsync(id, UserId);
-        if (payment is null)
-        {
-            return NotFound(
-                string.Format(
-                    Messages.NOT_FOUND_MESSAGE_PATTERN,
-                    nameof(PaymentMethod),
-                    nameof(PaymentMethod.Id),
-                    id
-                ));
-        }
-
-        var response = _mapper.Map<PaymentMethodResponse>(payment);
+        var response = await _application.FetchByIdAsync(id, UserId);
         return Ok(response);
     }
 
