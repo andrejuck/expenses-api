@@ -1,54 +1,51 @@
+using System.Net.Http.Headers;
 using System.Security.Claims;
-using AutoMapper;
-using Expenses.Infra;
-using Expenses.Infra.Settings;
+using System.Text.Json;
+using Expenses.Api.PresentationContracts;
+using Expenses.Tests.Helpers;
+using Libs.Auth.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Mongo2Go;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Serializers;
 using NSubstitute;
 
 namespace Expenses.Tests.Generics;
 
 public abstract class BaseIntegrationTest
 {
-    protected MongoDbRunner _runner;
-    protected DBContext _dbContext;
-
-    [OneTimeSetUp]
-    public void OneTimeSetup()
-    {
-        BsonSerializer.TryRegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
-    }
+    protected CustomWebApplicationFactory<Program> Factory { get; private set; }
+    protected HttpClient Client { get; private set; }
+    protected UserResponse AdminUser {get; private set;}
 
     protected virtual void Setup()
     {
-        _runner = MongoDbRunner.Start();
-        var mongoSettings = new MongoDbSettings() { DbName = "TestDB" };
-        _dbContext = new DBContext(_runner.ConnectionString, mongoSettings);
+        Factory = new CustomWebApplicationFactory<Program>();
+        Client = Factory.CreateClient();
+        MockUser("testadmin", "test", UserRole.Admin);
     }
 
     [TearDown]
     protected virtual void Dispose()
     {
-        _runner.Dispose();
+        Factory.Dispose();
+        Client.Dispose();
     }
 
-    protected virtual ControllerContext AddRoleToControllerContext(string role)
+    protected virtual void Authenticate(string email = "testadmin", string password = "test")
     {
-        var httpContext = Substitute.For<HttpContext>();
-        var claimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity(new[]
-        {
-            new Claim(ClaimTypes.Name, "TestUser"),
-            new Claim(ClaimTypes.Role, role)
-        }));
+        var content = new { email, password }.BuildJsonContent();
+        var stringResult = Client.PostAsync("/api/auth/login", content).Result.Content.ReadAsStringAsync().Result;
+        var result = stringResult.Deserialize<UserResponse>();
+        AdminUser = result;
+        
+        Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.Token);
+    }
 
-        httpContext.User.Returns(claimsPrincipal);
-        return new ControllerContext
-        {
-            HttpContext = httpContext
-        };
+    protected virtual void MockUser(string email, string password, params UserRole[] roles)
+    {
+        var user = new User(email, email);
+        user.SetPassword(password);
+        user.AddRoles(roles);
+
+        Factory.DbContext.Users.InsertOne(user);
     }
 }

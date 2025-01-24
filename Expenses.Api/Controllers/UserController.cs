@@ -1,12 +1,9 @@
 using System.Net;
 using AutoMapper;
-using Expenses.Api.Adapters;
-using Expenses.Api.DataContracts;
 using Expenses.Api.PresentationContracts;
 using Expenses.Domain.DataContracts;
 using Libs.Api.Adapters;
 using Libs.Api.Models;
-using Libs.Auth.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,14 +26,14 @@ public class UserController : ControllerBase
         _mapper = mapper;
     }
 
-    [HttpPatch("approve")]
+    [HttpPatch("approve/{id}")]
     [ProducesResponseType((int)HttpStatusCode.Accepted)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> ApproveUserRegistration([FromQuery] Guid userId)
+    public async Task<IActionResult> ApproveUserRegistration(Guid id)
     {
 
-        var user = await _userRepository.GetByIdAsync(userId);
+        var user = await _userRepository.FindByIdAsync(id);
         user.UpdateRegistrationStatus(RegistrationStatus.Approved);
         user.ConfirmEmail();
 
@@ -45,14 +42,14 @@ public class UserController : ControllerBase
         return Accepted();
     }
 
-    [HttpPatch("deny")]
+    [HttpPatch("deny/{id}")]
     [ProducesResponseType((int)HttpStatusCode.Accepted)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    public async Task<IActionResult> DenyUserRegistration([FromQuery] Guid userId)
+    public async Task<IActionResult> DenyUserRegistration(Guid id)
     {
 
-        var user = await _userRepository.GetByIdAsync(userId);
+        var user = await _userRepository.FindByIdAsync(id);
         user.UpdateRegistrationStatus(RegistrationStatus.Denied);
 
         //TODO - Send an email to the user asking to get in contact with support.
@@ -63,7 +60,7 @@ public class UserController : ControllerBase
         return Accepted();
     }
 
-    [HttpGet("all")]
+    [HttpGet]
     [ProducesResponseType(typeof(PagedResponse<UserResponse>), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]

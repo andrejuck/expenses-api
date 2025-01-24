@@ -2,7 +2,6 @@ using Expenses.Domain.DataContracts;
 using Expenses.Domain.Models;
 using Libs.Api.Infra;
 using MongoDB.Driver;
-using MongoDB.Bson;
 
 namespace Expenses.Infra.Repositories;
 
@@ -30,7 +29,7 @@ public class ModuleRepository : BaseMongoRepository<Module>, IModuleRepository
         await _dbContext.Modules.InsertOneAsync(entity);
     }
 
-    public async Task<Module> GetByIdAsync(Guid id)
+    public async Task<Module> FindByIdAsync(Guid id)
     {
           var filters = _filter.And(NotDeletedFilter(), IdFilter(id));
         return await _dbContext.Modules.Find(IdFilter(id)).FirstOrDefaultAsync();

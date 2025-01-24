@@ -10,6 +10,7 @@ public class DBContext : MongoDbContext
 {
     public IMongoCollection<User> Users { get; set; }
     public IMongoCollection<Module> Modules { get; set; }
+    public IMongoCollection<PaymentMethod> PaymentMethods { get; set; }
 
     public DBContext(string connectionString, MongoDbSettings settings)
         : base(connectionString, settings.DbName)
@@ -20,14 +21,23 @@ public class DBContext : MongoDbContext
     {
         Users = Database.GetCollection<User>("users");
         Modules = Database.GetCollection<Module>("modules");
+        PaymentMethods = Database.GetCollection<PaymentMethod>("payment-methods");
 
         InitializeData();
     }
 
     private void InitializeData()
     {
-        var adminModule = Modules.Find(Builders<Module>.Filter.Eq(x => x.Name, "Admin Module")).FirstOrDefault();
-        if (adminModule == null)
-            Modules.InsertOne(new Module("Admin Module", UserRole.Admin));
+        var adminModule = Modules.Find(NameFilter<Module>("Admin Module")).FirstOrDefault();
+        if (adminModule == null) Modules.InsertOne(new Module("Admin Module", UserRole.Admin));
+            
+
+        var configModule = Modules.Find(NameFilter<Module>("Configuration Module")).FirstOrDefault();
+        if (configModule == null) Modules.InsertOne(new Module("Configuration Module", UserRole.Admin, UserRole.GeneralUser));
+    }
+
+    private FilterDefinition<T> NameFilter<T>(string name)
+    {
+        return Builders<T>.Filter.Eq("Name", name);
     }
 }

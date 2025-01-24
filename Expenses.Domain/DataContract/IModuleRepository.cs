@@ -1,10 +1,11 @@
+using Expenses.Domain.DataContracts.Generics;
 using Expenses.Domain.Models;
-using Libs.Api.Infra;
 
 namespace Expenses.Domain.DataContracts;
 
 public interface IModuleRepository : IBaseRepository<Module>
 {
+    Task<Module> FindByIdAsync(Guid id);
     Task<List<Module>> FindAllByRolesAsync(IEnumerable<string> roles);
     Task<Module> FindByNameAsync(string name);
 }

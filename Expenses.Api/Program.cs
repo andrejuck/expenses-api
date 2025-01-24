@@ -5,13 +5,18 @@ using Microsoft.OpenApi.Models;
 using Expenses.Api.ExtensionMethods;
 using System.Text;
 using Expenses.Infra.Settings;
+using Libs.Auth.Models.Config;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services
-    .AddControllers()
+    .AddControllers(options =>
+    {
+        options.Filters.Add<ErrorFilterAttribute>();
+    })
+    .AddNewtonsoftJson()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
@@ -28,6 +33,7 @@ if (builder.Environment.IsDevelopment())
 //Dependency injection
 builder.Services.AddExpensesDependencies();
 builder.Services.Configure<EmailingSettings>(builder.Configuration.GetSection("EmailingSettings"));
+builder.Services.Configure<CustomClaimSettings>(builder.Configuration.GetSection("CustomClaims"));
 var mongoConn = builder.Configuration.GetSection("MongoDbSettings").Get<MongoDbSettings>();
 builder.Services.AddMongoDbContext(mongoConn);
 
@@ -101,3 +107,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+//Enabling integrated Tests
+public partial class Program { }

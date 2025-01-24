@@ -1,8 +1,11 @@
-﻿using Expenses.Api.DataContracts;
+﻿using AutoMapper;
+using Expenses.Api.DataContracts;
 using Expenses.Api.Dtos;
+using Expenses.Api.PresentationContracts;
 using Expenses.Api.Settings;
 using Expenses.Domain.DataContracts;
 using Libs.Auth.Models;
+using Libs.Auth.Models.Config;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -23,19 +26,25 @@ namespace Expenses.Api.Controllers
         private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
         private readonly EmailingSettings _emailSettings;
+        private readonly CustomClaimSettings _claimSettings;
+        private readonly IMapper _mapper;
         private readonly byte[] _key;
 
         public AuthController(
-            IConfiguration configuration, 
-            IUserRepository userRepository, 
-            IEmailService emailService, 
-            IOptions<EmailingSettings> settings)
+            IConfiguration configuration,
+            IUserRepository userRepository,
+            IEmailService emailService,
+            IOptions<EmailingSettings> settings,
+            IOptions<CustomClaimSettings> claimSettings,
+            IMapper mapper)
         {
             _configuration = configuration;
             _key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
             _userRepository = userRepository;
             _emailService = emailService;
             _emailSettings = settings.Value;
+            _claimSettings = claimSettings.Value;
+            _mapper = mapper;
         }
 
         [HttpPost("register")]
@@ -71,7 +80,7 @@ namespace Expenses.Api.Controllers
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-        public async Task<IActionResult> Login(LoginDto dto)
+        public async Task<ActionResult<UserResponse>> Login(LoginDto dto)
         {
             var user = await _userRepository.GetByEmailAsync(dto.Email);
             if (user == null)
@@ -88,9 +97,11 @@ namespace Expenses.Api.Controllers
             //TODO - it should do a fire and forget notification to update db, because this is not relevant to login flow
             await _userRepository.UpdateAsync(user);
 
-            object stringToken = CreateJwtToken(user);
+            var stringToken = CreateJwtToken(user);
+            var response = _mapper.Map<UserResponse>(user);
+            response.Token = stringToken;
 
-            return Ok(stringToken);
+            return Ok(response);
         }
 
         [HttpGet("confirm-email")]        
@@ -132,12 +143,13 @@ namespace Expenses.Api.Controllers
 
         private string CreateJwtToken(User user)
         {
-            //Creating jwt token with information related to the user logged such as roles and username
+            //Creating jwt token with information related to the user logged such as roles, username and id
             var tokenHandler = new JwtSecurityTokenHandler();
             var roles = user.Roles.Select(x => new Claim(ClaimTypes.Role, x.ToString()));
             var claimIdentity = new ClaimsIdentity(new[] { 
                 new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Email, user.Email)
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(_claimSettings.Identity, user.Id.ToString())
             });
             claimIdentity.AddClaims(roles);
 

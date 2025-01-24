@@ -9,7 +9,7 @@ namespace Expenses.Api.ExtensionMethods;
 public static class DbContextExtension {
 
     public static IServiceCollection AddMongoDbContext(this IServiceCollection services, MongoDbSettings settings) {
-        BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
+        // BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
         
         var conString = settings.Uri
             .Replace("__username__", settings.Username)
