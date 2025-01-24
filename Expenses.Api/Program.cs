@@ -107,3 +107,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+//Enabling integrated Tests
+public partial class Program { }

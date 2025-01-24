@@ -19,6 +19,6 @@ public class PagedRequest
 
     public Dictionary<string, string> Filters { get; set; }
     public bool IsSorted { get; set; }
-    public (string key, SortOrder order) SortingOrder { get; set; }
+    public (string key, SortOrder order)? SortingOrder { get; set; }
 }
 

@@ -79,13 +79,13 @@ namespace Expenses.Infra.Repositories
             if (request.IsSorted)
             {
 
-                if (request.SortingOrder.order == SortOrder.Ascending)
+                if (request.SortingOrder?.order == SortOrder.Ascending)
                 {
-                    sortDefinition = _sort.Ascending(request.SortingOrder.key);
+                    sortDefinition = _sort.Ascending(request.SortingOrder?.key);
                 }
                 else
                 {
-                    sortDefinition = _sort.Descending(request.SortingOrder.key);
+                    sortDefinition = _sort.Descending(request.SortingOrder?.key);
                 }
             }
 

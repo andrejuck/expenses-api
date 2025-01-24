@@ -9,10 +9,5 @@ public class UserResponse
     public List<string> Roles { get; set; }
     public RegistrationStatus RegistrationStatus { get; set; }
     public DateTime LoggedAt { get; set; }
-    public string Token { get; private set; }
-
-    public void SetToken(string token)
-    {
-        Token = token;
-    }
+    public string Token { get; set; }
 }

@@ -1,12 +1,7 @@
 using System.Net;
-using System.Security.Claims;
-using AutoMapper;
 using Expenses.Api.DataContracts.Applications;
-using Expenses.Api.Helpers;
 using Expenses.Api.PresentationContracts;
 using Expenses.Api.PresentationContracts.Forms;
-using Expenses.Domain.DataContracts;
-using Expenses.Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -47,7 +42,7 @@ public class ModuleController : ControllerBase
         return Accepted();
     }
 
-    [HttpDelete("id")]
+    [HttpDelete("{id}")]
     [Authorize(Policy = "AdminOnly")]
     [ProducesResponseType((int)HttpStatusCode.Accepted)]
     [ProducesResponseType((int)HttpStatusCode.Conflict)]

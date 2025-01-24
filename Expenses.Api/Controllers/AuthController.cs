@@ -99,7 +99,7 @@ namespace Expenses.Api.Controllers
 
             var stringToken = CreateJwtToken(user);
             var response = _mapper.Map<UserResponse>(user);
-            response.SetToken(stringToken);
+            response.Token = stringToken;
 
             return Ok(response);
         }

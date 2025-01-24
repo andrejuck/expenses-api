@@ -7,7 +7,7 @@ namespace Libs.Auth.Models
     public class User
     {
         public User(
-            string email, 
+            string email,
             string username)
         {
             Id = Guid.NewGuid();
@@ -27,50 +27,64 @@ namespace Libs.Auth.Models
         public List<UserRole> Roles { get; private set; }
         public RegistrationStatus RegistrationStatus { get; private set; }
         public bool EmailConfirmed { get; private set; }
-        public DateTime? LoggedAt { get; private set; }    
-        public DateTime? UpdatedAt { get;private set; }
+        public DateTime? LoggedAt { get; private set; }
+        public DateTime? UpdatedAt { get; private set; }
         public DateTime CreatedAt { get; private set; }
         public DateTime? DeletedAt { get; private set; }
 
-        public virtual void UpdateRegistrationStatus(RegistrationStatus status) {
+        public virtual void UpdateRegistrationStatus(RegistrationStatus status)
+        {
             RegistrationStatus = status;
             SetUpdateAt();
         }
 
-        public virtual void ConfirmEmail() {
+        public virtual void ConfirmEmail()
+        {
             EmailConfirmed = true;
             SetUpdateAt();
         }
 
-        public virtual void UpdateLoggedAt() {
+        public virtual void UpdateLoggedAt()
+        {
             LoggedAt = DateTime.Now;
         }
 
-        public virtual void SetPassword(string password) {
+        public virtual void SetPassword(string password)
+        {
             CryptPassword(password);
         }
 
-        public virtual void UpdateUsername(string newUsername) {
+        public virtual void UpdateUsername(string newUsername)
+        {
             Username = newUsername;
             SetUpdateAt();
         }
 
-        public virtual void SetDeleted() {
+        public virtual void SetDeleted()
+        {
             DeletedAt = DateTime.Now;
             SetUpdateAt();
         }
 
-        private void SetUpdateAt() {
-            UpdatedAt = DateTime.Now;
-        }
-
-        public bool VerifyPassword(string password) {
+        public bool VerifyPassword(string password)
+        {
             var salt = Convert.FromBase64String(Salt);
-            
+
             return Password == HashingHelper.HashPassword(password, salt);
         }
 
-        private void CryptPassword(string password) {
+        public void AddRoles(params UserRole[] roles)
+        {
+            Roles.AddRange(roles);
+        }
+
+        private void SetUpdateAt()
+        {
+            UpdatedAt = DateTime.Now;
+        }
+
+        private void CryptPassword(string password)
+        {
             var salt = HashingHelper.GenerateSalt();
             var pass = HashingHelper.HashPassword(password, salt);
 

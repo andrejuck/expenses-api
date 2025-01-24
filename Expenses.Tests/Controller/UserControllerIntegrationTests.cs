@@ -1,15 +1,8 @@
-using AutoMapper;
-using Expenses.Api.Adapters;
-using Expenses.Api.Controllers;
 using Expenses.Api.PresentationContracts;
-using Expenses.Domain.DataContracts;
-using Expenses.Infra.Repositories;
 using Expenses.Tests.Generics;
-using Libs.Api.Adapters;
+using Expenses.Tests.Helpers;
 using Libs.Api.Models;
 using Libs.Auth.Models;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 
 namespace Expenses.Tests.Controller;
@@ -17,25 +10,13 @@ namespace Expenses.Tests.Controller;
 [TestFixture]
 public class UserControllerIntegrationTests : BaseIntegrationTest
 {
-    private IUserRepository _repository;
-    private IPaginationAdapter _pageAdapter;
-    private IMapper _mapper;
-    private UserController _controller;
+    private UriBuilder BaseUriBuilder = new UriBuilder("http://localhost/api/user");
 
     [SetUp]
     protected override void Setup()
     {
         base.Setup();
-        var mapperConfig = new MapperConfiguration(cfg =>
-        {
-            cfg.AddProfile<UserProfile>();
-        });
-
-        _mapper = mapperConfig.CreateMapper();
-        _pageAdapter = new PaginationAdapter();
-        _repository = new UserRepository(_dbContext);
-        _controller = new UserController(_repository, _pageAdapter, _mapper);
-
+        Authenticate();
         MockDatabase();
     }
 
@@ -44,10 +25,10 @@ public class UserControllerIntegrationTests : BaseIntegrationTest
     {
         var user = FindUsers().First();
 
-        var result = await _controller.ApproveUserRegistration(user.Id);
+        var result = await Client.PatchAsync(BaseUriBuilder.Path + "/approve/" + user.Id.ToString(), null);
 
         var updatedUser = FindUserById(user.Id);
-        Assert.IsInstanceOf<AcceptedResult>(result);
+        Assert.That(result.IsSuccessStatusCode, Is.True);
         Assert.That(updatedUser.RegistrationStatus, Is.EqualTo(RegistrationStatus.Approved));
         Assert.That(updatedUser.EmailConfirmed, Is.True);
     }
@@ -55,15 +36,14 @@ public class UserControllerIntegrationTests : BaseIntegrationTest
     [Test]
     public async Task Should_Fetch_All_Users()
     {
-        var request = new PagedRequest() { CurrentPage = 1, PageSize = 2};
+        var request = new PagedRequest() { CurrentPage = 1, PageSize = 3};
+        BaseUriBuilder.Query =  request.BuildQueryParams();
 
-        var result = await _controller.GetPaginatedUserList(request);
-        
-        Assert.IsInstanceOf<OkObjectResult>(result.Result);
-        var resultObj = result.Result as OkObjectResult;
-        Assert.IsInstanceOf<PagedResponse<UserResponse>>(resultObj.Value);
-        var responseObj = resultObj.Value as PagedResponse<UserResponse>;
-        Assert.That(responseObj.Result.Count(), Is.EqualTo(2));
+        var result = await Client.GetAsync(BaseUriBuilder.Uri);
+        var content = result.Content.ReadAsStringAsync().Result.Deserialize<PagedResponse<UserResponse>>();
+
+        Assert.That(result.IsSuccessStatusCode, Is.True);
+        Assert.That(content.Result.Count(), Is.EqualTo(3));
     }
 
     [Test]
@@ -71,21 +51,21 @@ public class UserControllerIntegrationTests : BaseIntegrationTest
     {
         var user = FindUsers().First();
 
-        var result = await _controller.DenyUserRegistration(user.Id);
+        var result = await Client.PatchAsync(BaseUriBuilder.Path + "/deny/" + user.Id.ToString(), null);
 
         var updatedUser = FindUserById(user.Id);
-        Assert.IsInstanceOf<AcceptedResult>(result);
+        Assert.That(result.IsSuccessStatusCode, Is.True);
         Assert.That(updatedUser.RegistrationStatus, Is.EqualTo(RegistrationStatus.Denied));
     }
 
     [Test]
-    public void Should_Fecth_All_UserRegistration_Status_Names()
+    public async Task Should_Fecth_All_UserRegistration_Status_Names()
     {
-        var result = _controller.GetAllRegistrationStatus();
+        var result = await Client.GetAsync(BaseUriBuilder.Path + "/status");
+        var content = result.Content.ReadAsStringAsync().Result.Deserialize<List<string>>();
 
-        Assert.IsInstanceOf<OkObjectResult>(result.Result);
-        var responseObj = result.Result as OkObjectResult;
-        Assert.That((responseObj.Value as List<string>).Count, Is.EqualTo(4));
+        Assert.That(result.IsSuccessStatusCode, Is.True);
+        Assert.That(content.Count, Is.EqualTo(4));
     }
 
     private void MockDatabase()
@@ -96,16 +76,16 @@ public class UserControllerIntegrationTests : BaseIntegrationTest
             new User("test2@test.mock", "test2"),
         };
 
-        _dbContext.Users.InsertMany(users);
+        Factory.DbContext.Users.InsertMany(users);
     }
 
     private List<User> FindUsers()
     {
-        return _dbContext.Users.Find(Builders<User>.Filter.Empty).ToList();
+        return Factory.DbContext.Users.Find(Builders<User>.Filter.Empty).ToList();
     }
 
     private User FindUserById(Guid id)
     {
-        return _dbContext.Users.Find(Builders<User>.Filter.Eq(x => x.Id, id)).FirstOrDefault();
+        return Factory.DbContext.Users.Find(Builders<User>.Filter.Eq(x => x.Id, id)).FirstOrDefault();
     }
 }

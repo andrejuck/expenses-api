@@ -1,62 +1,54 @@
-using AutoMapper;
-using Expenses.Api.Adapters;
-using Expenses.Api.Controllers;
+using System.Net;
+using Expenses.Api.DataContracts.Applications;
 using Expenses.Api.PresentationContracts;
 using Expenses.Api.PresentationContracts.Forms;
 using Expenses.Domain.DataContracts;
 using Expenses.Domain.Models;
-using Expenses.Infra.Repositories;
 using Expenses.Tests.Generics;
-using Microsoft.AspNetCore.Mvc;
+using Expenses.Tests.Helpers;
+using Libs.Auth.Models;
 using MongoDB.Driver;
+using Newtonsoft.Json;
 
 namespace Expenses.Tests.Controller;
 
 [TestFixture]
 public class ModuleControllerIntegrationTests : BaseIntegrationTest
 {
-    public IModuleRepository _moduleRepository;
-    private IMapper _mapper;
-    private ModuleController _controller;
+    private Uri BaseUri = new Uri("http://localhost/api/module/");
 
     [SetUp]
     protected override void Setup()
     {
         base.Setup();
-
-        var mapperConfig = new MapperConfiguration(cfg =>
-        {
-            cfg.AddProfile<ModuleProfile>();
-        });
-        _mapper = mapperConfig.CreateMapper();
-
-        _moduleRepository = new ModuleRepository(_dbContext);
-
-        _controller = new ModuleController(_moduleRepository, _mapper);
+        Authenticate();
     }
 
-    [TestCase("GeneralUser", 1)]
-    [TestCase("Admin", 3)]
+    [TestCase("GeneralUser", 2)]
+    [TestCase("Admin", 5)]
     public async Task Should_Fetch_Modules_By_Role(string role, int expectedCount)
     {
+        var user = new User("general", "general");
+        MockUser(user.Email, "test", Enum.Parse<UserRole>(role));
         MockDatabase();
-        _controller.ControllerContext = AddRoleToControllerContext(role);
+        Authenticate(user.Email);
 
-        var actionResult = (await _controller.FetchAllModulesByRoleAsync()).Result as OkObjectResult;
-        var result = actionResult.Value as List<ModuleResponse>;
+        var result = await Client.GetAsync(BaseUri);
+        var resultContent = result.Content.ReadAsStringAsync().Result.Deserialize<List<ModuleResponse>>();
 
-        Assert.That(result.Count == expectedCount);
+        Assert.That(result.IsSuccessStatusCode, Is.True);
+        Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        Assert.That(resultContent.Count, Is.EqualTo(expectedCount));
     }
 
     [Test]
     public async Task Should_Initialize_Db_With_AdminModule()
     {
-        var modules = await _dbContext.Modules.Find(Builders<Module>.Filter.Empty).ToListAsync();
+        var modules = await Factory.DbContext.Modules.Find(Builders<Module>.Filter.Empty).ToListAsync();
 
         Assert.IsNotEmpty(modules);
-        Assert.That(modules.Count == 1);
-        Assert.That(modules.FirstOrDefault().Name == "Admin Module");
-        Assert.That(modules.FirstOrDefault().AllowedRoles.All(x => x == UserRole.Admin));
+        Assert.That(modules.Any(x => x.Name.Equals("Admin Module")));
+        Assert.That(modules.FirstOrDefault(x => x.Name.Equals("Admin Module")).AllowedRoles.All(x => x.Equals(UserRole.Admin)));
     }
 
     [Test]
@@ -67,9 +59,11 @@ public class ModuleControllerIntegrationTests : BaseIntegrationTest
             Name = "TestModule",
             AllowedRoles = new List<UserRole>() { UserRole.GeneralUser }
         };
+        var content = JsonConvert.SerializeObject(form).BuildStringContent();
 
-        var result = await _controller.CreateModule(form);
+        var result = await Client.PostAsync(BaseUri, content);
 
+        Assert.That(result.IsSuccessStatusCode, Is.True);
         var createdModule = FindByName(form.Name).FirstOrDefault();
         Assert.NotNull(createdModule);
         Assert.That(form.AllowedRoles, Is.EqualTo(createdModule.AllowedRoles));
@@ -85,10 +79,12 @@ public class ModuleControllerIntegrationTests : BaseIntegrationTest
             Name = "TestModAdmin",
             AllowedRoles = new List<UserRole>() { UserRole.GeneralUser }
         };
+        var content = JsonConvert.SerializeObject(form).BuildStringContent();
 
-        var result = await _controller.CreateModule(form);
+        var result = await Client.PostAsync(BaseUri, content);
 
-        Assert.IsInstanceOf<ConflictObjectResult>(result);
+        Assert.That(result.IsSuccessStatusCode, Is.False);
+        Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.Conflict));
     }
 
     [Test]
@@ -97,24 +93,25 @@ public class ModuleControllerIntegrationTests : BaseIntegrationTest
         MockDatabase();
         var moduleToDelete = FindByName("TestModAdmin").FirstOrDefault();
 
-        var result = await _controller.DeleteModule(moduleToDelete.Id);
+        var result = await Client.DeleteAsync(new Uri(BaseUri, moduleToDelete.Id.ToString()));
 
         var deletedModule = FindByName("TestModAdmin").FirstOrDefault();
-        Assert.IsInstanceOf<AcceptedResult>(result);
+        Assert.That(result.IsSuccessStatusCode, Is.True);
         Assert.NotNull(deletedModule.DeletedAt);
     }
 
     [Test]
     public async Task Should_Not_Soft_Delete_Inexisting_Module()
     {
-        var result = await _controller.DeleteModule(Guid.NewGuid());
+        var result = await Client.DeleteAsync(new Uri(BaseUri, Guid.NewGuid().ToString()));
 
-        Assert.IsInstanceOf<NotFoundObjectResult>(result);
+        Assert.That(result.IsSuccessStatusCode, Is.False);
+        Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
     }
 
     private List<Module> FindByName(string name)
     {
-        return _dbContext.Modules.Find(Builders<Module>.Filter.Eq(x => x.Name, name)).ToList();
+        return Factory.DbContext.Modules.Find(Builders<Module>.Filter.Eq(x => x.Name, name)).ToList();
     }
 
     private void MockDatabase()
@@ -126,6 +123,6 @@ public class ModuleControllerIntegrationTests : BaseIntegrationTest
             new Module("TestModuleGeneral", UserRole.GeneralUser)
         };
 
-        _dbContext.Modules.InsertMany(modules);
+        Factory.DbContext.Modules.InsertMany(modules);
     }
 }
