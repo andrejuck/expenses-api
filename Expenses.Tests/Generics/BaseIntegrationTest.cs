@@ -29,11 +29,10 @@ public abstract class BaseIntegrationTest
         Factory.Dispose();
         Client.Dispose();
     }
-    
+
     protected virtual void Authenticate(string email = "testadmin", string password = "test")
     {
-        var json = JsonSerializer.Serialize(new { email, password });
-        var content = json.BuildStringContent();
+        var content = new { email, password }.BuildJsonContent();
         var stringResult = Client.PostAsync("/api/auth/login", content).Result.Content.ReadAsStringAsync().Result;
         var result = stringResult.Deserialize<UserResponse>();
         AdminUser = result;

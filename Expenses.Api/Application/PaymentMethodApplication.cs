@@ -69,6 +69,8 @@ public class PaymentMethodApplication : IPaymentMethodApplication
                     form.Name
                 ),
                 HttpStatusCode.Conflict);
+
+            return;
         }
 
         entity.BindUser(userId);

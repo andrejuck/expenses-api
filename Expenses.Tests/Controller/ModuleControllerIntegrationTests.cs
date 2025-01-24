@@ -1,8 +1,6 @@
 using System.Net;
-using Expenses.Api.DataContracts.Applications;
 using Expenses.Api.PresentationContracts;
 using Expenses.Api.PresentationContracts.Forms;
-using Expenses.Domain.DataContracts;
 using Expenses.Domain.Models;
 using Expenses.Tests.Generics;
 using Expenses.Tests.Helpers;
@@ -59,7 +57,7 @@ public class ModuleControllerIntegrationTests : BaseIntegrationTest
             Name = "TestModule",
             AllowedRoles = new List<UserRole>() { UserRole.GeneralUser }
         };
-        var content = JsonConvert.SerializeObject(form).BuildStringContent();
+        var content = form.BuildJsonContent();
 
         var result = await Client.PostAsync(BaseUri, content);
 
@@ -79,7 +77,7 @@ public class ModuleControllerIntegrationTests : BaseIntegrationTest
             Name = "TestModAdmin",
             AllowedRoles = new List<UserRole>() { UserRole.GeneralUser }
         };
-        var content = JsonConvert.SerializeObject(form).BuildStringContent();
+        var content = form.BuildJsonContent();
 
         var result = await Client.PostAsync(BaseUri, content);
 

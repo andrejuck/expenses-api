@@ -1,3 +1,5 @@
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 
@@ -5,12 +7,20 @@ namespace Expenses.Tests.Helpers;
 
 public static class ExtensionMethodHelpers
 {
+    public static JsonSerializerOptions JsonOptions => new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+
     #region Extensions
-    public static StringContent BuildStringContent(this string content) =>
-        new StringContent(content, Encoding.UTF8, "application/json");
+    public static JsonContent BuildJsonContent<T>(this T content, string contentType = "application/json") where T : class
+    {
+        var mediaType = new MediaTypeHeaderValue(contentType);
+        return JsonContent.Create(content, mediaType: mediaType, options: JsonOptions);
+    }
 
     public static T Deserialize<T>(this string stringResult) =>
-        JsonSerializer.Deserialize<T>(stringResult, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+        JsonSerializer.Deserialize<T>(stringResult, JsonOptions);
+
+    public static string SerializeToJsonString<T>(this T obj) =>
+        JsonSerializer.Serialize(obj);
 
     public static string BuildQueryParams<T>(this T model)
     {
