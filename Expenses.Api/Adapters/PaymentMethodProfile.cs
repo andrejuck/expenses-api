@@ -13,5 +13,6 @@ public class PaymentMethodProfile : Profile {
         CreateMap<PaymentMethodForm, PaymentMethod>();
         CreateMap<PaymentMethod, PaymentMethodForm>();
         CreateMap<PaymentMethod, PaymentMethodResponse>();
+        CreateMap<PaymentMethodResponse, PaymentMethod>();
     }
 }

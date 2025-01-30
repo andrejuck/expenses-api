@@ -10,6 +10,7 @@ public class PaymentMethodRepository : BaseMongoRepository<PaymentMethod>, IPaym
     private readonly DBContext _dbContext;
 
     public PaymentMethodRepository(DBContext dbContext)
+        : base(dbContext.PaymentMethods)
     {
         _dbContext = dbContext;
     }
@@ -22,11 +23,6 @@ public class PaymentMethodRepository : BaseMongoRepository<PaymentMethod>, IPaym
     private FilterDefinition<PaymentMethod> UserIdFilter(Guid userId)
     {
         return _filter.Eq(a => a.UserId, userId);
-    }
-
-    public async Task AddAsync(PaymentMethod entity)
-    {
-        await _dbContext.PaymentMethods.InsertOneAsync(entity);
     }
 
     public async Task<PaymentMethod> FindByIdAsync(Guid id, Guid userId)
@@ -46,9 +42,7 @@ public class PaymentMethodRepository : BaseMongoRepository<PaymentMethod>, IPaym
     public async Task UpdateAsync(PaymentMethod entity)
     {
         var filter = IdFilter(entity.Id);
-        var update = PrepareToUpdate(entity);
-
-        await _dbContext.PaymentMethods.UpdateOneAsync(filter, update);
+        await base.UpdateAsync(entity, filter);
     }
 
     public async Task<List<PaymentMethod>> FindAllByUserIdAsync(Guid userId)

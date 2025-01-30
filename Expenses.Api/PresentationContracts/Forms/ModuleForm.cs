@@ -2,8 +2,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Expenses.Api.PresentationContracts.Forms;
 
-public class ModuleForm {
-    
+public class ModuleForm
+{
+
     [Required]
     public string Name { get; set; }
     [Required]

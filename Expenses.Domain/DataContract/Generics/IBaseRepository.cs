@@ -1,3 +1,5 @@
+using MongoDB.Driver;
+
 namespace Expenses.Domain.DataContracts.Generics;
 
 public interface IBaseRepository<T>
