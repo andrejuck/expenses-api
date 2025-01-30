@@ -8,8 +8,8 @@ using Expenses.Domain.Models;
 using Expenses.Domain.Models.Enum;
 using Expenses.Tests.Generics;
 using Expenses.Tests.Helpers;
+using Expenses.Tests.Mock;
 using Microsoft.AspNetCore.JsonPatch;
-using MongoDB.Bson.IO;
 using MongoDB.Driver;
 
 namespace Expenses.Tests.Controller;
@@ -51,10 +51,10 @@ public class PaymentMethodControllerIntegrationTests : BaseIntegrationTest
     [Test]
     public async Task Should_Not_Create_New_PaymentMethod_With_Existing_Name()
     {
-        MockDatabase();
+        MockPaymentMethod.CreatePaymentMethod(Factory.DbContext.PaymentMethods, AdminUser);
         var form = new PaymentMethodForm()
         {
-            Name = "Cash",
+            Name = "TestPayment",
             IsActive = true,
             PaymentType = PaymentType.Cash
         };
@@ -73,7 +73,7 @@ public class PaymentMethodControllerIntegrationTests : BaseIntegrationTest
     public async Task Should_Update_Existing_PaymentMethod()
     {
         //Arrange
-        var paymentMock = MockDatabase();
+        var paymentMock = MockPaymentMethod.CreatePaymentMethod(Factory.DbContext.PaymentMethods, AdminUser);
         var patch = new JsonPatchDocument<PaymentMethodForm>();
         patch.Replace(x => x.Name, "Cash2");
         var body = patch.Operations.BuildJsonContent("application/json-patch+json");
@@ -94,7 +94,7 @@ public class PaymentMethodControllerIntegrationTests : BaseIntegrationTest
     public async Task Should_Not_Update_Existing_PaymentMethod_With_Invalid_UserId()
     {
         //Arrange
-        var paymentMock = MockDatabase();
+        var paymentMock = MockPaymentMethod.CreatePaymentMethod(Factory.DbContext.PaymentMethods, AdminUser);
         var patch = new JsonPatchDocument<PaymentMethodForm>();
         patch.Replace(x => x.Name, "Cash2");
         var body = patch.Operations.BuildJsonContent("application/json-patch+json");
@@ -118,7 +118,7 @@ public class PaymentMethodControllerIntegrationTests : BaseIntegrationTest
     public async Task Should_Fetch_Users_PaymentMethod()
     {
         //Arrange
-        var paymentMock = MockDatabase();
+        var paymentMock = MockPaymentMethod.CreatePaymentMethod(Factory.DbContext.PaymentMethods, AdminUser);
 
         //Act
         var result = await Client.GetAsync(BaseUri + $"{paymentMock.Id}");
@@ -136,7 +136,7 @@ public class PaymentMethodControllerIntegrationTests : BaseIntegrationTest
     public async Task Should_Not_Fetch_Users_PaymentMethod()
     {
         //Arrange
-        var paymentMock = MockDatabase();
+        var paymentMock = MockPaymentMethod.CreatePaymentMethod(Factory.DbContext.PaymentMethods, AdminUser);
         MockUser("not_payment_user", "test");
         Authenticate("not_payment_user");
         
@@ -152,7 +152,7 @@ public class PaymentMethodControllerIntegrationTests : BaseIntegrationTest
     public async Task Should_Fetch_All_Users_PaymentMethod()
     {
         //Arrange
-        MockDatabase();
+        MockPaymentMethod.CreatePaymentMethod(Factory.DbContext.PaymentMethods, AdminUser);
 
         //Act
         var result = await Client.GetAsync(BaseUri.Uri);
@@ -172,14 +172,5 @@ public class PaymentMethodControllerIntegrationTests : BaseIntegrationTest
     private List<PaymentMethod> FindByUserId(Guid userId)
     {
         return Factory.DbContext.PaymentMethods.Find(Builders<PaymentMethod>.Filter.Eq(x => x.UserId, userId)).ToList();
-    }
-
-    private PaymentMethod MockDatabase()
-    {
-        var entity = new PaymentMethod("Cash", PaymentType.Cash);
-        entity.BindUser(AdminUser.Id);
-
-        Factory.DbContext.PaymentMethods.InsertOne(entity);
-        return FindByName(entity.Name).FirstOrDefault();
     }
 }

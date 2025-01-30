@@ -6,6 +6,7 @@ using Expenses.Api.ExtensionMethods;
 using System.Text;
 using Expenses.Infra.Settings;
 using Libs.Auth.Models.Config;
+using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,8 @@ builder.Services
     {
         options.JsonSerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
     });
+
+builder.Services.AddFluentValidationAutoValidation();
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();

@@ -11,6 +11,7 @@ public class ModuleRepository : BaseMongoRepository<Module>, IModuleRepository
     private readonly DBContext _dbContext;
 
     public ModuleRepository(DBContext dbContext)
+        : base(dbContext.Modules)
     {
         _dbContext = dbContext;
     }
@@ -24,11 +25,6 @@ public class ModuleRepository : BaseMongoRepository<Module>, IModuleRepository
         return _filter.Eq(a => a.DeletedAt, null);
     }
 
-    public async Task AddAsync(Module entity)
-    {
-        await _dbContext.Modules.InsertOneAsync(entity);
-    }
-
     public async Task<Module> FindByIdAsync(Guid id)
     {
           var filters = _filter.And(NotDeletedFilter(), IdFilter(id));
@@ -38,9 +34,7 @@ public class ModuleRepository : BaseMongoRepository<Module>, IModuleRepository
     public async Task UpdateAsync(Module entity)
     {
         var filter = IdFilter(entity.Id);
-        var update = PrepareToUpdate(entity);
-
-        await _dbContext.Modules.UpdateOneAsync(filter, update);
+        await base.UpdateAsync(entity, filter);
     }
 
     public async Task<List<Module>> FindAllByRolesAsync(IEnumerable<string> roles)

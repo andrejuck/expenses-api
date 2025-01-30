@@ -7,12 +7,12 @@ using MongoDB.Driver;
 namespace Expenses.Infra.Repositories
 {
 
-    public class UserRepository : BaseMongoRepository<User>, IUserRepository
+    public class UserRepository : BasePageableMongoRepository<User>, IUserRepository
     {
         private readonly DBContext _dbContext;
 
         public UserRepository(DBContext dbContext)
-            : base()
+            : base(dbContext.Users)
         {
             _dbContext = dbContext;
         }
@@ -22,17 +22,16 @@ namespace Expenses.Infra.Repositories
             return _filter.Eq(a => a.Id, id);
         }
 
-        public async Task AddAsync(User entity)
-        {
-            await _dbContext.Users.InsertOneAsync(entity);
-        }
-
         public async Task UpdateAsync(User entity)
         {
             var filter = IdFilter(entity.Id);
-            var update = PrepareToUpdate(entity);
+            await base.UpdateAsync(entity, filter);
+        }
 
-            await _dbContext.Users.UpdateOneAsync(filter, update);
+        public Task<long> GetAllCountAsync(PagedRequest request)
+        {
+            var sortDefinition = _sort.Ascending(x => x.Email);
+            return base.GetAllCountAsync(request, sortDefinition);
         }
 
         public async Task<User> GetByEmailAsync(string email)
@@ -49,54 +48,8 @@ namespace Expenses.Infra.Repositories
 
         public async Task<IEnumerable<User>> GetAllPagedAsync(PagedRequest request)
         {
-            SortDefinition<User> sortDefinition = _sort.Ascending(x => x.Email);
-            IEnumerable<FilterDefinition<User>> dynamicFilters = null;
-            var userQuery = DefineFilters(request, ref sortDefinition, ref dynamicFilters);
-
-            return await userQuery
-                    .Skip((request.CurrentPage - 1) * request.PageSize)
-                    .Limit(request.PageSize)
-                    .Sort(sortDefinition)
-                    .ToListAsync();
-        }
-        public async Task<long> GetAllCountAsync(PagedRequest request)
-        {
-            SortDefinition<User> sortDefinition = _sort.Ascending(x => x.Email);
-            IEnumerable<FilterDefinition<User>> dynamicFilters = null;
-            var userQuery = DefineFilters(request, ref sortDefinition, ref dynamicFilters);
-
-            return await userQuery.CountDocumentsAsync();
-
-        }
-
-        private IFindFluent<User, User> DefineFilters(PagedRequest request, ref SortDefinition<User> sortDefinition, ref IEnumerable<FilterDefinition<User>> dynamicFilters)
-        {
-            if (request.Filters != null)
-            {
-                dynamicFilters = request.Filters.Select(x => _filter.In(x.Key, x.Value));
-            }
-
-            if (request.IsSorted)
-            {
-
-                if (request.SortingOrder?.order == SortOrder.Ascending)
-                {
-                    sortDefinition = _sort.Ascending(request.SortingOrder?.key);
-                }
-                else
-                {
-                    sortDefinition = _sort.Descending(request.SortingOrder?.key);
-                }
-            }
-
-            var userQuery = _dbContext.Users.Find(_filter.Empty);
-
-            if (dynamicFilters != null)
-            {
-                userQuery = _dbContext.Users.Find(_filter.And(dynamicFilters));
-            }
-
-            return userQuery;
+            var sortDefinition = _sort.Ascending(x => x.Email);
+            return await base.GetAllPagedAsync(request, sortDefinition);
         }
 
     }

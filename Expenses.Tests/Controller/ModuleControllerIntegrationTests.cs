@@ -6,7 +6,6 @@ using Expenses.Tests.Generics;
 using Expenses.Tests.Helpers;
 using Libs.Auth.Models;
 using MongoDB.Driver;
-using Newtonsoft.Json;
 
 namespace Expenses.Tests.Controller;
 

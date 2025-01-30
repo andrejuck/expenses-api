@@ -20,5 +20,7 @@ public class PaymentMethod : BaseUserEntity
         Name = name;
         PaymentType = paymentType;
         IsActive = isActive;
+
+        SetUpdateAt();
     }
 }
