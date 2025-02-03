@@ -1,9 +1,11 @@
 using System.Net;
+using Expenses.Api.PresentationContracts;
 using Expenses.Api.PresentationContracts.Forms;
 using Expenses.Domain.Models;
 using Expenses.Tests.Generics;
 using Expenses.Tests.Helpers;
 using Expenses.Tests.Mock;
+using Libs.Api.Models;
 using Microsoft.AspNetCore.JsonPatch;
 using MongoDB.Driver;
 
@@ -12,7 +14,7 @@ namespace Expenses.Tests.Controller;
 [TestFixture]
 public class ExpenseControllerIntegrationTests : BaseIntegrationTest
 {
-    private Uri BaseUri = new Uri("http://localhost/api/expense/");
+    private UriBuilder BaseUri = new UriBuilder("http://localhost/api/expense/");
 
     [SetUp]
     protected override void Setup()
@@ -36,7 +38,7 @@ public class ExpenseControllerIntegrationTests : BaseIntegrationTest
         };
         var content = form.BuildJsonContent();
 
-        var result = await Client.PostAsync(BaseUri, content);
+        var result = await Client.PostAsync(BaseUri.Path, content);
 
         Assert.That(result.IsSuccessStatusCode, Is.True);
         var createdExpense = FindByDesc(form.Description).FirstOrDefault();
@@ -65,7 +67,7 @@ public class ExpenseControllerIntegrationTests : BaseIntegrationTest
         };
         var content = form.BuildJsonContent();
 
-        var result = await Client.PostAsync(BaseUri, content);
+        var result = await Client.PostAsync(BaseUri.Path, content);
 
         Assert.That(result.IsSuccessStatusCode, Is.False);
         Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.InternalServerError));
@@ -86,7 +88,7 @@ public class ExpenseControllerIntegrationTests : BaseIntegrationTest
         };
         var content = form.BuildJsonContent();
 
-        var result = await Client.PostAsync(BaseUri, content);
+        var result = await Client.PostAsync(BaseUri.Path, content);
 
         Assert.That(result.IsSuccessStatusCode, Is.False);
         Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.InternalServerError));
@@ -108,7 +110,7 @@ public class ExpenseControllerIntegrationTests : BaseIntegrationTest
         };
         var content = form.BuildJsonContent();
 
-        var result = await Client.PostAsync(BaseUri, content);
+        var result = await Client.PostAsync(BaseUri.Path, content);
 
         Assert.That(result.IsSuccessStatusCode, Is.False);
         Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.InternalServerError));
@@ -133,7 +135,7 @@ public class ExpenseControllerIntegrationTests : BaseIntegrationTest
         };
         var content = form.BuildJsonContent();
 
-        var result = await Client.PostAsync(BaseUri, content);
+        var result = await Client.PostAsync(BaseUri.Path, content);
 
         Assert.That(result.IsSuccessStatusCode, Is.False);
         Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
@@ -163,7 +165,7 @@ public class ExpenseControllerIntegrationTests : BaseIntegrationTest
         patch.Replace(x => x.PaymentMethodId, patchRequest.PaymentMethodId);
         var body = patch.Operations.BuildJsonContent("application/json-patch+json");
 
-        var result = await Client.PatchAsync(BaseUri + $"{existingExpense.Id}", body);
+        var result = await Client.PatchAsync(BaseUri.Path + $"{existingExpense.Id}", body);
 
         Assert.That(result.IsSuccessStatusCode, Is.True);
         var createdExpense = FindByDesc("Cash2").FirstOrDefault();
@@ -190,7 +192,7 @@ public class ExpenseControllerIntegrationTests : BaseIntegrationTest
         patch.Replace(x => x.Description, "Cash2");
         var body = patch.Operations.BuildJsonContent("application/json-patch+json");
 
-        var result = await Client.PatchAsync(BaseUri + $"{existingExpense.Id}", body);
+        var result = await Client.PatchAsync(BaseUri.Path + $"{existingExpense.Id}", body);
 
         Assert.That(result.IsSuccessStatusCode, Is.False);
         Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
@@ -209,11 +211,47 @@ public class ExpenseControllerIntegrationTests : BaseIntegrationTest
         patch.Replace(x => x.Description, "Cash2");
         var body = patch.Operations.BuildJsonContent("application/json-patch+json");
 
-        var result = await Client.PatchAsync(BaseUri + $"{existingExpense.Id}", body);
+        var result = await Client.PatchAsync(BaseUri.Path + $"{existingExpense.Id}", body);
 
         Assert.That(result.IsSuccessStatusCode, Is.False);
         Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
     }
+
+    [TestCase]
+    public async Task Should_Fetch_User_Expenses_Paged_Size_Equals_ExpensesCount()
+    {
+        var payment = MockPaymentMethod.CreatePaymentMethod(Factory.DbContext.PaymentMethods, AdminUser);
+        var existingExpense = MockExpense.CreateMultipleExpenses(5, AdminUser, payment, Factory.DbContext.Expenses);
+        var request = new PagedRequest() { CurrentPage = 1, PageSize = 5 };
+        BaseUri.Query =  request.BuildQueryParams();
+
+        var result = await Client.GetAsync(BaseUri.Uri);
+        var content = result.Content.ReadAsStringAsync().Result.Deserialize<PagedResponse<ExpenseResponse>>();
+
+        Assert.That(result.IsSuccessStatusCode, Is.True);
+        Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        Assert.That(content.Result.Count(), Is.EqualTo(5));
+        Assert.True(content.Result.All(x => x.PaymentMethod.Id == payment.Id));
+    }
+
+    [Test]
+    public async Task Should_Fetch_User_Expenses_Paged_Size_LessThan_ExpensesCount()
+    {
+        var payment = MockPaymentMethod.CreatePaymentMethod(Factory.DbContext.PaymentMethods, AdminUser);
+        var existingExpense = MockExpense.CreateMultipleExpenses(5, AdminUser, payment, Factory.DbContext.Expenses);
+        var request = new PagedRequest() { CurrentPage = 1, PageSize = 2 };
+        BaseUri.Query =  request.BuildQueryParams();
+
+        var result = await Client.GetAsync(BaseUri.Uri);
+        var content = result.Content.ReadAsStringAsync().Result.Deserialize<PagedResponse<ExpenseResponse>>();
+
+        Assert.That(result.IsSuccessStatusCode, Is.True);
+        Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
+        Assert.That(content.Result.Count(), Is.EqualTo(request.PageSize));
+        Assert.That(content.TotalPages, Is.EqualTo(3));
+    }
+
+    //TODO - Scenario with expenses of multiple users
 
     private List<Expense> FindByDesc(string desc)
     {

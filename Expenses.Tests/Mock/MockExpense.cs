@@ -19,4 +19,19 @@ public static class MockExpense
 
         return expense;
     }
+
+    public static List<Expense> CreateMultipleExpenses(int count, UserResponse loggedUser, PaymentMethod paymentMethod, IMongoCollection<Expense> collection)
+    {
+        var listExpense = new List<Expense>();
+        for (int i = 0; i < count; i++)
+        {
+            var expense = new Expense("test", $"test {i}", 10+i, DateTime.Now, new List<string>() { $"test {i}" }, paymentMethod);
+            expense.BindUser(loggedUser.Id);
+
+            listExpense.Add(expense);
+            collection.InsertOne(expense);
+        }
+
+        return listExpense;
+    }
 }

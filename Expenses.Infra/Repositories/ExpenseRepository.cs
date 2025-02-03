@@ -22,10 +22,26 @@ public class ExpenseRepository : BasePageableMongoRepository<Expense>, IExpenseR
         return _filterBuilder.Eq(x => x.Id, id);
     }
 
+    private BsonDocument BuildPaymentMethodAggregation() =>
+        BuildAggregation(_dbContext.PaymentMethods.CollectionNamespace.CollectionName, nameof(Expense.PaymentMethodId), nameof(PaymentMethod));
+
+    private BsonDocument BuildIdFilter(Guid id) =>
+        BuildEqualFilter(nameof(Expense.Id), id);
+
+    private BsonDocument BuildUserIdFilter(Guid id) =>
+        BuildEqualFilter(nameof(Expense.UserId), id);
+
     public async Task<Expense> FindByIdAsync(Guid id, Guid userId)
     {
-        var filter = _filterBuilder.And(IdFilter(id), _filterBuilder.Eq(x => x.UserId, userId));
-        return await Collection.Find(filter).FirstOrDefaultAsync();
+        var pipeline = new[] {
+            BuildIdFilter(id),
+            BuildEqualFilter(nameof(Expense.DeletedAt), null),
+            BuildUserIdFilter(userId),
+            BuildPaymentMethodAggregation(),
+            BuildFlatChildAggregation(nameof(PaymentMethod))
+        };
+
+        return await Collection.Aggregate<Expense>(pipeline).FirstOrDefaultAsync();
     }
 
     public async Task UpdateAsync(Expense entity)
@@ -34,18 +50,23 @@ public class ExpenseRepository : BasePageableMongoRepository<Expense>, IExpenseR
         await base.UpdateAsync(entity, filter);
     }
 
-    public Task<long> GetAllCountAsync(PagedRequest request)
+    public Task<long> GetAllCountAsync(ExpenseSearchParam searchParams, Guid userId)
     {
-        var sortDefinition = _sortBuilder.Descending(x => x.TransactionDate);
-        return base.GetAllCountAsync(request, sortDefinition);
+        var filter = _filterBuilder.And(_filterBuilder.Eq(x => x.UserId, userId), _filterBuilder.Eq(x => x.DeletedAt, null));
+        filter = DefineFilters(searchParams, filter);
+        filter = BuildDateFilter(filter, nameof(Expense.TransactionDate), searchParams.TransactionDate);
+        return base.GetAllCountAsync(filter);
     }
 
-    public async Task<List<TResponse>> GetAllPagedAsync<TResponse>(PagedRequest request)
+    public async Task<List<TResponse>> GetAllPagedAsync<TResponse>(ExpenseSearchParam searchParam, PagedRequest request, Guid userId)
     {
         var sortDefinition = _sortBuilder.Descending(x => x.TransactionDate);
         var aggregatedBson = new BsonDocument[] {
-            BuildFilters(request),
-            BuildAggregation(_dbContext.PaymentMethods.CollectionNamespace.CollectionName, nameof(Expense.PaymentMethodId), nameof(PaymentMethod)),
+            BuildEqualFilter(nameof(Expense.UserId), userId),
+            BuildDateFilter(nameof(Expense.TransactionDate), searchParam.TransactionDate),
+            BuildEqualFilter(nameof(Expense.DeletedAt), null),
+            BuildFilters(searchParam),
+            BuildPaymentMethodAggregation(),
             BuildFlatChildAggregation(nameof(PaymentMethod)),
             BuildSorting(request, ref sortDefinition)
         };
@@ -54,4 +75,14 @@ public class ExpenseRepository : BasePageableMongoRepository<Expense>, IExpenseR
 
         return pagedResult;
     }
+
+    public async Task<List<string>> GetAllUserCategories(Guid userId)
+    {
+        var expenses = await Collection.Find(_filterBuilder.Eq(x => x.UserId, userId)).ToListAsync();
+        return expenses
+            .SelectMany(x => x.ExpenseCategories)
+            .Distinct()
+            .ToList();
+    }
+
 }

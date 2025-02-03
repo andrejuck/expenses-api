@@ -38,7 +38,7 @@ public class ExpenseApplication : IExpenseApplication
     public async Task CreateNewExpenseAsync(Guid userId, ExpenseForm form)
     {
         var paymentMethod = await FindPaymentBydId(form.PaymentMethodId, userId);
-        if(paymentMethod == null) return;
+        if (paymentMethod == null) return;
 
         var entity = new Expense(form.Location,
             form.Description,
@@ -53,34 +53,30 @@ public class ExpenseApplication : IExpenseApplication
         await _repository.AddAsync(entity);
     }
 
-    public async Task<PagedResponse<ExpenseResponse>> GetPagedExpense(PagedRequest pagedRequest, Guid userId)
+    public async Task<PagedResponse<ExpenseResponse>> GetPagedExpenseAsync(ExpenseSearchParam searchParams, PagedRequest pagedRequest, Guid userId)
     {
-        var expensesResponse = await _repository.GetAllPagedAsync<ExpenseResponse>(pagedRequest);
-        var total = await _repository.GetAllCountAsync(pagedRequest);
+        var expensesResponse = await _repository.GetAllPagedAsync<ExpenseResponse>(searchParams, pagedRequest, userId);
+        var total = await _repository.GetAllCountAsync(searchParams, userId);
         var pagedResponse = _pageAdapter.ConvertToResponse(pagedRequest, total, expensesResponse);
 
         return pagedResponse;
     }
 
+    public async Task<List<string>> GetUserCategoriesAsync(Guid userId)
+    {
+        return await _repository.GetAllUserCategories(userId);
+    }
+
     public async Task UpdateExpenseAsync(Guid id, Guid userId, JsonPatchDocument<ExpenseForm> patchForm)
     {
-        var expense = await _repository.FindByIdAsync(id, userId);
-        if (expense is null)
-        {
-            _errorService.AddError(
-                nameof(UpdateExpenseAsync),
-                string.Format(Messages.NOT_FOUND_MESSAGE_PATTERN, nameof(Expense), nameof(Expense.Id), id),
-                HttpStatusCode.NotFound
-            );
-
-            return;
-        }
+        var expense = await FindByIdAsync(id, userId);
+        if (expense is null) return;
 
         var entityForm = _mapper.Map<ExpenseForm>(expense);
 
         patchForm.ApplyTo(entityForm);
         var paymentMethod = await FindPaymentBydId(entityForm.PaymentMethodId, userId);
-        if(paymentMethod == null) return;
+        if (paymentMethod == null) return;
 
         expense.PrepareToUpdate(entityForm.Location,
             entityForm.Description,
@@ -90,6 +86,23 @@ public class ExpenseApplication : IExpenseApplication
             paymentMethod,
             entityForm.Installment);
 
+        await _repository.UpdateAsync(expense);
+    }
+
+    public async Task<ExpenseResponse> GetExpenseAsync(Guid id, Guid userId)
+    {
+        var expense = await FindByIdAsync(id, userId);
+        if (expense is null) return null;
+
+        return _mapper.Map<ExpenseResponse>(expense);
+    }
+
+    public async Task DeleteExpenseAsync(Guid id, Guid userId)
+    {
+        var expense = await FindByIdAsync(id, userId);
+        if (expense is null) return;
+
+        expense.SetDeleted();
         await _repository.UpdateAsync(expense);
     }
 
@@ -108,5 +121,22 @@ public class ExpenseApplication : IExpenseApplication
         }
 
         return paymentMethod;
+    }
+
+    private async Task<Expense> FindByIdAsync(Guid id, Guid userId)
+    {
+        var expense = await _repository.FindByIdAsync(id, userId);
+        if (expense is null)
+        {
+            _errorService.AddError(
+                nameof(GetExpenseAsync),
+                string.Format(Messages.NOT_FOUND_MESSAGE_PATTERN, nameof(Expense), nameof(Expense.Id), id),
+                HttpStatusCode.NotFound
+            );
+
+            return null;
+        }
+
+        return expense;
     }
 }

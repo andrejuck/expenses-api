@@ -1,6 +1,5 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Text;
 using System.Text.Json;
 
 namespace Expenses.Tests.Helpers;
@@ -33,6 +32,11 @@ public static class ExtensionMethodHelpers
 
             if (propValue == null || propValue == default)
                 continue;
+
+            if (propValue is Dictionary<string, string>){
+                if (((Dictionary<string,string>)propValue).Count == 0) continue;
+                
+            }
 
             resultString += $"{char.ToLowerInvariant(property.Name[0]) + property.Name.Substring(1)}={propValue}&";
         }
