@@ -19,7 +19,7 @@ namespace Expenses.Infra.Repositories
 
         private FilterDefinition<User> IdFilter(Guid id)
         {
-            return _filter.Eq(a => a.Id, id);
+            return _filterBuilder.Eq(a => a.Id, id);
         }
 
         public async Task UpdateAsync(User entity)
@@ -30,13 +30,13 @@ namespace Expenses.Infra.Repositories
 
         public Task<long> GetAllCountAsync(PagedRequest request)
         {
-            var sortDefinition = _sort.Ascending(x => x.Email);
+            var sortDefinition = _sortBuilder.Ascending(x => x.Email);
             return base.GetAllCountAsync(request, sortDefinition);
         }
 
         public async Task<User> GetByEmailAsync(string email)
         {
-            return await _dbContext.Users.Find(_filter.Eq(u => u.Email, email)).FirstOrDefaultAsync();
+            return await _dbContext.Users.Find(_filterBuilder.Eq(u => u.Email, email)).FirstOrDefaultAsync();
         }
 
         public async Task<User> FindByIdAsync(Guid id)
@@ -48,7 +48,7 @@ namespace Expenses.Infra.Repositories
 
         public async Task<IEnumerable<User>> GetAllPagedAsync(PagedRequest request)
         {
-            var sortDefinition = _sort.Ascending(x => x.Email);
+            var sortDefinition = _sortBuilder.Ascending(x => x.Email);
             return await base.GetAllPagedAsync(request, sortDefinition);
         }
 

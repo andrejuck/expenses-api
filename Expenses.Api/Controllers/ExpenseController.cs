@@ -1,6 +1,8 @@
 using System.Net;
 using Expenses.Api.DataContracts.Applications;
+using Expenses.Api.PresentationContracts;
 using Expenses.Api.PresentationContracts.Forms;
+using Libs.Api.Models;
 using Libs.Auth.Helpers;
 using Libs.Auth.Models.Config;
 using Microsoft.AspNetCore.Authorization;
@@ -42,5 +44,15 @@ public class ExpenseController : ControllerBase
     {
         await _application.UpdateExpenseAsync(id, UserId, patchForm);
         return Accepted();
+    }
+
+    [HttpGet]
+    [ProducesResponseType((int)HttpStatusCode.Accepted)]
+    [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    public async Task<ActionResult<PagedResponse<ExpenseResponse>>> GetPagedExpense([FromQuery] PagedRequest pagedRequest)
+    {
+        var result = await _application.GetPagedExpense(pagedRequest, UserId);
+        return Ok(result);
     }
 }

@@ -64,7 +64,7 @@ public class UserController : ControllerBase
     [ProducesResponseType(typeof(PagedResponse<UserResponse>), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<PagedResponse<UserResponse>>> GetPaginatedUserList(
+    public async Task<ActionResult<PagedResponse<UserResponse>>> GetPagedUserList(
         [FromQuery] PagedRequest request)
     {
         var users = await _userRepository.GetAllPagedAsync(request);

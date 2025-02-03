@@ -17,7 +17,7 @@ public class PagedRequest
         set => _pageSize = value;
     }
 
-    public Dictionary<string, string> Filters { get; set; }
+    public Dictionary<string, string> Filters { get; set; } = new Dictionary<string, string>();
     public bool IsSorted { get; set; }
     public (string key, SortOrder order)? SortingOrder { get; set; }
 }

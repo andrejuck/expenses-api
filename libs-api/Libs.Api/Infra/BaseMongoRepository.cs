@@ -4,9 +4,9 @@ namespace Libs.Api.Infra;
 
 public abstract class BaseMongoRepository<T>
 {
-    protected SortDefinitionBuilder<T> _sort = Builders<T>.Sort;
-    protected FilterDefinitionBuilder<T> _filter = Builders<T>.Filter;
-    protected UpdateDefinitionBuilder<T> _update = Builders<T>.Update;
+    protected SortDefinitionBuilder<T> _sortBuilder = Builders<T>.Sort;
+    protected FilterDefinitionBuilder<T> _filterBuilder = Builders<T>.Filter;
+    protected UpdateDefinitionBuilder<T> _updateBuilder = Builders<T>.Update;
     protected IMongoCollection<T> Collection;
 
     protected BaseMongoRepository(IMongoCollection<T> collection)
@@ -23,11 +23,11 @@ public abstract class BaseMongoRepository<T>
             var modifiedValue = property.GetValue(newValue);
 
             updateDefinitionList.Add(
-                _update.Set(property.Name, modifiedValue)
+                _updateBuilder.Set(property.Name, modifiedValue)
             );
         }
 
-        return _update.Combine(updateDefinitionList);
+        return _updateBuilder.Combine(updateDefinitionList);
     }
 
     public virtual async Task AddAsync(T entity)

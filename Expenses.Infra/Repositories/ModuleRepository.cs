@@ -18,16 +18,16 @@ public class ModuleRepository : BaseMongoRepository<Module>, IModuleRepository
 
     private FilterDefinition<Module> IdFilter(Guid id)
     {
-        return _filter.Eq(a => a.Id, id);
+        return _filterBuilder.Eq(a => a.Id, id);
     }
 
     private FilterDefinition<Module> NotDeletedFilter() {
-        return _filter.Eq(a => a.DeletedAt, null);
+        return _filterBuilder.Eq(a => a.DeletedAt, null);
     }
 
     public async Task<Module> FindByIdAsync(Guid id)
     {
-          var filters = _filter.And(NotDeletedFilter(), IdFilter(id));
+          var filters = _filterBuilder.And(NotDeletedFilter(), IdFilter(id));
         return await _dbContext.Modules.Find(IdFilter(id)).FirstOrDefaultAsync();
     }
 
@@ -39,14 +39,14 @@ public class ModuleRepository : BaseMongoRepository<Module>, IModuleRepository
 
     public async Task<List<Module>> FindAllByRolesAsync(IEnumerable<string> roles)
     {
-        var filters = _filter.And(NotDeletedFilter(), _filter.AnyIn("AllowedRoles", roles));
+        var filters = _filterBuilder.And(NotDeletedFilter(), _filterBuilder.AnyIn("AllowedRoles", roles));
 
         return await _dbContext.Modules.Find(filters).ToListAsync();
     }
 
     public async Task<Module> FindByNameAsync(string name)
     {
-        var filters = _filter.And(NotDeletedFilter(), _filter.Eq(x => x.Name, name));
+        var filters = _filterBuilder.And(NotDeletedFilter(), _filterBuilder.Eq(x => x.Name, name));
         return await _dbContext.Modules.Find(filters).FirstOrDefaultAsync();
     }
 

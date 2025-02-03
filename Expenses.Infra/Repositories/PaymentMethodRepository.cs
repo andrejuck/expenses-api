@@ -17,26 +17,26 @@ public class PaymentMethodRepository : BaseMongoRepository<PaymentMethod>, IPaym
 
     private FilterDefinition<PaymentMethod> IdFilter(Guid id)
     {
-        return _filter.Eq(a => a.Id, id);
+        return _filterBuilder.Eq(a => a.Id, id);
     }
 
     private FilterDefinition<PaymentMethod> UserIdFilter(Guid userId)
     {
-        return _filter.Eq(a => a.UserId, userId);
+        return _filterBuilder.Eq(a => a.UserId, userId);
     }
 
     public async Task<PaymentMethod> FindByIdAsync(Guid id, Guid userId)
     {
-        var filter = _filter.And(IdFilter(id), UserIdFilter(userId));
+        var filter = _filterBuilder.And(IdFilter(id), UserIdFilter(userId));
 
         return await _dbContext.PaymentMethods.Find(filter).FirstOrDefaultAsync();
     }
 
     public async Task<PaymentMethod> FindByNameAsync(string name, Guid userId)
     {
-        var filter = _filter.Eq(x => x.Name, name);
+        var filter = _filterBuilder.Eq(x => x.Name, name);
 
-        return await _dbContext.PaymentMethods.Find(_filter.And(UserIdFilter(userId), filter)).FirstOrDefaultAsync();
+        return await _dbContext.PaymentMethods.Find(_filterBuilder.And(UserIdFilter(userId), filter)).FirstOrDefaultAsync();
     }
 
     public async Task UpdateAsync(PaymentMethod entity)

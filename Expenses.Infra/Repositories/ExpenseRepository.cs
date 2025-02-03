@@ -2,25 +2,29 @@ using Expenses.Domain.DataContracts;
 using Expenses.Domain.Models;
 using Libs.Api.Infra;
 using Libs.Api.Models;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Expenses.Infra.Repositories;
 
 public class ExpenseRepository : BasePageableMongoRepository<Expense>, IExpenseRepository
 {
+    private DBContext _dbContext;
+
     public ExpenseRepository(DBContext dbContext)
         : base(dbContext.Expenses)
     {
+        _dbContext = dbContext;
     }
 
     private FilterDefinition<Expense> IdFilter(Guid id)
     {
-        return _filter.Eq(x => x.Id, id);
+        return _filterBuilder.Eq(x => x.Id, id);
     }
 
     public async Task<Expense> FindByIdAsync(Guid id, Guid userId)
     {
-        var filter = _filter.And(IdFilter(id), _filter.Eq(x => x.UserId, userId));
+        var filter = _filterBuilder.And(IdFilter(id), _filterBuilder.Eq(x => x.UserId, userId));
         return await Collection.Find(filter).FirstOrDefaultAsync();
     }
 
@@ -32,13 +36,22 @@ public class ExpenseRepository : BasePageableMongoRepository<Expense>, IExpenseR
 
     public Task<long> GetAllCountAsync(PagedRequest request)
     {
-        var sortDefinition = _sort.Descending(x => x.TransactionDate);
+        var sortDefinition = _sortBuilder.Descending(x => x.TransactionDate);
         return base.GetAllCountAsync(request, sortDefinition);
     }
 
-    public async Task<IEnumerable<Expense>> GetAllPagedAsync(PagedRequest request)
+    public async Task<List<Expense>> GetAllPagedAsync(PagedRequest request)
     {
-        var sortDefinition = _sort.Descending(x => x.TransactionDate);
-        return await base.GetAllPagedAsync(request, sortDefinition);
+        var sortDefinition = _sortBuilder.Descending(x => x.TransactionDate);
+        var aggregatedBson = new BsonDocument[] {
+            BuildFilters(request),
+            BuildAggregation(_dbContext.PaymentMethods.CollectionNamespace.CollectionName, nameof(Expense.PaymentMethodId), nameof(PaymentMethod)),
+            BuildFlatChildAggregation(nameof(PaymentMethod)),
+            BuildSorting(request, ref sortDefinition)
+        };
+
+        var pagedResult = await base.GetAllPagedAsync(request, aggregatedBson);
+
+        return pagedResult;
     }
 }
