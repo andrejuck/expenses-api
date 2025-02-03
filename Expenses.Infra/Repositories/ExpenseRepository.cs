@@ -40,7 +40,7 @@ public class ExpenseRepository : BasePageableMongoRepository<Expense>, IExpenseR
         return base.GetAllCountAsync(request, sortDefinition);
     }
 
-    public async Task<List<Expense>> GetAllPagedAsync(PagedRequest request)
+    public async Task<List<TResponse>> GetAllPagedAsync<TResponse>(PagedRequest request)
     {
         var sortDefinition = _sortBuilder.Descending(x => x.TransactionDate);
         var aggregatedBson = new BsonDocument[] {
@@ -50,7 +50,7 @@ public class ExpenseRepository : BasePageableMongoRepository<Expense>, IExpenseR
             BuildSorting(request, ref sortDefinition)
         };
 
-        var pagedResult = await base.GetAllPagedAsync(request, aggregatedBson);
+        var pagedResult = await base.GetAllPagedAsync<TResponse>(request, aggregatedBson);
 
         return pagedResult;
     }

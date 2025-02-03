@@ -1,5 +1,6 @@
 using Expenses.Domain.Exceptions;
 using Expenses.Domain.Models.Enum;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace Expenses.Domain.Models;
 

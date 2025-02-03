@@ -26,7 +26,7 @@ public abstract class BasePageableMongoRepository<T> : BaseMongoRepository<T>
                 .ToListAsync();
     }
 
-    protected virtual async Task<List<T>> GetAllPagedAsync(PagedRequest request, BsonDocument[] aggregationPipeline)
+    protected virtual async Task<List<TResponse>> GetAllPagedAsync<TResponse>(PagedRequest request, BsonDocument[] aggregationPipeline)
     {
         aggregationPipeline = aggregationPipeline
             .Append(BuildCurrentPage(request))
@@ -34,7 +34,7 @@ public abstract class BasePageableMongoRepository<T> : BaseMongoRepository<T>
             .ToArray();
 
         return await Collection
-                .Aggregate<T>(aggregationPipeline)
+                .Aggregate<TResponse>(aggregationPipeline)
                 .ToListAsync();
     }
 

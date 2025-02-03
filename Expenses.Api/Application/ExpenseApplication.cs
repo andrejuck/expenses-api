@@ -55,9 +55,8 @@ public class ExpenseApplication : IExpenseApplication
 
     public async Task<PagedResponse<ExpenseResponse>> GetPagedExpense(PagedRequest pagedRequest, Guid userId)
     {
-        var expenses = await _repository.GetAllPagedAsync(pagedRequest);
+        var expensesResponse = await _repository.GetAllPagedAsync<ExpenseResponse>(pagedRequest);
         var total = await _repository.GetAllCountAsync(pagedRequest);
-        var expensesResponse = _mapper.Map<List<ExpenseResponse>>(expenses);
         var pagedResponse = _pageAdapter.ConvertToResponse(pagedRequest, total, expensesResponse);
 
         return pagedResponse;
