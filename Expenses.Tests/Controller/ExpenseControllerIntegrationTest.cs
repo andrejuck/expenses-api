@@ -2,12 +2,16 @@ using System.Net;
 using Expenses.Api.PresentationContracts;
 using Expenses.Api.PresentationContracts.Forms;
 using Expenses.Domain.Models;
+using Expenses.Domain.Exceptions;
 using Expenses.Tests.Generics;
 using Expenses.Tests.Helpers;
 using Expenses.Tests.Mock;
+using Libs.Api.ErrorHandling.Model;
 using Libs.Api.Models;
 using Microsoft.AspNetCore.JsonPatch;
 using MongoDB.Driver;
+using Libs.Api.ErrorHandling.Exceptions;
+using Expenses.Domain.Models.Enum;
 
 namespace Expenses.Tests.Controller;
 
@@ -435,7 +439,7 @@ public class ExpenseControllerIntegrationTests : BaseIntegrationTest
         Assert.That(result.IsSuccessStatusCode, Is.True);
         Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         Assert.That(content.Count, Is.EqualTo(4));
-        Assert.That(content, Is.EqualTo(new List<string> {"fixed expense", "food", "restaurant", "tax"  }));
+        Assert.That(content, Is.EqualTo(new List<string> { "fixed expense", "food", "restaurant", "tax" }));
     }
 
     [Test]
@@ -450,6 +454,80 @@ public class ExpenseControllerIntegrationTests : BaseIntegrationTest
 
         Assert.That(result.IsSuccessStatusCode, Is.False);
         Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
+    }
+
+    [TestCase(0)]
+    [TestCase(-1)]
+    public async Task Should_Return_DomainException_Invalid_TotalPrice_BadRequest(int totalPrice)
+    {
+        var payment = MockPaymentMethod.CreatePaymentMethod(Factory.DbContext.PaymentMethods, AdminUser);
+        var form = new ExpenseForm()
+        {
+            Description = "test",
+            ExpenseCategories = new List<string>() { "testCat" },
+            PaymentMethodId = payment.Id,
+            Location = "test",
+            TotalPrice = totalPrice,
+            TransactionDate = DateTime.Now.ToUniversalTime()
+        }.BuildJsonContent();
+
+        var result = await Client.PostAsync(BaseUri.Path, form);
+        var content = result.Content.ReadAsStringAsync().Result.Deserialize<ErrorResponse>();
+
+        Assert.That(result.IsSuccessStatusCode, Is.False);
+        Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+        Assert.That(content.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+        Assert.That(content.Message, Is.EqualTo("TotalPrice should be higher than 0."));
+        Assert.That(content.Action, Is.EqualTo(nameof(DomainException)));
+    }
+
+    [Test]
+    public async Task Should_Return_DomainException_Invalid_Description_BadRequest()
+    {
+        var payment = MockPaymentMethod.CreatePaymentMethod(Factory.DbContext.PaymentMethods, AdminUser);
+        var form = new ExpenseForm()
+        {
+            Description = string.Empty,
+            ExpenseCategories = new List<string>() { "testCat" },
+            PaymentMethodId = payment.Id,
+            Location = "test",
+            TotalPrice = 10,
+            TransactionDate = DateTime.Now.ToUniversalTime()
+        }.BuildJsonContent();
+
+        var result = await Client.PostAsync(BaseUri.Path, form);
+        var content = result.Content.ReadAsStringAsync().Result.Deserialize<ErrorResponse>();
+
+        Assert.That(result.IsSuccessStatusCode, Is.False);
+        Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+        Assert.That(content.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+        Assert.That(content.Message, Is.EqualTo("Description should be filled."));
+        Assert.That(content.Action, Is.EqualTo(nameof(DomainException)));
+    }
+
+    [Test]
+    public async Task Should_Return_DomainException_Invalid_Installments_BadRequest()
+    {
+        var payment = MockPaymentMethod.CreatePaymentMethod(Factory.DbContext.PaymentMethods, AdminUser);
+        var form = new ExpenseForm()
+        {
+            Description = "desc",
+            ExpenseCategories = new List<string>() { "testCat" },
+            PaymentMethodId = payment.Id,
+            Location = "test",
+            TotalPrice = 10,
+            TransactionDate = DateTime.Now.ToUniversalTime(),
+            Installment = 10
+        }.BuildJsonContent();
+
+        var result = await Client.PostAsync(BaseUri.Path, form);
+        var content = result.Content.ReadAsStringAsync().Result.Deserialize<ErrorResponse>();
+
+        Assert.That(result.IsSuccessStatusCode, Is.False);
+        Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+        Assert.That(content.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
+        Assert.That(content.Message, Is.EqualTo("Expense installments is allowed to credit cards only."));
+        Assert.That(content.Action, Is.EqualTo(nameof(DomainException)));
     }
 
     private List<Expense> FindByDesc(string desc)

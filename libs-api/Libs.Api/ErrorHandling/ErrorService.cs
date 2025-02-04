@@ -29,6 +29,6 @@ public class ErrorService : IErrorService
 
     public void AddError(string action, string message, HttpStatusCode statusCode)
     {
-        _errors.Add(new ErrorResponse() { Action = action, Message = message, StatusCode = statusCode });
+        _errors.Add(new ErrorResponse(statusCode, message, action));
     }
 }
