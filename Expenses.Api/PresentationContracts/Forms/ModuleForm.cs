@@ -8,5 +8,5 @@ public class ModuleForm
     [Required]
     public string Name { get; set; }
     [Required]
-    public List<UserRole> AllowedRoles { get; set; }
+    public List<string> AllowedRoles { get; set; }
 }

@@ -1,4 +1,5 @@
-public enum RegistrationStatus : short {
+public enum RegistrationStatus
+{
     WaitingApproval,
     Approved,
     Denied,

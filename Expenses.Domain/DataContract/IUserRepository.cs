@@ -1,4 +1,5 @@
 using Expenses.Domain.DataContracts.Generics;
+using Expenses.Domain.Models;
 using Libs.Api.Models;
 using Libs.Auth.Models;
 
@@ -8,6 +9,6 @@ public interface IUserRepository : IBaseRepository<User>
 {
     Task<User> FindByIdAsync(Guid id);
     Task<User> GetByEmailAsync(string email);
-    Task<IEnumerable<User>> GetAllPagedAsync(PagedRequest request);
-    Task<long> GetAllCountAsync(PagedRequest request);
+    Task<List<TResponse>> GetAllPagedAsync<TResponse>(UserSearchParam searchParam, PagedRequest request);
+    Task<long> GetAllCountAsync(UserSearchParam searchParam);
 }
