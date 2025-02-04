@@ -1,4 +1,4 @@
-namespace Expenses.Domain.Exceptions;
+namespace Libs.Api.ErrorHandling.Exceptions;
 
 [Serializable]
 public class DomainException : Exception

@@ -1,7 +1,7 @@
-
-using Libs.Api.ErrorHandling;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
+
+namespace Libs.Api.ErrorHandling.Attributes;
 
 public class ErrorFilterAttribute : Attribute, IAsyncResultFilter
 {

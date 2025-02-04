@@ -7,6 +7,7 @@ using System.Text;
 using Expenses.Infra.Settings;
 using Libs.Auth.Models.Config;
 using FluentValidation.AspNetCore;
+using Libs.Api.ErrorHandling.Attributes;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,7 @@ builder.Services
     .AddControllers(options =>
     {
         options.Filters.Add<ErrorFilterAttribute>();
+        options.Filters.Add<CustomExceptionFilter>();
     })
     .AddNewtonsoftJson()
     .AddJsonOptions(options =>

@@ -1,5 +1,6 @@
 using Expenses.Domain.Exceptions;
 using Expenses.Domain.Models.Enum;
+using Libs.Api.ErrorHandling.Exceptions;
 
 namespace Expenses.Domain.Models;
 
@@ -57,7 +58,7 @@ public class Expense : BaseUserEntity
     public List<Expense> DivideByInstallments(PaymentMethod paymentMethod)
     {
         if (!paymentMethod.PaymentType.Equals(PaymentType.CreditCard))
-            throw new DomainException("To create installments, payment should be on credit card.");
+            throw new DomainException(DomainMessages.EXPENSE_INSTALLMENT_ALLOWED_ONLY_TO_CREDIT_CARD);
 
         if (Installment == 0 || !Installment.HasValue)
             throw new DomainException("Number of Installments should be higher than zero.");

@@ -1,6 +1,6 @@
-using Expenses.Domain.Exceptions;
 using Expenses.Domain.Models;
 using Expenses.Domain.Models.Enum;
+using Libs.Api.ErrorHandling.Exceptions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
 namespace Expenses.Tests.Domain;
