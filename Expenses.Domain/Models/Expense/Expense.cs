@@ -31,6 +31,7 @@ public class Expense : BaseUserEntity
     public DateTime TransactionDate { get; private set; }
     public List<string> ExpenseCategories { get; private set; }
     public Guid PaymentMethodId { get; private set; }
+    public PaymentMethod PaymentMethod { get; set; }
     public int? Installment { get; private set; }
 
     public void PrepareToUpdate(string location,

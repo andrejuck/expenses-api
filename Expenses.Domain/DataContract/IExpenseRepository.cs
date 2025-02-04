@@ -6,6 +6,7 @@ namespace Expenses.Domain.DataContracts;
 
 public interface IExpenseRepository : IBaseEntityRepository<Expense>
 {
-    Task<long> GetAllCountAsync(PagedRequest request);
-    Task<IEnumerable<Expense>> GetAllPagedAsync(PagedRequest request);
+    Task<long> GetAllCountAsync(ExpenseSearchParam searchParams, Guid userId);
+    Task<List<TResponse>> GetAllPagedAsync<TResponse>(ExpenseSearchParam searchParam, PagedRequest request, Guid userId);
+    Task<List<string>> GetAllUserCategories(Guid userId);
 }

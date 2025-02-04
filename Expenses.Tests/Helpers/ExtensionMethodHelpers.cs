@@ -1,6 +1,5 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Text;
 using System.Text.Json;
 
 namespace Expenses.Tests.Helpers;
@@ -34,10 +33,20 @@ public static class ExtensionMethodHelpers
             if (propValue == null || propValue == default)
                 continue;
 
+            if (propValue is List<string>)
+            {
+                var list = (List<string>)propValue;
+                foreach (var item in list)
+                {
+                    resultString += $"{char.ToLowerInvariant(property.Name[0]) + property.Name.Substring(1)}={item}&";
+                }
+                continue;
+            }
+
             resultString += $"{char.ToLowerInvariant(property.Name[0]) + property.Name.Substring(1)}={propValue}&";
         }
 
-        return "?" + resultString;
+        return resultString;
     }
     #endregion
 }
