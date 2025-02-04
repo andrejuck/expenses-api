@@ -33,15 +33,20 @@ public static class ExtensionMethodHelpers
             if (propValue == null || propValue == default)
                 continue;
 
-            if (propValue is Dictionary<string, string>){
-                if (((Dictionary<string,string>)propValue).Count == 0) continue;
-                
+            if (propValue is List<string>)
+            {
+                var list = (List<string>)propValue;
+                foreach (var item in list)
+                {
+                    resultString += $"{char.ToLowerInvariant(property.Name[0]) + property.Name.Substring(1)}={item}&";
+                }
+                continue;
             }
 
             resultString += $"{char.ToLowerInvariant(property.Name[0]) + property.Name.Substring(1)}={propValue}&";
         }
 
-        return "?" + resultString;
+        return resultString;
     }
     #endregion
 }

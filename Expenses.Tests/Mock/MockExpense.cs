@@ -9,10 +9,12 @@ public static class MockExpense
     public static Expense CreateExpense(
         IMongoCollection<Expense> collection,
         UserResponse loggedUser,
-        PaymentMethod paymentMethod
+        PaymentMethod paymentMethod,
+        DateTime? transactionDate = null,
+        List<string> categories = null
     )
     {
-        var expense = new Expense("test", "test", 10, DateTime.Now, new List<string>() { "test" }, paymentMethod);
+        var expense = new Expense("test", "test", 10, transactionDate ?? DateTime.Now, categories ?? new List<string>() { "test" }, paymentMethod);
         expense.BindUser(loggedUser.Id);
 
         collection.InsertOne(expense);

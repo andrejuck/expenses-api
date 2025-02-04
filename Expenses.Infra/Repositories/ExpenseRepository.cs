@@ -78,10 +78,15 @@ public class ExpenseRepository : BasePageableMongoRepository<Expense>, IExpenseR
 
     public async Task<List<string>> GetAllUserCategories(Guid userId)
     {
-        var expenses = await Collection.Find(_filterBuilder.Eq(x => x.UserId, userId)).ToListAsync();
+        var expenses = await Collection
+            .Find(_filterBuilder.Eq(x => x.UserId, userId))
+            .Project(e => e.ExpenseCategories)
+            .ToListAsync();
+            
         return expenses
-            .SelectMany(x => x.ExpenseCategories)
+            .SelectMany(e => e)
             .Distinct()
+            .OrderBy(e => e)
             .ToList();
     }
 

@@ -85,7 +85,7 @@ public abstract class BasePageableMongoRepository<T> : BaseMongoRepository<T>
                     continue;
                 }
 
-                if (propType == typeof(Guid))
+                if (propType == typeof(Guid?) || propType == typeof(Guid))
                 {
                     filter &= _filterBuilder.Eq(property.Name, (Guid)propValue);
                     continue;
