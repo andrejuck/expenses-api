@@ -1,6 +1,8 @@
 using Expenses.Domain.Models;
+using Expenses.Domain.Models.Enum;
 using Expenses.Infra;
 using Expenses.Infra.Settings;
+using Libs.Api.Serializers;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
 
@@ -11,7 +13,10 @@ public static class DbContextExtension
 
     public static IServiceCollection AddMongoDbContext(this IServiceCollection services, MongoDbSettings settings)
     {
-        // BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
+        BsonSerializer.RegisterSerializer(typeof(UserRole), new EnumStringSerializer<UserRole>());
+        BsonSerializer.RegisterSerializer(typeof(RegistrationStatus), new EnumStringSerializer<RegistrationStatus>());
+        BsonSerializer.RegisterSerializer(typeof(PaymentType), new EnumStringSerializer<PaymentType>());
+
         var conventionPack = new ConventionPack
         {
             new IgnoreExtraElementsConvention(true)

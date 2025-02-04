@@ -1,4 +1,5 @@
-public enum UserRole : short {
+public enum UserRole
+{
     Admin,
     GeneralUser
 }

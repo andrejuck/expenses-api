@@ -1,6 +1,6 @@
 namespace Expenses.Domain.Models.Enum;
 
-public enum PaymentType : short
+public enum PaymentType
 {
     Cash,
     DebitCard,

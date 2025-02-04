@@ -1,7 +1,9 @@
 using Expenses.Domain.DataContracts;
+using Expenses.Domain.Models;
 using Libs.Api.Infra;
 using Libs.Api.Models;
 using Libs.Auth.Models;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Expenses.Infra.Repositories
@@ -28,12 +30,6 @@ namespace Expenses.Infra.Repositories
             await base.UpdateAsync(entity, filter);
         }
 
-        public Task<long> GetAllCountAsync(PagedRequest request)
-        {
-            var sortDefinition = _sortBuilder.Ascending(x => x.Email);
-            return base.GetAllCountAsync(request, sortDefinition);
-        }
-
         public async Task<User> GetByEmailAsync(string email)
         {
             return await _dbContext.Users.Find(_filterBuilder.Eq(u => u.Email, email)).FirstOrDefaultAsync();
@@ -46,10 +42,24 @@ namespace Expenses.Infra.Repositories
             return await _dbContext.Users.Find(filter).FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<User>> GetAllPagedAsync(PagedRequest request)
+        public async Task<List<TResponse>> GetAllPagedAsync<TResponse>(UserSearchParam searchParam, PagedRequest request)
         {
-            var sortDefinition = _sortBuilder.Ascending(x => x.Email);
-            return await base.GetAllPagedAsync(request, sortDefinition);
+            var sortDefinition = _sortBuilder.Descending(x => x.CreatedAt);
+            var aggregatedBson = new BsonDocument[] {
+                BuildFilters(searchParam),
+                BuildSorting(request, ref sortDefinition)
+            };
+
+            var pagedResult = await base.GetAllPagedAsync<TResponse>(request, aggregatedBson);
+
+            return pagedResult;
+        }
+
+        public Task<long> GetAllCountAsync(UserSearchParam searchParams)
+        {
+            var filter = _filterBuilder.Empty;
+            filter = DefineFilters(searchParams, filter);
+            return base.GetAllCountAsync(filter);
         }
 
     }

@@ -2,6 +2,7 @@ using System.Net;
 using AutoMapper;
 using Expenses.Api.PresentationContracts;
 using Expenses.Domain.DataContracts;
+using Expenses.Domain.Models;
 using Libs.Api.Adapters;
 using Libs.Api.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -65,10 +66,11 @@ public class UserController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     public async Task<ActionResult<PagedResponse<UserResponse>>> GetPagedUserList(
+        [FromQuery] UserSearchParam searchParams, 
         [FromQuery] PagedRequest request)
     {
-        var users = await _userRepository.GetAllPagedAsync(request);
-        var totalUsers = await _userRepository.GetAllCountAsync(request);
+        var users = await _userRepository.GetAllPagedAsync<UserResponse>(searchParams, request);
+        var totalUsers = await _userRepository.GetAllCountAsync(searchParams);
         var usersResponse = _mapper.Map<List<UserResponse>>(users);
         var response = _pageAdapter.ConvertToResponse(request, totalUsers, usersResponse);
 
