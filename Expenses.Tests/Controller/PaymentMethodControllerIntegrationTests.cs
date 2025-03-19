@@ -1,9 +1,7 @@
 using System.Net;
-using System.Net.Http.Json;
-using System.Text;
 using System.Text.Json;
-using Expenses.Api.PresentationContracts;
 using Expenses.Api.PresentationContracts.Forms;
+using Expenses.Api.PresentationContracts.PaymentMethods;
 using Expenses.Domain.Models;
 using Expenses.Domain.Models.Enum;
 using Expenses.Tests.Generics;
@@ -128,7 +126,7 @@ public class PaymentMethodControllerIntegrationTests : BaseIntegrationTest
         Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
         var fetchedContent = (await result.Content.ReadAsStringAsync()).Deserialize<PaymentMethodResponse>();
         Assert.That(fetchedContent.IsActive, Is.EqualTo(paymentMock.IsActive));
-        Assert.That(fetchedContent.PaymentType, Is.EqualTo(paymentMock.PaymentType));
+        Assert.That(fetchedContent.PaymentType, Is.EqualTo(paymentMock.PaymentType.ToString()));
         Assert.That(fetchedContent.Name, Is.EqualTo(paymentMock.Name));
     }
 

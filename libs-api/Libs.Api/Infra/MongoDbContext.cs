@@ -12,6 +12,7 @@ public abstract class MongoDbContext {
         public MongoDbContext(string connectionString, string dbName)
         {
             BsonSerializer.TryRegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
+
             var settings = MongoClientSettings.FromConnectionString(connectionString);
             Client = new MongoClient(settings);
             Database = Client.GetDatabase(dbName);

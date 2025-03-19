@@ -25,10 +25,9 @@ public class DBContext : MongoDbContext
         PaymentMethods = Database.GetCollection<PaymentMethod>("payment-methods");
         Expenses = Database.GetCollection<Expense>("expenses");
 
-        InitializeData();
     }
 
-    private void InitializeData()
+    public void InitializeData()
     {
         var adminModule = Modules.Find(NameFilter<Module>("Admin Module")).FirstOrDefault();
         if (adminModule == null) Modules.InsertOne(new Module("Admin Module", UserRole.Admin));

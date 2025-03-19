@@ -1,4 +1,6 @@
 
+using Libs.Api.Models;
+
 namespace Expenses.Domain.Models;
 
 public class ExpenseSearchParam

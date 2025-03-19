@@ -1,5 +1,5 @@
 using AutoMapper;
-using Expenses.Api.PresentationContracts;
+using Expenses.Api.PresentationContracts.Expenses;
 using Expenses.Api.PresentationContracts.Forms;
 using Expenses.Domain.Models;
 

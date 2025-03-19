@@ -43,6 +43,7 @@ var mongoConn = builder.Configuration.GetSection("MongoDbSettings").Get<MongoDbS
 builder.Services.AddMongoDbContext(mongoConn);
 
 builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddGraphQL();
 
 // Configure JWT Authentication
 var key = Encoding.ASCII.GetBytes(builder.Configuration.GetSection("JWT:key").Value);
@@ -111,8 +112,9 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapGraphQL();
 
 app.Run();
 
-//Enabling integrated Tests
+//Access point for integrated Tests
 public partial class Program { }

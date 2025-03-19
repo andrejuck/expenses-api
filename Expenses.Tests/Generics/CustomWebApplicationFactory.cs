@@ -1,16 +1,14 @@
-
-using System.Data.Common;
+using Expenses.Api.ExtensionMethods;
 using Expenses.Infra;
 using Expenses.Infra.Settings;
 using Libs.Api.Infra;
+using Libs.Api.Serializers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Mongo2Go;
-using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 
 namespace Expenses.Tests.Generics;
@@ -30,10 +28,12 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
         builder.ConfigureServices(services =>
         {
             // Substituir o serviço de IMongoClient pela instância do Mongo2Go
+            //BsonSerializer.TryRegisterSerializer(new EnumStringSerializer<UserRole>());
             services.RemoveAll<IMongoClient>();
+            services.RemoveAll<MongoDbContext>();
             // BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
 
-            services.AddSingleton(DbContext);
+            services.AddScoped(ssp => DbContext);
         });
     }
 

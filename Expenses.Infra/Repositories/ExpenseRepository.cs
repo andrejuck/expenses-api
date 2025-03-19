@@ -1,9 +1,12 @@
 using Expenses.Domain.DataContracts;
+using Expenses.Domain.Extensions;
 using Expenses.Domain.Models;
 using Libs.Api.Infra;
 using Libs.Api.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
+using System.Linq.Expressions;
 
 namespace Expenses.Infra.Repositories;
 
@@ -58,7 +61,10 @@ public class ExpenseRepository : BasePageableMongoRepository<Expense>, IExpenseR
         return base.GetAllCountAsync(filter);
     }
 
-    public async Task<List<TResponse>> GetAllPagedAsync<TResponse>(ExpenseSearchParam searchParam, PagedRequest request, Guid userId)
+    public async Task<List<TResponse>> GetAllPagedAsync<TResponse>(
+        ExpenseSearchParam searchParam,
+        PagedRequest request,
+        Guid userId)
     {
         var sortDefinition = _sortBuilder.Descending(x => x.TransactionDate);
         var aggregatedBson = new BsonDocument[] {
@@ -76,13 +82,35 @@ public class ExpenseRepository : BasePageableMongoRepository<Expense>, IExpenseR
         return pagedResult;
     }
 
+    public async Task<List<TResponse>> GetAllGroupedPagedAsync<TResponse>(
+        ExpenseSearchParam searchParam,
+        PagedRequest request,
+        Guid userId)
+    {
+        var sortDefinition = _sortBuilder.Descending(x => x.TransactionDate);
+        var aggregatedBson = new List<BsonDocument> {
+            BuildEqualFilter(nameof(Expense.UserId), userId),
+            BuildDateFilter(nameof(Expense.TransactionDate), searchParam.TransactionDate),
+            BuildEqualFilter(nameof(Expense.DeletedAt), null),
+            BuildFilters(searchParam),
+            BuildPaymentMethodAggregation(),
+            BuildFlatChildAggregation(nameof(PaymentMethod)),
+        };
+
+        aggregatedBson.AddRange(BuildGrouping());
+
+        var pagedResult = await Collection.Aggregate<TResponse>(aggregatedBson).ToListAsync();
+
+        return pagedResult;
+    }
+
     public async Task<List<string>> GetAllUserCategories(Guid userId)
     {
         var expenses = await Collection
             .Find(_filterBuilder.Eq(x => x.UserId, userId))
             .Project(e => e.ExpenseCategories)
             .ToListAsync();
-            
+
         return expenses
             .SelectMany(e => e)
             .Distinct()
@@ -90,4 +118,29 @@ public class ExpenseRepository : BasePageableMongoRepository<Expense>, IExpenseR
             .ToList();
     }
 
+    public List<BsonDocument> BuildGrouping()
+    {
+        return new List<BsonDocument> {
+            new BsonDocument("$set", new BsonDocument
+            {
+                { 
+                    "TransactionDateOnly", new BsonDocument
+                    {
+                        { "$dateToString", new BsonDocument
+                            {
+                                { "format", "%Y-%m-%d" },
+                                { "date", "$TransactionDate" }
+                            }
+                        }
+                    }
+                }
+            }),
+            new BsonDocument("$group", new BsonDocument 
+            {
+                { "_id", "$TransactionDateOnly" },
+                { "TotalPrice", new BsonDocument { { "$sum", "$TotalPrice" } } },
+                { "Amount", new BsonDocument { { "$sum", 1 } } }
+            }),
+        };
+    }
 }

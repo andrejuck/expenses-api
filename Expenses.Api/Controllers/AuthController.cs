@@ -9,6 +9,7 @@ using Libs.Auth.Models.Config;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using MongoDB.Driver.Linq;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
@@ -158,7 +159,7 @@ namespace Expenses.Api.Controllers
                 Issuer = "expenses-api.com",
                 Audience = "expenses-api.com",
                 Subject = claimIdentity,
-                Expires = DateTime.UtcNow.AddHours(1),
+                Expires = DateTime.UtcNow.AddDays(15),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(_key), SecurityAlgorithms.HmacSha256Signature)
             };
 

@@ -10,6 +10,8 @@ public static class UserClaimsHelper
     {
         if(settings == null) throw new ArgumentNullException($"{nameof(CustomClaimSettings)} should be configured.");
         if(settings.Identity == null) throw new ArgumentNullException($"{nameof(CustomClaimSettings)} should have Identity property.");
+        if(user == null) throw new UnauthorizedAccessException();
+        if(user.Claims == null || user.Claims.Count() == 0) throw new UnauthorizedAccessException();
 
         return Guid.Parse(user.Claims.FirstOrDefault(x => x.Type.Equals(settings.Identity)).Value);
     }
