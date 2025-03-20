@@ -24,7 +24,6 @@ public class DBContext : MongoDbContext
         Modules = Database.GetCollection<Module>("modules");
         PaymentMethods = Database.GetCollection<PaymentMethod>("payment-methods");
         Expenses = Database.GetCollection<Expense>("expenses");
-
     }
 
     public void InitializeData()

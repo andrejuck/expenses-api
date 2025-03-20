@@ -79,7 +79,7 @@ public class ExpenseControllerIntegrationTests : BaseIntegrationTest
         var result = await Client.PostAsync(BaseUri.Path, content);
 
         Assert.That(result.IsSuccessStatusCode, Is.False);
-        Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.InternalServerError));
+        Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
     }
 
     [Test]
@@ -100,7 +100,7 @@ public class ExpenseControllerIntegrationTests : BaseIntegrationTest
         var result = await Client.PostAsync(BaseUri.Path, content);
 
         Assert.That(result.IsSuccessStatusCode, Is.False);
-        Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.InternalServerError));
+        Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
     }
 
     [Test]
@@ -122,7 +122,7 @@ public class ExpenseControllerIntegrationTests : BaseIntegrationTest
         var result = await Client.PostAsync(BaseUri.Path, content);
 
         Assert.That(result.IsSuccessStatusCode, Is.False);
-        Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.InternalServerError));
+        Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
     }
 
     [Test]

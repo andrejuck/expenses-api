@@ -10,7 +10,7 @@ using FluentValidation.AspNetCore;
 using Libs.Api.ErrorHandling.Attributes;
 
 var builder = WebApplication.CreateBuilder(args);
-
+var isTesting = Environment.GetEnvironmentVariable("DOTNET_INTEGRATION_TESTS") == "true";
 // Add services to the container.
 
 builder.Services
@@ -40,7 +40,7 @@ builder.Services.AddExpensesDependencies();
 builder.Services.Configure<EmailingSettings>(builder.Configuration.GetSection("EmailingSettings"));
 builder.Services.Configure<CustomClaimSettings>(builder.Configuration.GetSection("CustomClaims"));
 var mongoConn = builder.Configuration.GetSection("MongoDbSettings").Get<MongoDbSettings>();
-builder.Services.AddMongoDbContext(mongoConn);
+if(!isTesting) builder.Services.AddMongoDbContext(mongoConn);
 
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddGraphQL();
