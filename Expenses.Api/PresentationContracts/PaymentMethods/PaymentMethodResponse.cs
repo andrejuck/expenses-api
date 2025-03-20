@@ -1,4 +1,4 @@
-namespace Expenses.Api.PresentationContracts;
+namespace Expenses.Api.PresentationContracts.PaymentMethods;
 
 public class PaymentMethodResponse
 {

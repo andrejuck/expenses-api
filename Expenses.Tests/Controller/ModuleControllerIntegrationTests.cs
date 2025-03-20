@@ -54,7 +54,7 @@ public class ModuleControllerIntegrationTests : BaseIntegrationTest
         var form = new ModuleForm()
         {
             Name = "TestModule",
-            AllowedRoles = new List<UserRole>() { UserRole.GeneralUser }
+            AllowedRoles = new List<string>() { UserRole.GeneralUser.ToString() }
         };
         var content = form.BuildJsonContent();
 
@@ -63,7 +63,7 @@ public class ModuleControllerIntegrationTests : BaseIntegrationTest
         Assert.That(result.IsSuccessStatusCode, Is.True);
         var createdModule = FindByName(form.Name).FirstOrDefault();
         Assert.NotNull(createdModule);
-        Assert.That(form.AllowedRoles, Is.EqualTo(createdModule.AllowedRoles));
+        Assert.That(form.AllowedRoles, Is.EqualTo(createdModule.AllowedRoles.Select(x => x.ToString())));
         Assert.That(createdModule.CreatedAt, Is.Not.EqualTo(DateTime.MinValue));
     }
 
@@ -74,7 +74,7 @@ public class ModuleControllerIntegrationTests : BaseIntegrationTest
         var form = new ModuleForm()
         {
             Name = "TestModAdmin",
-            AllowedRoles = new List<UserRole>() { UserRole.GeneralUser }
+            AllowedRoles = new List<string>() { UserRole.GeneralUser.ToString() }
         };
         var content = form.BuildJsonContent();
 

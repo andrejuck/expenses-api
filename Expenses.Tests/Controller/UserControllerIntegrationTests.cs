@@ -1,8 +1,10 @@
+using System.Diagnostics;
 using Expenses.Api.PresentationContracts;
 using Expenses.Tests.Generics;
 using Expenses.Tests.Helpers;
 using Libs.Api.Models;
 using Libs.Auth.Models;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Expenses.Tests.Controller;
@@ -77,6 +79,8 @@ public class UserControllerIntegrationTests : BaseIntegrationTest
         };
 
         Factory.DbContext.Users.InsertMany(users);
+
+        Debug.WriteLine(Factory.DbContext.Users.Find(Builders<User>.Filter.Empty).ToListAsync().SerializeToJsonString());
     }
 
     private List<User> FindUsers()

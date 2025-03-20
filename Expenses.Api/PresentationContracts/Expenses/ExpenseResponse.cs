@@ -1,4 +1,6 @@
-namespace Expenses.Api.PresentationContracts;
+using Expenses.Api.PresentationContracts.PaymentMethods;
+
+namespace Expenses.Api.PresentationContracts.Expenses;
 
 public class ExpenseResponse
 {

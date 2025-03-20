@@ -53,7 +53,7 @@ public class ExpenseDomainTests
         }
         catch (DomainException ex)
         {
-            Assert.That(ex.Message, Is.EqualTo("To create installments, payment should be on credit card."));
+            Assert.That(ex.Message, Is.EqualTo("Expense installments is allowed to credit cards only."));
         }
     }
 

@@ -1,12 +1,8 @@
 using System.Net.Http.Headers;
-using System.Security.Claims;
 using System.Text.Json;
 using Expenses.Api.PresentationContracts;
 using Expenses.Tests.Helpers;
 using Libs.Auth.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using NSubstitute;
 
 namespace Expenses.Tests.Generics;
 

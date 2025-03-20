@@ -1,6 +1,5 @@
-using Expenses.Api.PresentationContracts;
 using Expenses.Api.PresentationContracts.Forms;
-using Expenses.Domain.Models;
+using Expenses.Api.PresentationContracts.PaymentMethods;
 using Microsoft.AspNetCore.JsonPatch;
 
 namespace Expenses.Api.DataContracts.Applications;

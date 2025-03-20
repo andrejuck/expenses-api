@@ -1,8 +1,7 @@
 using AutoMapper;
-using Expenses.Api.PresentationContracts;
 using Expenses.Api.PresentationContracts.Forms;
+using Expenses.Api.PresentationContracts.PaymentMethods;
 using Expenses.Domain.Models;
-using Libs.Auth.Models;
 
 namespace Expenses.Api.Adapters;
 

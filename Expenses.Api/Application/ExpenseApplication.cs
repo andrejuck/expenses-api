@@ -2,7 +2,7 @@ using System.Net;
 using AutoMapper;
 using Expenses.Api.DataContracts.Applications;
 using Expenses.Api.Helpers;
-using Expenses.Api.PresentationContracts;
+using Expenses.Api.PresentationContracts.Expenses;
 using Expenses.Api.PresentationContracts.Forms;
 using Expenses.Domain.DataContracts;
 using Expenses.Domain.Models;
@@ -10,6 +10,7 @@ using Libs.Api.Adapters;
 using Libs.Api.ErrorHandling;
 using Libs.Api.Models;
 using Microsoft.AspNetCore.JsonPatch;
+using MongoDB.Bson;
 
 namespace Expenses.Api.Application;
 
@@ -56,6 +57,15 @@ public class ExpenseApplication : IExpenseApplication
     public async Task<PagedResponse<ExpenseResponse>> GetPagedExpenseAsync(ExpenseSearchParam searchParams, PagedRequest pagedRequest, Guid userId)
     {
         var expensesResponse = await _repository.GetAllPagedAsync<ExpenseResponse>(searchParams, pagedRequest, userId);
+        var total = await _repository.GetAllCountAsync(searchParams, userId);
+        var pagedResponse = _pageAdapter.ConvertToResponse(pagedRequest, total, expensesResponse);
+
+        return pagedResponse;
+    }
+
+    public async Task<PagedResponse<GroupedExpensesResponse>> GetGroupedPagedExpenseAsync(ExpenseSearchParam searchParams, PagedRequest pagedRequest, Guid userId)
+    {
+        var expensesResponse = await _repository.GetAllGroupedPagedAsync<GroupedExpensesResponse>(searchParams, pagedRequest, userId);
         var total = await _repository.GetAllCountAsync(searchParams, userId);
         var pagedResponse = _pageAdapter.ConvertToResponse(pagedRequest, total, expensesResponse);
 

@@ -2,7 +2,7 @@ using System.Net;
 using AutoMapper;
 using Expenses.Api.DataContracts.Applications;
 using Expenses.Api.Helpers;
-using Expenses.Api.PresentationContracts;
+using Expenses.Api.PresentationContracts.PaymentMethods;
 using Expenses.Api.PresentationContracts.Forms;
 using Expenses.Domain.DataContracts;
 using Expenses.Domain.Models;

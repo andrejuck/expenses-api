@@ -1,8 +1,6 @@
 using System.Net;
-using Expenses.Api.PresentationContracts;
 using Expenses.Api.PresentationContracts.Forms;
 using Expenses.Domain.Models;
-using Expenses.Domain.Exceptions;
 using Expenses.Tests.Generics;
 using Expenses.Tests.Helpers;
 using Expenses.Tests.Mock;
@@ -11,7 +9,7 @@ using Libs.Api.Models;
 using Microsoft.AspNetCore.JsonPatch;
 using MongoDB.Driver;
 using Libs.Api.ErrorHandling.Exceptions;
-using Expenses.Domain.Models.Enum;
+using Expenses.Api.PresentationContracts.Expenses;
 
 namespace Expenses.Tests.Controller;
 
@@ -81,7 +79,7 @@ public class ExpenseControllerIntegrationTests : BaseIntegrationTest
         var result = await Client.PostAsync(BaseUri.Path, content);
 
         Assert.That(result.IsSuccessStatusCode, Is.False);
-        Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.InternalServerError));
+        Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
     }
 
     [Test]
@@ -102,7 +100,7 @@ public class ExpenseControllerIntegrationTests : BaseIntegrationTest
         var result = await Client.PostAsync(BaseUri.Path, content);
 
         Assert.That(result.IsSuccessStatusCode, Is.False);
-        Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.InternalServerError));
+        Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
     }
 
     [Test]
@@ -124,7 +122,7 @@ public class ExpenseControllerIntegrationTests : BaseIntegrationTest
         var result = await Client.PostAsync(BaseUri.Path, content);
 
         Assert.That(result.IsSuccessStatusCode, Is.False);
-        Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.InternalServerError));
+        Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
     }
 
     [Test]

@@ -9,7 +9,7 @@ public class PagedRequest
     {
         get
         {
-            if(_currentPage == 0)
+            if (_currentPage == 0)
                 return 1;
 
             return _currentPage;
@@ -31,8 +31,19 @@ public class PagedRequest
         set => _pageSize = value;
     }
 
-    public bool IsSorted { get; set; }
+    public bool IsSorted { get; set; } = false;
     public string SortKey { get; set; }
-    public string SortOrder { get; set; }
+
+    private string _sortOrder;
+    public string SortOrder
+    {
+        get
+        {
+            if(string.IsNullOrEmpty(_sortOrder)) return "Ascending";
+            
+            return _sortOrder;
+        }
+        set { _sortOrder = value; }
+    }
 }
 
