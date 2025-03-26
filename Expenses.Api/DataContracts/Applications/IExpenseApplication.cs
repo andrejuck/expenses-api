@@ -16,4 +16,5 @@ public interface IExpenseApplication
     Task<ExpenseResponse> GetExpenseAsync(Guid id, Guid userId);
     Task DeleteExpenseAsync(Guid id, Guid userId);
     Task<PagedResponse<GroupedExpensesResponse>> GetGroupedPagedExpenseAsync(ExpenseSearchParam searchParams, PagedRequest pagedRequest, Guid userId);
+    Task<List<ExpenseFileResponse>> GetAllExpensesAsync(ExpenseSearchParam searchParams, Guid userId);
 }

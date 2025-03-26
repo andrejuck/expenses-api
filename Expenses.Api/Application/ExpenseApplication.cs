@@ -10,7 +10,6 @@ using Libs.Api.Adapters;
 using Libs.Api.ErrorHandling;
 using Libs.Api.Models;
 using Microsoft.AspNetCore.JsonPatch;
-using MongoDB.Bson;
 
 namespace Expenses.Api.Application;
 
@@ -116,6 +115,12 @@ public class ExpenseApplication : IExpenseApplication
         await _repository.UpdateAsync(expense);
     }
 
+    public async Task<List<ExpenseFileResponse>> GetAllExpensesAsync(ExpenseSearchParam searchParams, Guid userId)
+    {
+        var result = await _repository.GetAllAsync<ExpenseFileResponse>(searchParams, userId);
+        return result;
+    }
+
     private async Task<PaymentMethod> FindPaymentBydId(Guid paymentId, Guid userId)
     {
         var paymentMethod = await _paymentRepo.FindByIdAsync(paymentId, userId);
@@ -148,5 +153,5 @@ public class ExpenseApplication : IExpenseApplication
         }
 
         return expense;
-    }
+    }  
 }
