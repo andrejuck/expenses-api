@@ -1,5 +1,5 @@
 using Expenses.Api.Helpers;
-using Expenses.Api.PresentationContracts.Forms;
+using Expenses.Api.PresentationContracts.Expenses;
 using Expenses.Domain.Models.Enum;
 using FluentValidation;
 

@@ -1,7 +1,4 @@
-
-using Expenses.Domain.Models;
-
-namespace Expenses.Api.PresentationContracts.Forms;
+namespace Expenses.Api.PresentationContracts.Expenses;
 
 public class ExpenseForm
 {

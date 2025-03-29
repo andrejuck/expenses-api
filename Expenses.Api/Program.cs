@@ -8,6 +8,8 @@ using Expenses.Infra.Settings;
 using Libs.Auth.Models.Config;
 using FluentValidation.AspNetCore;
 using Libs.Api.ErrorHandling.Attributes;
+using Microsoft.AspNetCore.Localization;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 var isTesting = Environment.GetEnvironmentVariable("DOTNET_INTEGRATION_TESTS") == "true";
@@ -100,6 +102,25 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
+builder.Services.AddLocalization();
+var supportedCultures = new[]
+{
+    new CultureInfo("en"),
+    new CultureInfo("pt-BR")
+};
+var localizationOptions = new RequestLocalizationOptions()
+{
+    DefaultRequestCulture = new RequestCulture("pt-BR"),
+    SupportedCultures =  supportedCultures,
+    SupportedUICultures = supportedCultures
+};
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    options.DefaultRequestCulture = localizationOptions.DefaultRequestCulture;
+    options.SupportedCultures = localizationOptions.SupportedCultures;
+    options.SupportedUICultures = localizationOptions.SupportedUICultures;
+});
+
 builder.Services.AddEndpointsApiExplorer();
 
 var app = builder.Build();
@@ -110,6 +131,8 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseRequestLocalization(localizationOptions);
 
 app.MapControllers();
 app.MapGraphQL();

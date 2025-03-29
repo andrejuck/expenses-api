@@ -4,15 +4,18 @@ using Expenses.Api.DataContracts.Applications;
 using Expenses.Api.Services;
 using Expenses.Domain.DataContracts;
 using Expenses.Infra.Repositories;
-using Libs.Api.Adapters;
+using Expenses.Api.Adapters;
 using Libs.Api.ErrorHandling;
-using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Extensions.Localization;
+using Libs.Api.Adapters;
 
 namespace Expenses.Api.ExtensionMethods;
 
-public static class DependencyInjectionExtension {
+public static class DependencyInjectionExtension
+{
 
-    public static IServiceCollection AddExpensesDependencies(this IServiceCollection services) {
+    public static IServiceCollection AddExpensesDependencies(this IServiceCollection services)
+    {
         services.AddScoped<IUserRepository, UserRepository>();
 
         services.AddScoped<IModuleRepository, ModuleRepository>();
@@ -28,6 +31,12 @@ public static class DependencyInjectionExtension {
         services.AddScoped<IPaginationAdapter, PaginationAdapter>();
         services.AddScoped<IErrorService, ErrorService>();
 
+        services.AddSingleton<CsvHelperAdapter>();
+        //services.AddSingleton<IStringLocalizer>(sp =>
+        //{
+        //    var factory = sp.GetRequiredService<IStringLocalizerFactory>();
+        //    return factory.Create(typeof(SharedResources));
+        //});
         return services;
     }
 }
