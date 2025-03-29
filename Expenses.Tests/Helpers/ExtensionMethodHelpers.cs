@@ -43,6 +43,14 @@ public static class ExtensionMethodHelpers
                 continue;
             }
 
+            if (propValue is DateTime?)
+            {
+                var item = (DateTime)propValue;
+                resultString += $"{char.ToLowerInvariant(property.Name[0]) + property.Name.Substring(1)}={item:yyyy-MM-dd}&";
+
+                continue;
+            }
+
             resultString += $"{char.ToLowerInvariant(property.Name[0]) + property.Name.Substring(1)}={propValue}&";
         }
 
