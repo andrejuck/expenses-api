@@ -3,12 +3,12 @@ using System.Globalization;
 using System.Text;
 using CsvHelper;
 using CsvHelper.Configuration;
-using Libs.Api.Adapters.Resources;
+using Expenses.Api.Resources;
 using Microsoft.Extensions.Localization;
 
-namespace Libs.Api.Adapters;
+namespace Expenses.Api.Adapters;
 
-internal class CsvHelperAdapter
+public class CsvHelperAdapter
 {
 
     private readonly IServiceProvider _serviceProvider;
@@ -55,9 +55,7 @@ internal class CsvHelperAdapter
 
         if (constructor != null)
         {
-            var localizer = (IStringLocalizer<SharedResources>)_serviceProvider.GetService(typeof(IStringLocalizer<SharedResources>))!;
-            Debug.WriteLine("Current culture " + Thread.CurrentThread.CurrentCulture.Name);
-            Debug.WriteLine(localizer.GetAllStrings().FirstOrDefault());
+            var localizer = (IStringLocalizer<SharedResources>)_serviceProvider.GetService(typeof(IStringLocalizer<SharedResources>));
             return (TMap)constructor.Invoke(new object[] { localizer });
         }
 

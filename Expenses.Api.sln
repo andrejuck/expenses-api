@@ -7,15 +7,20 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Expenses.Api", "Expenses.Ap
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Libs.Auth", "libs-auth\Libs.Auth\Libs.Auth.csproj", "{9B9C05DA-4359-4373-828F-171035107583}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Expenses.Domain", "Expenses.Domain\Expenses.Domain.csproj", "{2A35374A-04F4-4684-B342-7EFAF7D3199B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Expenses.Domain", "Expenses.Domain\Expenses.Domain.csproj", "{2A35374A-04F4-4684-B342-7EFAF7D3199B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Expenses.Infra", "Expenses.Infra\Expenses.Infra.csproj", "{C323E349-3D82-4A6F-8441-91FA9FDCB3CB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Expenses.Infra", "Expenses.Infra\Expenses.Infra.csproj", "{C323E349-3D82-4A6F-8441-91FA9FDCB3CB}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs-api", "libs-api", "{870B7876-E810-4A4E-81EE-B6CCDE49422F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Libs.Api", "libs-api\Libs.Api\Libs.Api.csproj", "{95D23703-1E87-4331-914A-B4127B9EA8F5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Libs.Api", "libs-api\Libs.Api\Libs.Api.csproj", "{95D23703-1E87-4331-914A-B4127B9EA8F5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Expenses.Tests", "Expenses.Tests\Expenses.Tests.csproj", "{C2651725-8244-4742-BB05-311FB8F4EC4C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Expenses.Tests", "Expenses.Tests\Expenses.Tests.csproj", "{C2651725-8244-4742-BB05-311FB8F4EC4C}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_deploy", "_deploy", "{16ACCA9E-98DE-483D-B048-51907048D9C2}"
+	ProjectSection(SolutionItems) = preProject
+		_deploy\scripts\commands.sh = _deploy\scripts\commands.sh
+		_deploy\scripts\init-mongo.js = _deploy\scripts\init-mongo.js
+		_deploy\mongodb = _deploy\mongodb
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,8 +58,5 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DA1E2DC1-6BE4-48BE-8459-1E257C735AF5}
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{95D23703-1E87-4331-914A-B4127B9EA8F5} = {870B7876-E810-4A4E-81EE-B6CCDE49422F}
 	EndGlobalSection
 EndGlobal

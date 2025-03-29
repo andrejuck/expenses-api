@@ -3,7 +3,6 @@ using AutoMapper;
 using Expenses.Api.DataContracts.Applications;
 using Expenses.Api.Helpers;
 using Expenses.Api.PresentationContracts.Expenses;
-using Expenses.Api.PresentationContracts.Forms;
 using Expenses.Domain.DataContracts;
 using Expenses.Domain.Models;
 using Libs.Api.Adapters;

@@ -1,3 +1,3 @@
 namespace Libs.Api.Adapters.Resources;
 
-public class SharedResources { }
+internal class SharedResources { }

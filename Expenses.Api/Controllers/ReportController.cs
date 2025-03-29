@@ -1,10 +1,8 @@
-
 using System.Net;
 using Expenses.Api.Adapters;
 using Expenses.Api.DataContracts.Applications;
 using Expenses.Api.PresentationContracts.Expenses;
 using Expenses.Domain.Models;
-using Libs.Api.Adapters;
 using Libs.Api.Extensions;
 using Libs.Auth.Helpers;
 using Libs.Auth.Models.Config;
