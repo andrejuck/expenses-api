@@ -1,0 +1,91 @@
+﻿using Expenses.Api.Adapters;
+using Expenses.Api.PresentationContracts.Expenses;
+using Expenses.Tests.Generics;
+using Expenses.Tests.Mock;
+using System.Collections;
+using System.Globalization;
+using System.Net;
+using System.Net.Http.Headers;
+using System.Resources;
+
+namespace Expenses.Tests.Controller.Report;
+internal class ReportControllerIntegrationTests : BaseIntegrationTest
+{
+    protected UriBuilder BaseUri = new UriBuilder("http://localhost/api/report/");
+    private CsvHelperAdapter _csvAdapter;
+    private ResourceManager _resourceManager = new ResourceManager("Expenses.Api.Resources.SharedResources", typeof(Program).Assembly);
+
+    [SetUp]
+    protected override void Setup()
+    {
+        base.Setup();
+        Authenticate();
+        _csvAdapter = new CsvHelperAdapter(Factory.Services);
+    }
+
+    [TearDown]
+    protected override void Dispose()
+    {
+        BaseUri.Query = string.Empty;
+        base.Dispose();
+    }
+
+    [Test]
+    public async Task Should_Fetch_CSV_With_User_Expenses()
+    {
+        var payment = MockPaymentMethod.CreatePaymentMethod(Factory.DbContext.PaymentMethods, AdminUser);
+        MockExpense.CreateExpense(Factory.DbContext.Expenses, AdminUser, payment, DateTime.Now, totalPrice: 10.2M);
+        MockExpense.CreateExpense(Factory.DbContext.Expenses, AdminUser, payment, DateTime.Now, totalPrice: 12.2M);
+        MockExpense.CreateExpense(Factory.DbContext.Expenses, AdminUser, payment, DateTime.Now, totalPrice: 20.18M);
+        MockExpense.CreateExpense(Factory.DbContext.Expenses, AdminUser, payment, DateTime.Now.AddDays(-1), totalPrice: 25.23M);
+        MockExpense.CreateExpense(Factory.DbContext.Expenses, AdminUser, payment, DateTime.Now.AddDays(-1), totalPrice: 26.37M);
+
+        var result = await Client.GetAsync(BaseUri.Uri + "expenses/csv");
+        Assert.That(result.Content.Headers.ContentType?.MediaType, Is.EqualTo("text/csv"));
+
+        var records = _csvAdapter.ReadCsv<ExpenseFileResponse, ExpenseMap>(result.Content.ReadAsStringAsync().Result).records;
+        Assert.That(records.Count, Is.EqualTo(5));
+        Assert.That(records.GroupBy(x => x.TransactionDate).Count(), Is.EqualTo(2));
+    }
+
+    [Test]
+    public async Task Should_Return_No_Content_When_User_Doesnt_Have_Expenses()
+    {
+        var payment = MockPaymentMethod.CreatePaymentMethod(Factory.DbContext.PaymentMethods, AdminUser);
+
+        var result = await Client.GetAsync(BaseUri.Uri + "expenses/csv");
+
+        Assert.That(result.IsSuccessStatusCode, Is.True);
+        Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.NoContent));
+    }
+
+    [TestCase("en")]
+    [TestCase("pt-BR")]
+    public async Task Should_Fetch_CSV_With_Localized_Headers(string locale)
+    {
+        var culture = CultureInfo.GetCultureInfo(locale);
+        CultureInfo.CurrentCulture = culture;
+        CultureInfo.CurrentUICulture = culture;
+        Client.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue(locale));
+        var localizationResource = _resourceManager.GetResourceSet(culture, true, true);
+
+        var payment = MockPaymentMethod.CreatePaymentMethod(Factory.DbContext.PaymentMethods, AdminUser);
+        MockExpense.CreateExpense(Factory.DbContext.Expenses, AdminUser, payment, DateTime.Now.AddDays(-1), totalPrice: 25.23M);
+        MockExpense.CreateExpense(Factory.DbContext.Expenses, AdminUser, payment, DateTime.Now.AddDays(-1), totalPrice: 26.37M);
+
+        var result = await Client.GetAsync(BaseUri.Uri + "expenses/csv");
+        Assert.That(result.Content.Headers.ContentType?.MediaType, Is.EqualTo("text/csv"));
+
+        var headers = _csvAdapter.ReadCsv<ExpenseFileResponse, ExpenseMap>(
+            result.Content.ReadAsStringAsync().Result,
+            culture
+            ).headers;
+
+        foreach (DictionaryEntry item in localizationResource)
+        {
+            Assert.That(headers.Contains(item.Value));
+        }
+    }
+
+}
+

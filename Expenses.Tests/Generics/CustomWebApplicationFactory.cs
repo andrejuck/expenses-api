@@ -1,4 +1,5 @@
 using Expenses.Api.ExtensionMethods;
+using Expenses.Api.Resources;
 using Expenses.Infra;
 using Expenses.Infra.Settings;
 using Libs.Api.Infra;
@@ -6,16 +7,17 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Localization;
 using Mongo2Go;
-using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
+using System.Reflection;
 
 namespace Expenses.Tests.Generics;
 
 public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProgram> where TProgram : class
 {
     private MongoDbRunner _mongoRunner;
-    public DBContext DbContext {get; private set; }
+    public DBContext DbContext { get; private set; }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -28,6 +30,7 @@ public class CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProg
         {
             services.RemoveAll<IMongoClient>();
             services.RemoveAll<MongoDbContext>();
+            services.RemoveAll<IStringLocalizer>();
 
             DbContextExtension.RegisterMongoSerializers();
 

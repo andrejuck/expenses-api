@@ -8,10 +8,8 @@ using Expenses.Infra.Settings;
 using Libs.Auth.Models.Config;
 using FluentValidation.AspNetCore;
 using Libs.Api.ErrorHandling.Attributes;
-using Microsoft.Extensions.Localization;
 using Microsoft.AspNetCore.Localization;
 using System.Globalization;
-using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 var isTesting = Environment.GetEnvironmentVariable("DOTNET_INTEGRATION_TESTS") == "true";

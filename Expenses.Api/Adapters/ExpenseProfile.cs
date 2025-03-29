@@ -22,7 +22,8 @@ public class ExpenseMap : ClassMap<ExpenseFileResponse>
     public ExpenseMap(IStringLocalizer<SharedResources> localizer)
     {
         Map(m => m.TransactionDate)
-            .Name(localizer[nameof(ExpenseFileResponse.TransactionDate)]);
+            .Name(localizer[nameof(ExpenseFileResponse.TransactionDate)])
+            .TypeConverterOption.Format("yyyy-MM-dd");
         Map(m => m.Description)
             .Name(localizer[nameof(ExpenseFileResponse.Description)]);
         Map(m => m.Location)

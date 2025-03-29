@@ -49,6 +49,29 @@ public class CsvHelperAdapter
         return stream;
     }
 
+    public (List<string> headers, List<T> records) ReadCsv<T, TMap>(string csvContent, CultureInfo culture = null)
+        where TMap : ClassMap<T>
+    {
+        var csvConfig = new CsvConfiguration(culture ?? CultureInfo.InvariantCulture)
+        {
+            HeaderValidated = null,
+            MissingFieldFound = null,
+        };
+
+        using var reader = new StringReader(csvContent);
+        using (var csv = new CsvReader(reader, csvConfig))
+        {
+            csv.Context.AutoMap<T>();
+            var classMap = CreateClassMapInstance<TMap>();
+            csv.Context.RegisterClassMap(classMap);
+            var records = csv.GetRecords<T>().ToList();
+            var headers = csv.HeaderRecord.ToList();
+
+            return (headers, records);
+        };
+       
+    }
+
     private TMap CreateClassMapInstance<TMap>() where TMap : ClassMap
     {
         var constructor = typeof(TMap).GetConstructor(new[] { typeof(IStringLocalizer<SharedResources>) });
