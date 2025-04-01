@@ -49,7 +49,7 @@ public class CsvHelperAdapter
         return stream;
     }
 
-    public (List<string> headers, List<T> records) ReadCsv<T, TMap>(string csvContent, CultureInfo culture = null)
+    public (List<string> Headers, List<T> Records) ReadCsv<T, TMap>(string csvContent, CultureInfo culture = null)
         where TMap : ClassMap<T>
     {
         var csvConfig = new CsvConfiguration(culture ?? CultureInfo.InvariantCulture)
