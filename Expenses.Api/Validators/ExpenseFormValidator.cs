@@ -1,13 +1,12 @@
 using Expenses.Api.Helpers;
 using Expenses.Api.PresentationContracts.Expenses;
-using Expenses.Domain.Models.Enum;
 using FluentValidation;
 
 namespace Expenses.Api.Validators;
 
-public class ExpenseValidator : AbstractValidator<ExpenseForm>
+public class ExpenseFormValidator : AbstractValidator<ExpenseForm>
 {
-    public ExpenseValidator()
+    public ExpenseFormValidator()
     {
         RuleFor(x => x.Description)
             .NotEmpty()

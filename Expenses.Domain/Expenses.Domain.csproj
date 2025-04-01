@@ -1,6 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="11.11.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\libs-auth\Libs.Auth\Libs.Auth.csproj" />
     <ProjectReference Include="..\libs-api\Libs.Api\Libs.Api.csproj" />
   </ItemGroup>

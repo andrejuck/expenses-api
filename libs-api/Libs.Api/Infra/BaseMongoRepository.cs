@@ -51,22 +51,13 @@ public abstract class BaseMongoRepository<T>
         return new BsonDocument("$match", bsonFilter);
     }
 
-    protected virtual BsonDocument BuildDateFilter(string propName, DateTime? date)
+    protected virtual FilterDefinition<T> BuildDateFilter(FilterDefinition<T> filter, string propName, DateTime? startDate, DateTime? endDate)
     {
-        var filter = _filterBuilder.Empty;
+        if (startDate.HasValue)
+            filter &= _filterBuilder.Gte(propName, startDate.Value.Date);
 
-        if (date.HasValue)
-            filter = _filterBuilder.Gte(propName, date.Value.Date) & _filterBuilder.Lt(propName, date.Value.AddDays(1));
-
-
-        var bsonFilter = filter.Render(_renderArgs).ToBsonDocument();
-        return new BsonDocument("$match", bsonFilter);
-    }
-
-    protected virtual FilterDefinition<T> BuildDateFilter(FilterDefinition<T> filter, string propName, DateTime? date)
-    {
-        if (date.HasValue)
-            filter &= _filterBuilder.Gte(propName, date.Value.Date) & _filterBuilder.Lt(propName, date.Value.AddDays(1));
+        if(endDate.HasValue)
+            filter &= _filterBuilder.Lt(propName, startDate.Value.AddDays(1));
 
         return filter;
     }
@@ -75,11 +66,11 @@ public abstract class BaseMongoRepository<T>
     {
         var filter = _filterBuilder.Empty;
 
-        if (startDate.HasValue && endDate.HasValue)
-            filter = _filterBuilder.Gte(propName, startDate.Value.Date) & _filterBuilder.Lt(propName, endDate.Value.Date);
+        if (startDate.HasValue)
+            filter &= _filterBuilder.Gte(propName, startDate.Value.Date);
 
-        if (startDate.HasValue && !endDate.HasValue)
-            filter = _filterBuilder.Gte(propName, startDate.Value.Date);
+        if ( endDate.HasValue)
+            filter &= _filterBuilder.Lte(propName, endDate.Value.Date);
 
         var bsonFilter = filter.Render(_renderArgs).ToBsonDocument();
         return new BsonDocument("$match", bsonFilter);

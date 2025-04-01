@@ -1,7 +1,10 @@
 ﻿using Expenses.Api.Adapters;
 using Expenses.Api.PresentationContracts.Expenses;
+using Expenses.Domain.Models;
 using Expenses.Tests.Generics;
+using Expenses.Tests.Helpers;
 using Expenses.Tests.Mock;
+using MongoDB.Driver.Linq;
 using System.Collections;
 using System.Globalization;
 using System.Net;
@@ -46,6 +49,26 @@ internal class ReportControllerIntegrationTests : BaseIntegrationTest
         var records = _csvAdapter.ReadCsv<ExpenseFileResponse, ExpenseMap>(result.Content.ReadAsStringAsync().Result).records;
         Assert.That(records.Count, Is.EqualTo(5));
         Assert.That(records.GroupBy(x => x.TransactionDate).Count(), Is.EqualTo(2));
+    }
+
+    [Test]
+    public async Task Should_Fetch_CSV_With_User_Expenses_Within_TransactionDate_Range()
+    {
+        BaseUri.Path += "expenses/csv";
+        var payment = MockPaymentMethod.CreatePaymentMethod(Factory.DbContext.PaymentMethods, AdminUser);
+        MockExpense.CreateExpense(Factory.DbContext.Expenses, AdminUser, payment, DateTime.Now.AddDays(-1), totalPrice: 10.2M);
+        MockExpense.CreateExpense(Factory.DbContext.Expenses, AdminUser, payment, DateTime.Now.AddDays(-1), totalPrice: 12.2M);
+        MockExpense.CreateExpense(Factory.DbContext.Expenses, AdminUser, payment, DateTime.Now.AddDays(-1), totalPrice: 20.18M);
+        MockExpense.CreateExpense(Factory.DbContext.Expenses, AdminUser, payment, DateTime.Now.AddDays(-5), totalPrice: 25.23M);
+        MockExpense.CreateExpense(Factory.DbContext.Expenses, AdminUser, payment, DateTime.Now.AddDays(-5), totalPrice: 26.37M);
+        var searchParam = new ExpenseSearchParam() { StartTransactionDate = DateTime.Now.AddDays(-3), EndTransactionDate =  DateTime.Now};
+        BaseUri.Query = searchParam.BuildQueryParams();
+
+        var result = await Client.GetAsync(BaseUri.Uri);
+        Assert.That(result.Content.Headers.ContentType?.MediaType, Is.EqualTo("text/csv"));
+
+        var records = _csvAdapter.ReadCsv<ExpenseFileResponse, ExpenseMap>(result.Content.ReadAsStringAsync().Result).records;
+        Assert.That(records.Count, Is.EqualTo(3));
     }
 
     [Test]
