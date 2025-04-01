@@ -15,4 +15,7 @@
 */*/obj
 */*/bin/Debug
 */*/.vs
+/.vs/Expenses.Api
+/.vs/ProjectEvaluation
+/Expenses.Api/Expenses.Api.csproj.user
 /.vs

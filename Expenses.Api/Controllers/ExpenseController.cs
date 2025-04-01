@@ -1,7 +1,6 @@
 using System.Net;
 using Expenses.Api.DataContracts.Applications;
 using Expenses.Api.PresentationContracts.Expenses;
-using Expenses.Api.PresentationContracts.Forms;
 using Expenses.Domain.Models;
 using Libs.Api.Models;
 using Libs.Auth.Helpers;

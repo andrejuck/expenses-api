@@ -11,10 +11,11 @@ public static class MockExpense
         UserResponse loggedUser,
         PaymentMethod paymentMethod,
         DateTime? transactionDate = null,
-        List<string> categories = null
+        List<string> categories = null,
+        decimal totalPrice = 10
     )
     {
-        var expense = new Expense("test", "test", 10, transactionDate ?? DateTime.Now, categories ?? new List<string>() { "test" }, paymentMethod);
+        var expense = new Expense("test", "test", totalPrice, transactionDate ?? DateTime.Now, categories ?? new List<string>() { "test" }, paymentMethod);
         expense.BindUser(loggedUser.Id);
 
         collection.InsertOne(expense);

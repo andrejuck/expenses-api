@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Net;
 using Libs.Api.ErrorHandling.Exceptions;
 using Libs.Api.ErrorHandling.Model;
@@ -20,6 +21,7 @@ public class CustomExceptionFilter : ExceptionFilterAttribute
                 break;
 
             default:
+                Debug.WriteLine(context.Exception);
                 errorResponse = new ErrorResponse(HttpStatusCode.InternalServerError, context.Exception.Message, exceptionType.Name);
                 break;
         }
