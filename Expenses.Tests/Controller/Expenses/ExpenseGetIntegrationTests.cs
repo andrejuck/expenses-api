@@ -69,7 +69,7 @@ public class ExpenseGetIntegrationTests : BaseExpenseIntegrationTests
         MockExpense.CreateMultipleExpenses(5, AdminUser, payment, Factory.DbContext.Expenses);
         MockExpense.CreateExpense(Factory.DbContext.Expenses, AdminUser, payment, DateTime.Now.AddDays(-1));
         var request = new PagedRequest() { CurrentPage = 1, PageSize = 2 };
-        var searchParam = new ExpenseSearchParam() { TransactionDate = DateTime.Now.AddDays(-1) };
+        var searchParam = new ExpenseSearchParam() { StartTransactionDate = DateTime.Now.AddDays(-1) };
         BaseUri.Query = request.BuildQueryParams();
         BaseUri.Query += searchParam.BuildQueryParams();
 

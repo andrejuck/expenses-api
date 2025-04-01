@@ -56,7 +56,7 @@ public class ExpenseRepository : BasePageableMongoRepository<Expense>, IExpenseR
     {
         var filter = _filterBuilder.And(_filterBuilder.Eq(x => x.UserId, userId), _filterBuilder.Eq(x => x.DeletedAt, null));
         filter = DefineFilters(searchParams, filter);
-        filter = BuildDateFilter(filter, nameof(Expense.TransactionDate), searchParams.TransactionDate);
+        filter = BuildDateFilter(filter, nameof(Expense.TransactionDate), searchParams.StartTransactionDate, searchParams.EndTransactionDate);
         return base.GetAllCountAsync(filter);
     }
 
@@ -68,7 +68,7 @@ public class ExpenseRepository : BasePageableMongoRepository<Expense>, IExpenseR
         var sortDefinition = _sortBuilder.Descending(x => x.TransactionDate);
         var aggregatedBson = new BsonDocument[] {
             BuildEqualFilter(nameof(Expense.UserId), userId),
-            BuildDateFilter(nameof(Expense.TransactionDate), searchParam.TransactionDate),
+            BuildDateFilter(nameof(Expense.TransactionDate), searchParam.StartTransactionDate, searchParam.EndTransactionDate),
             BuildEqualFilter(nameof(Expense.DeletedAt), null),
             BuildFilters(searchParam),
             BuildPaymentMethodAggregation(),
@@ -90,7 +90,7 @@ public class ExpenseRepository : BasePageableMongoRepository<Expense>, IExpenseR
         var sortDefinition = _sortBuilder.Descending(x => x.TransactionDate);
         var aggregatedBson = new List<BsonDocument> {
             BuildEqualFilter(nameof(Expense.UserId), userId),
-            BuildDateFilter(nameof(Expense.TransactionDate), searchParam.TransactionDate),
+            BuildDateFilter(nameof(Expense.TransactionDate), searchParam.StartTransactionDate, searchParam.EndTransactionDate),
             BuildEqualFilter(nameof(Expense.DeletedAt), null),
             BuildFilters(searchParam),
             BuildPaymentMethodAggregation(),
@@ -111,7 +111,7 @@ public class ExpenseRepository : BasePageableMongoRepository<Expense>, IExpenseR
         var sortDefinition = _sortBuilder.Descending(x => x.TransactionDate);
         var aggregatedBson = new List<BsonDocument> {
             BuildEqualFilter(nameof(Expense.UserId), userId),
-            BuildDateFilter(nameof(Expense.TransactionDate), searchParam.TransactionDate),
+            BuildDateFilter(nameof(Expense.TransactionDate), searchParam.StartTransactionDate, searchParam.EndTransactionDate),
             BuildEqualFilter(nameof(Expense.DeletedAt), null),
             BuildFilters(searchParam),
             BuildPaymentMethodAggregation(),

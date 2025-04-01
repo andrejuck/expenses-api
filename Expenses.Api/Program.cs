@@ -10,6 +10,8 @@ using FluentValidation.AspNetCore;
 using Libs.Api.ErrorHandling.Attributes;
 using Microsoft.AspNetCore.Localization;
 using System.Globalization;
+using Expenses.Domain;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 var isTesting = Environment.GetEnvironmentVariable("DOTNET_INTEGRATION_TESTS") == "true";
@@ -28,6 +30,7 @@ builder.Services
     });
 
 builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssembly(typeof(DomainAssembly).Assembly);
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
