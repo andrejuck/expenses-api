@@ -1,10 +1,11 @@
+using Konscious.Security.Cryptography;
 using System.Security.Cryptography;
 using System.Text;
-using Konscious.Security.Cryptography;
 
 namespace Libs.Auth.Cryptography;
 
-public static class HashingHelper {
+public static class HashingHelper
+{
 
     public static byte[] GenerateSalt()
     {

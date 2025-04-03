@@ -1,8 +1,8 @@
-using System.Net.Http.Headers;
-using System.Text.Json;
 using Expenses.Api.PresentationContracts;
 using Expenses.Tests.Helpers;
 using Libs.Auth.Models;
+using System.Net.Http.Headers;
+using System.Text.Json;
 
 namespace Expenses.Tests.Generics;
 
@@ -10,7 +10,7 @@ public abstract class BaseIntegrationTest
 {
     protected CustomWebApplicationFactory<Program> Factory { get; private set; }
     protected HttpClient Client { get; private set; }
-    protected UserResponse AdminUser {get; private set;}
+    protected UserResponse AdminUser { get; private set; }
 
     protected virtual void Setup()
     {
@@ -32,7 +32,7 @@ public abstract class BaseIntegrationTest
         var stringResult = Client.PostAsync("/api/auth/login", content).Result.Content.ReadAsStringAsync().Result;
         var result = stringResult.Deserialize<UserResponse>();
         AdminUser = result;
-        
+
         Client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", result.Token);
     }
 

@@ -1,4 +1,3 @@
-using System.Net;
 using Expenses.Api.DataContracts.Applications;
 using Expenses.Api.PresentationContracts.Forms;
 using Expenses.Api.PresentationContracts.PaymentMethods;
@@ -8,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using System.Net;
 
 namespace Expenses.Api.Controllers;
 

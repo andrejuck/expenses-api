@@ -1,4 +1,3 @@
-using System.Net;
 using AutoMapper;
 using Expenses.Api.DataContracts.Applications;
 using Expenses.Api.Helpers;
@@ -9,6 +8,8 @@ using Libs.Api.Adapters;
 using Libs.Api.ErrorHandling;
 using Libs.Api.Models;
 using Microsoft.AspNetCore.JsonPatch;
+using MongoDB.Bson;
+using System.Net;
 
 namespace Expenses.Api.Application;
 
@@ -19,19 +20,22 @@ public class ExpenseApplication : IExpenseApplication
     private readonly IMapper _mapper;
     private readonly IErrorService _errorService;
     private readonly IPaginationAdapter _pageAdapter;
+    private readonly ILogger<ExpenseApplication> _logger;
 
     public ExpenseApplication(
         IExpenseRepository repository,
         IMapper mapper,
         IPaymentMethodRepository paymentRepo,
         IErrorService errorService,
-        IPaginationAdapter pageAdapter)
+        IPaginationAdapter pageAdapter,
+        ILogger<ExpenseApplication> logger)
     {
         _repository = repository;
         _mapper = mapper;
         _paymentRepo = paymentRepo;
         _errorService = errorService;
         _pageAdapter = pageAdapter;
+        _logger = logger;
     }
 
     public async Task CreateNewExpenseAsync(Guid userId, ExpenseForm form)
@@ -50,6 +54,7 @@ public class ExpenseApplication : IExpenseApplication
         entity.BindUser(userId);
 
         await _repository.AddAsync(entity);
+        _logger.LogInformation(Messages.LOG_CREATED_MESSAGE, nameof(Expense), userId, entity.ToJson());
     }
 
     public async Task<PagedResponse<ExpenseResponse>> GetPagedExpenseAsync(ExpenseSearchParam searchParams, PagedRequest pagedRequest, Guid userId)
@@ -58,6 +63,7 @@ public class ExpenseApplication : IExpenseApplication
         var total = await _repository.GetAllCountAsync(searchParams, userId);
         var pagedResponse = _pageAdapter.ConvertToResponse(pagedRequest, total, expensesResponse);
 
+        _logger.LogInformation(Messages.LOG_GET_MULTIPLE_MESSAGE, pagedResponse.Result.Count(), nameof(ExpenseResponse), total, userId);
         return pagedResponse;
     }
 
@@ -72,7 +78,9 @@ public class ExpenseApplication : IExpenseApplication
 
     public async Task<List<string>> GetUserCategoriesAsync(Guid userId)
     {
-        return await _repository.GetAllUserCategories(userId);
+        var result = await _repository.GetAllUserCategories(userId);
+        _logger.LogInformation(Messages.LOG_GET_MULTIPLE_MESSAGE, result.Count, nameof(ExpenseResponse), result.Count, userId);
+        return result;
     }
 
     public async Task UpdateExpenseAsync(Guid id, Guid userId, JsonPatchDocument<ExpenseForm> patchForm)
@@ -95,6 +103,7 @@ public class ExpenseApplication : IExpenseApplication
             entityForm.Installment);
 
         await _repository.UpdateAsync(expense);
+        _logger.LogInformation(Messages.LOG_UPDATED_MESSAGE, nameof(Expense), userId, expense.ToJson());
     }
 
     public async Task<ExpenseResponse> GetExpenseAsync(Guid id, Guid userId)
@@ -102,7 +111,9 @@ public class ExpenseApplication : IExpenseApplication
         var expense = await FindByIdAsync(id, userId);
         if (expense is null) return null;
 
-        return _mapper.Map<ExpenseResponse>(expense);
+        var result = _mapper.Map<ExpenseResponse>(expense);
+        _logger.LogInformation(Messages.LOG_GET_SINGLE_MESSAGE, nameof(ExpenseResponse), userId, result.ToJson());
+        return result;
     }
 
     public async Task DeleteExpenseAsync(Guid id, Guid userId)
@@ -112,11 +123,13 @@ public class ExpenseApplication : IExpenseApplication
 
         expense.SetDeleted();
         await _repository.UpdateAsync(expense);
+        _logger.LogInformation(Messages.LOG_DELETED_MESSAGE, nameof(expense), userId, expense.ToJson());
     }
 
     public async Task<List<ExpenseFileResponse>> GetAllExpensesAsync(ExpenseSearchParam searchParams, Guid userId)
     {
         var result = await _repository.GetAllAsync<ExpenseFileResponse>(searchParams, userId);
+        _logger.LogInformation(Messages.LOG_GET_MULTIPLE_MESSAGE, result.Count, nameof(ExpenseResponse), result.Count, userId);
         return result;
     }
 
@@ -134,6 +147,7 @@ public class ExpenseApplication : IExpenseApplication
             return null;
         }
 
+        _logger.LogInformation(Messages.LOG_GET_SINGLE_MESSAGE, nameof(PaymentMethod), userId, paymentMethod.ToJson());
         return paymentMethod;
     }
 
@@ -151,6 +165,7 @@ public class ExpenseApplication : IExpenseApplication
             return null;
         }
 
+        _logger.LogInformation(Messages.LOG_GET_SINGLE_MESSAGE, nameof(Expense), userId, expense.ToJson());
         return expense;
-    }  
+    }
 }

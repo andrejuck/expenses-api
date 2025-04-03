@@ -1,5 +1,5 @@
-﻿using System.Diagnostics;
-using Libs.Auth.Cryptography;
+﻿using Libs.Auth.Cryptography;
+using System.Diagnostics;
 
 namespace Libs.Auth.Models
 {

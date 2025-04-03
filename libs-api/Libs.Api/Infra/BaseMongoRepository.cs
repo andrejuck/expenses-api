@@ -33,15 +33,17 @@ public abstract class BaseMongoRepository<T>
         return _updateBuilder.Combine(updateDefinitionList);
     }
 
-    public virtual async Task AddAsync(T entity)
+    public virtual async Task<T> AddAsync(T entity)
     {
         await Collection.InsertOneAsync(entity);
+        return entity;
     }
 
-    protected virtual async Task UpdateAsync(T entity, FilterDefinition<T> filterById)
+    protected virtual async Task<T> UpdateAsync(T entity, FilterDefinition<T> filterById)
     {
         var update = PrepareToUpdate(entity);
         await Collection.UpdateOneAsync(filterById, update);
+        return entity;
     }
     protected virtual BsonDocument BuildEqualFilter(string propName, object propValue)
     {

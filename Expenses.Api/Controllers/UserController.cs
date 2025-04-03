@@ -1,12 +1,16 @@
-using System.Net;
 using AutoMapper;
+using Expenses.Api.Helpers;
 using Expenses.Api.PresentationContracts;
 using Expenses.Domain.DataContracts;
 using Expenses.Domain.Models;
 using Libs.Api.Adapters;
 using Libs.Api.Models;
+using Libs.Auth.Helpers;
+using Libs.Auth.Models.Config;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using System.Net;
 
 namespace Expenses.Api.Controllers;
 
@@ -19,12 +23,22 @@ public class UserController : ControllerBase
     private readonly IUserRepository _userRepository;
     private readonly IPaginationAdapter _pageAdapter;
     private readonly IMapper _mapper;
+    private readonly ILogger<UserController> _logger;
+    private readonly CustomClaimSettings _claimSettings;
+    private Guid UserId => UserClaimsHelper.GetUserGuidIdFromClaims(User, _claimSettings);
 
-    public UserController(IUserRepository userRepository, IPaginationAdapter pageAdapter, IMapper mapper)
+    public UserController(
+        IUserRepository userRepository,
+        IPaginationAdapter pageAdapter,
+        IMapper mapper,
+        ILogger<UserController> logger,
+        IOptions<CustomClaimSettings> options)
     {
         _userRepository = userRepository;
         _pageAdapter = pageAdapter;
         _mapper = mapper;
+        _logger = logger;
+        _claimSettings = options.Value;
     }
 
     [HttpPatch("approve/{id}")]
@@ -39,7 +53,7 @@ public class UserController : ControllerBase
         user.ConfirmEmail();
 
         await _userRepository.UpdateAsync(user);
-
+        _logger.LogInformation("User {user} was approved by {userId}", user.Username, UserId);
         return Accepted();
     }
 
@@ -57,7 +71,7 @@ public class UserController : ControllerBase
         //Admin should justify the motive of this denial
 
         await _userRepository.UpdateAsync(user);
-
+        _logger.LogInformation("User {user} was denied by {userId}", user.Username, UserId);
         return Accepted();
     }
 
@@ -66,7 +80,7 @@ public class UserController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     public async Task<ActionResult<PagedResponse<UserResponse>>> GetPagedUserList(
-        [FromQuery] UserSearchParam searchParams, 
+        [FromQuery] UserSearchParam searchParams,
         [FromQuery] PagedRequest request)
     {
         var users = await _userRepository.GetAllPagedAsync<UserResponse>(searchParams, request);
@@ -74,6 +88,7 @@ public class UserController : ControllerBase
         var usersResponse = _mapper.Map<List<UserResponse>>(users);
         var response = _pageAdapter.ConvertToResponse(request, totalUsers, usersResponse);
 
+        _logger.LogInformation(Messages.LOG_GET_MULTIPLE_MESSAGE, nameof(UserResponse), users.Count, totalUsers, UserId);
         return Ok(response);
     }
 
@@ -81,8 +96,9 @@ public class UserController : ControllerBase
     [ProducesResponseType(typeof(PagedResponse<UserResponse>), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    public ActionResult<List<string>> GetAllRegistrationStatus() {
-        
+    public ActionResult<List<string>> GetAllRegistrationStatus()
+    {
+
         return Ok(Enum.GetNames<RegistrationStatus>().ToList());
     }
 }

@@ -4,7 +4,8 @@ using Libs.Auth.Models;
 
 namespace Expenses.Api.Adapters;
 
-public class UserProfile : Profile {
+public class UserProfile : Profile
+{
 
     public UserProfile()
     {

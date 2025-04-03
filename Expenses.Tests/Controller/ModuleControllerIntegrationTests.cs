@@ -1,4 +1,3 @@
-using System.Net;
 using Expenses.Api.PresentationContracts;
 using Expenses.Api.PresentationContracts.Forms;
 using Expenses.Domain.Models;
@@ -6,6 +5,7 @@ using Expenses.Tests.Generics;
 using Expenses.Tests.Helpers;
 using Libs.Auth.Models;
 using MongoDB.Driver;
+using System.Net;
 
 namespace Expenses.Tests.Controller;
 
@@ -115,9 +115,9 @@ public class ModuleControllerIntegrationTests : BaseIntegrationTest
     {
         var modules = new List<Module>
         {
-            new Module("TestModAdmin", UserRole.Admin),
-            new Module("TestModuleAdmin2", UserRole.Admin),
-            new Module("TestModuleGeneral", UserRole.GeneralUser)
+            new Module("TestModAdmin", Guid.NewGuid(), UserRole.Admin),
+            new Module("TestModuleAdmin2", Guid.NewGuid(), UserRole.Admin),
+            new Module("TestModuleGeneral", Guid.NewGuid(), UserRole.GeneralUser)
         };
 
         Factory.DbContext.Modules.InsertMany(modules);

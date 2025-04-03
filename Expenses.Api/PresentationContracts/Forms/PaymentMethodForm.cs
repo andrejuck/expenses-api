@@ -1,6 +1,6 @@
-using System.ComponentModel.DataAnnotations;
 using Expenses.Domain.Models.Enum;
 using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace Expenses.Api.PresentationContracts.Forms;
 

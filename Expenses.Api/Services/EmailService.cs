@@ -1,18 +1,20 @@
-using System.Net;
-using System.Net.Mail;
 using Expenses.Api.DataContracts;
 using Expenses.Api.Settings;
 using Microsoft.Extensions.Options;
+using System.Net;
+using System.Net.Mail;
 
 namespace Expenses.Api.Services;
 
 public class EmailService : IEmailService
 {
     private readonly EmailingSettings _configuration;
+    private readonly ILogger<EmailService> _logger;
 
-    public EmailService(IOptions<EmailingSettings> configuration)
+    public EmailService(IOptions<EmailingSettings> configuration, ILogger<EmailService> logger)
     {
         _configuration = configuration.Value;
+        _logger = logger;
     }
 
     public async Task SendEmailAsync(string toEmail, string subject, string body)
@@ -33,5 +35,6 @@ public class EmailService : IEmailService
         mailMessage.To.Add(toEmail);
 
         await smtpClient.SendMailAsync(mailMessage);
+        _logger.LogInformation($"Confirmation email sent to {toEmail}");
     }
 }

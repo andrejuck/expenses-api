@@ -11,7 +11,7 @@ public class DomainException : Exception
     {
     }
 
-    public DomainException(string message, Exception innerException) 
+    public DomainException(string message, Exception innerException)
         : base(message, innerException)
     {
     }

@@ -1,6 +1,6 @@
-using System.Net;
 using Libs.Api.ErrorHandling.Model;
 using Microsoft.AspNetCore.Http;
+using System.Net;
 
 namespace Libs.Api.ErrorHandling;
 

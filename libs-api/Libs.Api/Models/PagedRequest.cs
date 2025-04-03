@@ -39,8 +39,8 @@ public class PagedRequest
     {
         get
         {
-            if(string.IsNullOrEmpty(_sortOrder)) return "Ascending";
-            
+            if (string.IsNullOrEmpty(_sortOrder)) return "Ascending";
+
             return _sortOrder;
         }
         set { _sortOrder = value; }

@@ -1,6 +1,7 @@
-namespace Expenses.Api.Settings; 
+namespace Expenses.Api.Settings;
 
-public class EmailingSettings {
+public class EmailingSettings
+{
 
     public bool IsEnabled { get; set; }
     public string Host { get; set; }

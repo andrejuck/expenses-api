@@ -21,20 +21,22 @@ public class ModuleRepository : BaseMongoRepository<Module>, IModuleRepository
         return _filterBuilder.Eq(a => a.Id, id);
     }
 
-    private FilterDefinition<Module> NotDeletedFilter() {
+    private FilterDefinition<Module> NotDeletedFilter()
+    {
         return _filterBuilder.Eq(a => a.DeletedAt, null);
     }
 
     public async Task<Module> FindByIdAsync(Guid id)
     {
-          var filters = _filterBuilder.And(NotDeletedFilter(), IdFilter(id));
+        var filters = _filterBuilder.And(NotDeletedFilter(), IdFilter(id));
         return await _dbContext.Modules.Find(IdFilter(id)).FirstOrDefaultAsync();
     }
 
-    public async Task UpdateAsync(Module entity)
+    public async Task<Module> UpdateAsync(Module entity)
     {
         var filter = IdFilter(entity.Id);
         await base.UpdateAsync(entity, filter);
+        return entity;
     }
 
     public async Task<List<Module>> FindAllByRolesAsync(IEnumerable<string> roles)

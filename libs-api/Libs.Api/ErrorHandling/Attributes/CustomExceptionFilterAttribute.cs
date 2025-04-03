@@ -1,9 +1,8 @@
-using System.Diagnostics;
-using System.Net;
 using Libs.Api.ErrorHandling.Exceptions;
 using Libs.Api.ErrorHandling.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using System.Net;
 
 namespace Libs.Api.ErrorHandling.Attributes;
 
@@ -21,7 +20,6 @@ public class CustomExceptionFilter : ExceptionFilterAttribute
                 break;
 
             default:
-                Debug.WriteLine(context.Exception);
                 errorResponse = new ErrorResponse(HttpStatusCode.InternalServerError, context.Exception.Message, exceptionType.Name);
                 break;
         }

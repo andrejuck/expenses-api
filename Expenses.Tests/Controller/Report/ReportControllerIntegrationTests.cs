@@ -1,5 +1,4 @@
-﻿using DnsClient.Protocol;
-using Expenses.Api.Adapters;
+﻿using Expenses.Api.Adapters;
 using Expenses.Api.PresentationContracts.Expenses;
 using Expenses.Domain.Models;
 using Expenses.Tests.Generics;
@@ -11,7 +10,6 @@ using System.Globalization;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Resources;
-using System.Text.RegularExpressions;
 
 namespace Expenses.Tests.Controller.Report;
 internal class ReportControllerIntegrationTests : BaseIntegrationTest
@@ -67,7 +65,7 @@ internal class ReportControllerIntegrationTests : BaseIntegrationTest
         MockExpense.CreateExpense(Factory.DbContext.Expenses, AdminUser, payment, DateTime.Now.AddDays(-1), totalPrice: 20.18M);
         MockExpense.CreateExpense(Factory.DbContext.Expenses, AdminUser, payment, DateTime.Now.AddDays(-5), totalPrice: 25.23M);
         MockExpense.CreateExpense(Factory.DbContext.Expenses, AdminUser, payment, DateTime.Now.AddDays(-5), totalPrice: 26.37M);
-        var searchParam = new ExpenseSearchParam() { StartTransactionDate = DateTime.Now.AddDays(-3), EndTransactionDate =  DateTime.Now};
+        var searchParam = new ExpenseSearchParam() { StartTransactionDate = DateTime.Now.AddDays(-3), EndTransactionDate = DateTime.Now };
         BaseUri.Query = searchParam.BuildQueryParams();
 
         var result = await Client.GetAsync(BaseUri.Uri);

@@ -1,9 +1,9 @@
 ﻿
-using MongoDB.Driver;
-using Libs.Auth.Models;
-using Libs.Api.Infra;
-using Expenses.Infra.Settings;
 using Expenses.Domain.Models;
+using Expenses.Infra.Settings;
+using Libs.Api.Infra;
+using Libs.Auth.Models;
+using MongoDB.Driver;
 
 namespace Expenses.Infra;
 public class DBContext : MongoDbContext
@@ -29,11 +29,10 @@ public class DBContext : MongoDbContext
     public void InitializeData()
     {
         var adminModule = Modules.Find(NameFilter<Module>("Admin Module")).FirstOrDefault();
-        if (adminModule == null) Modules.InsertOne(new Module("Admin Module", UserRole.Admin));
-            
+        if (adminModule == null) Modules.InsertOne(new Module("Admin Module", Guid.NewGuid(), UserRole.Admin));
 
         var configModule = Modules.Find(NameFilter<Module>("Configuration Module")).FirstOrDefault();
-        if (configModule == null) Modules.InsertOne(new Module("Configuration Module", UserRole.Admin, UserRole.GeneralUser));
+        if (configModule == null) Modules.InsertOne(new Module("Configuration Module", Guid.NewGuid(), UserRole.Admin, UserRole.GeneralUser));
     }
 
     private FilterDefinition<T> NameFilter<T>(string name)
