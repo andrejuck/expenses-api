@@ -1,10 +1,9 @@
-using System.Diagnostics;
-using System.Globalization;
-using System.Text;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Expenses.Api.Resources;
 using Microsoft.Extensions.Localization;
+using System.Globalization;
+using System.Text;
 
 namespace Expenses.Api.Adapters;
 
@@ -69,7 +68,7 @@ public class CsvHelperAdapter
 
             return (headers, records);
         };
-       
+
     }
 
     private TMap CreateClassMapInstance<TMap>() where TMap : ClassMap

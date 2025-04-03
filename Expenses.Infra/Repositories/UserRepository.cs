@@ -24,10 +24,11 @@ namespace Expenses.Infra.Repositories
             return _filterBuilder.Eq(a => a.Id, id);
         }
 
-        public async Task UpdateAsync(User entity)
+        public async Task<User> UpdateAsync(User entity)
         {
             var filter = IdFilter(entity.Id);
             await base.UpdateAsync(entity, filter);
+            return entity;
         }
 
         public async Task<User> GetByEmailAsync(string email)

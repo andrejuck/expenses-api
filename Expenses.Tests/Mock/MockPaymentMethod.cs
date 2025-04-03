@@ -8,12 +8,12 @@ namespace Expenses.Tests.Mock;
 public static class MockPaymentMethod
 {
     public static PaymentMethod CreatePaymentMethod(
-        IMongoCollection<PaymentMethod> collection, 
+        IMongoCollection<PaymentMethod> collection,
         UserResponse loggedUser,
         PaymentType paymentType = PaymentType.Cash
     )
     {
-        var paymentMethod = new PaymentMethod("TestPayment", paymentType); 
+        var paymentMethod = new PaymentMethod("TestPayment", paymentType);
         paymentMethod.BindUser(loggedUser.Id);
 
         collection.InsertOne(paymentMethod);

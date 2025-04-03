@@ -6,7 +6,6 @@ using Libs.Api.Models;
 using Libs.Auth.Helpers;
 using Libs.Auth.Models.Config;
 using Microsoft.Extensions.Options;
-using MongoDB.Bson;
 
 namespace Expenses.Api.PresentationContracts.GraphQL;
 

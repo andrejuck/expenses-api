@@ -1,6 +1,6 @@
 using Libs.Api.Models;
-using MongoDB.Driver;
 using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace Libs.Api.Infra;
 
@@ -74,8 +74,8 @@ public abstract class BasePageableMongoRepository<T> : BaseMongoRepository<T>
     protected virtual BsonDocument BuildSorting(PagedRequest request, ref SortDefinition<T> sortDefinition)
     {
         if (request.IsSorted)
-        { 
-            
+        {
+
             if (Enum.TryParse<SortOrder>(request.SortOrder, out var sortOrder))
             {
                 if (sortOrder == SortOrder.Ascending)

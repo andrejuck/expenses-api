@@ -5,7 +5,6 @@ namespace Libs.Api.ErrorHandling.Attributes;
 
 public class ErrorFilterAttribute : Attribute, IAsyncResultFilter
 {
-
     public virtual async Task OnResultExecutionAsync(ResultExecutingContext context, ResultExecutionDelegate next)
     {
         var errorService = context.HttpContext.RequestServices.GetService<IErrorService>();

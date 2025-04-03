@@ -5,7 +5,8 @@ using Expenses.Domain.Models;
 
 namespace Expenses.Api.Adapters;
 
-public class ModuleProfile : Profile {
+public class ModuleProfile : Profile
+{
 
     public ModuleProfile()
     {

@@ -50,7 +50,7 @@ public class Expense : BaseUserEntity
         ExpenseCategories = expenseCategories;
         PaymentMethodId = paymentMethod.Id;
         Installment = installment;
-        
+
         SetUpdateAt();
         Validate(paymentMethod);
     }
@@ -89,7 +89,7 @@ public class Expense : BaseUserEntity
             throw new DomainException(string.Format(DomainMessages.EMPTY_FIELD, nameof(Description)));
         if (PaymentMethodId == Guid.Empty)
             throw new DomainException(string.Format(DomainMessages.EMPTY_FIELD, nameof(PaymentMethod)));
-        if(paymentMethod.PaymentType != PaymentType.CreditCard && Installment != null)
+        if (paymentMethod.PaymentType != PaymentType.CreditCard && Installment != null)
             throw new DomainException(DomainMessages.EXPENSE_INSTALLMENT_ALLOWED_ONLY_TO_CREDIT_CARD);
     }
 }

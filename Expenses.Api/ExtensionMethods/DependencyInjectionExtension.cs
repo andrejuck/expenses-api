@@ -1,13 +1,12 @@
+using Expenses.Api.Adapters;
 using Expenses.Api.Application;
 using Expenses.Api.DataContracts;
 using Expenses.Api.DataContracts.Applications;
 using Expenses.Api.Services;
 using Expenses.Domain.DataContracts;
 using Expenses.Infra.Repositories;
-using Expenses.Api.Adapters;
-using Libs.Api.ErrorHandling;
-using Microsoft.Extensions.Localization;
 using Libs.Api.Adapters;
+using Libs.Api.ErrorHandling;
 
 namespace Expenses.Api.ExtensionMethods;
 

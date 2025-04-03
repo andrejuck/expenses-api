@@ -1,5 +1,4 @@
 using Expenses.Domain.DataContracts;
-using Expenses.Domain.Extensions;
 using Expenses.Domain.Models;
 using Libs.Api.Infra;
 using Libs.Api.Models;
@@ -46,10 +45,11 @@ public class ExpenseRepository : BasePageableMongoRepository<Expense>, IExpenseR
         return await Collection.Aggregate<Expense>(pipeline).FirstOrDefaultAsync();
     }
 
-    public async Task UpdateAsync(Expense entity)
+    public async Task<Expense> UpdateAsync(Expense entity)
     {
         var filter = IdFilter(entity.Id);
         await base.UpdateAsync(entity, filter);
+        return entity;
     }
 
     public Task<long> GetAllCountAsync(ExpenseSearchParam searchParams, Guid userId)
@@ -142,7 +142,7 @@ public class ExpenseRepository : BasePageableMongoRepository<Expense>, IExpenseR
         return new List<BsonDocument> {
             new BsonDocument("$set", new BsonDocument
             {
-                { 
+                {
                     "TransactionDateOnly", new BsonDocument
                     {
                         { "$dateToString", new BsonDocument
@@ -154,7 +154,7 @@ public class ExpenseRepository : BasePageableMongoRepository<Expense>, IExpenseR
                     }
                 }
             }),
-            new BsonDocument("$group", new BsonDocument 
+            new BsonDocument("$group", new BsonDocument
             {
                 { "_id", "$TransactionDateOnly" },
                 { "TotalPrice", new BsonDocument { { "$sum", "$TotalPrice" } } },

@@ -1,5 +1,3 @@
-using System.Net;
-using System.Text.Json;
 using Expenses.Api.PresentationContracts.Forms;
 using Expenses.Api.PresentationContracts.PaymentMethods;
 using Expenses.Domain.Models;
@@ -9,6 +7,8 @@ using Expenses.Tests.Helpers;
 using Expenses.Tests.Mock;
 using Microsoft.AspNetCore.JsonPatch;
 using MongoDB.Driver;
+using System.Net;
+using System.Text.Json;
 
 namespace Expenses.Tests.Controller;
 
@@ -137,7 +137,7 @@ public class PaymentMethodControllerIntegrationTests : BaseIntegrationTest
         var paymentMock = MockPaymentMethod.CreatePaymentMethod(Factory.DbContext.PaymentMethods, AdminUser);
         MockUser("not_payment_user", "test");
         Authenticate("not_payment_user");
-        
+
         //Act
         var result = await Client.GetAsync(BaseUri + $"{paymentMock.Id}");
 

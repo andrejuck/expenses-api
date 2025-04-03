@@ -1,5 +1,4 @@
 using Expenses.Api.ExtensionMethods;
-using Expenses.Api.Resources;
 using Expenses.Infra;
 using Expenses.Infra.Settings;
 using Libs.Api.Infra;
@@ -10,7 +9,6 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Localization;
 using Mongo2Go;
 using MongoDB.Driver;
-using System.Reflection;
 
 namespace Expenses.Tests.Generics;
 

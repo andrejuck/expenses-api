@@ -5,7 +5,8 @@ using Expenses.Domain.Models;
 
 namespace Expenses.Api.Adapters;
 
-public class PaymentMethodProfile : Profile {
+public class PaymentMethodProfile : Profile
+{
 
     public PaymentMethodProfile()
     {

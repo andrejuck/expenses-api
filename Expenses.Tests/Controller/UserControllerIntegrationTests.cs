@@ -1,11 +1,10 @@
-using System.Diagnostics;
 using Expenses.Api.PresentationContracts;
 using Expenses.Tests.Generics;
 using Expenses.Tests.Helpers;
 using Libs.Api.Models;
 using Libs.Auth.Models;
-using MongoDB.Bson;
 using MongoDB.Driver;
+using System.Diagnostics;
 
 namespace Expenses.Tests.Controller;
 
@@ -38,8 +37,8 @@ public class UserControllerIntegrationTests : BaseIntegrationTest
     [Test]
     public async Task Should_Fetch_All_Users()
     {
-        var request = new PagedRequest() { CurrentPage = 1, PageSize = 3};
-        BaseUriBuilder.Query =  request.BuildQueryParams();
+        var request = new PagedRequest() { CurrentPage = 1, PageSize = 3 };
+        BaseUriBuilder.Query = request.BuildQueryParams();
 
         var result = await Client.GetAsync(BaseUriBuilder.Uri);
         var content = result.Content.ReadAsStringAsync().Result.Deserialize<PagedResponse<UserResponse>>();
@@ -72,7 +71,7 @@ public class UserControllerIntegrationTests : BaseIntegrationTest
 
     private void MockDatabase()
     {
-        var users = new List<User> 
+        var users = new List<User>
         {
             new User("test@test.mock", "test"),
             new User("test2@test.mock", "test2"),

@@ -28,7 +28,7 @@ public static class MockExpense
         var listExpense = new List<Expense>();
         for (int i = 0; i < count; i++)
         {
-            var expense = new Expense("test", $"test {i}", 10+i, DateTime.Now, new List<string>() { $"test {i}" }, paymentMethod);
+            var expense = new Expense("test", $"test {i}", 10 + i, DateTime.Now, new List<string>() { $"test {i}" }, paymentMethod);
             expense.BindUser(loggedUser.Id);
 
             listExpense.Add(expense);

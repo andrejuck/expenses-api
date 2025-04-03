@@ -27,7 +27,7 @@ public class ExpenseFormValidator : AbstractValidator<ExpenseForm>
         RuleFor(x => x.PaymentMethodId)
             .NotEmpty()
             .WithMessage(string.Format(Messages.BAD_REQUEST_EMPTY_FIELD, nameof(ExpenseForm.PaymentMethodId)));
-        
+
         RuleFor(x => x.ExpenseCategories)
             .ForEach(x => x.MinimumLength(3))
             .WithMessage(string.Format(Messages.BAD_REQUEST_LENGTH_VALUE_HIGHER_THAN, nameof(ExpenseForm.ExpenseCategories), 3));

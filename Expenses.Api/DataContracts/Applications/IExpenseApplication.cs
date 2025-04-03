@@ -2,7 +2,6 @@ using Expenses.Api.PresentationContracts.Expenses;
 using Expenses.Domain.Models;
 using Libs.Api.Models;
 using Microsoft.AspNetCore.JsonPatch;
-using MongoDB.Bson;
 
 namespace Expenses.Api.DataContracts.Applications;
 

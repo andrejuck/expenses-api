@@ -1,17 +1,18 @@
-using Expenses.Api.Settings;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
 using Expenses.Api.ExtensionMethods;
-using System.Text;
+using Expenses.Api.Settings;
+using Expenses.Domain;
 using Expenses.Infra.Settings;
-using Libs.Auth.Models.Config;
+using FluentValidation;
 using FluentValidation.AspNetCore;
 using Libs.Api.ErrorHandling.Attributes;
+using Libs.Api.Logging;
+using Libs.Auth.Models.Config;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Localization;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Globalization;
-using Expenses.Domain;
-using FluentValidation;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 var isTesting = Environment.GetEnvironmentVariable("DOTNET_INTEGRATION_TESTS") == "true";
@@ -33,7 +34,7 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssembly(typeof(DomainAssembly).Assembly);
 
 builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
+builder.Logging.AddProvider(new CustomLoggerProvider());
 
 if (builder.Environment.IsDevelopment())
 {
@@ -44,8 +45,9 @@ if (builder.Environment.IsDevelopment())
 builder.Services.AddExpensesDependencies();
 builder.Services.Configure<EmailingSettings>(builder.Configuration.GetSection("EmailingSettings"));
 builder.Services.Configure<CustomClaimSettings>(builder.Configuration.GetSection("CustomClaims"));
+
 var mongoConn = builder.Configuration.GetSection("MongoDbSettings").Get<MongoDbSettings>();
-if(!isTesting) builder.Services.AddMongoDbContext(mongoConn);
+if (!isTesting) builder.Services.AddMongoDbContext(mongoConn);
 
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddGraphQL();
@@ -77,7 +79,7 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
     c.DescribeAllParametersInCamelCase();
-    
+
     // Add JWT Authentication to Swagger
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -114,7 +116,7 @@ var supportedCultures = new[]
 var localizationOptions = new RequestLocalizationOptions()
 {
     DefaultRequestCulture = new RequestCulture("pt-BR"),
-    SupportedCultures =  supportedCultures,
+    SupportedCultures = supportedCultures,
     SupportedUICultures = supportedCultures
 };
 builder.Services.Configure<RequestLocalizationOptions>(options =>

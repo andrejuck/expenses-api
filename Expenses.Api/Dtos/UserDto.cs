@@ -1,6 +1,4 @@
-﻿using System.Security.Claims;
-
-namespace Expenses.Api.Dtos
+﻿namespace Expenses.Api.Dtos
 {
     public class UserDto
     {
