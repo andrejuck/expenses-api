@@ -57,6 +57,7 @@ public class PaymentMethodApplication : IPaymentMethodApplication
 
         patch.ApplyTo(paymentEntityForm);
         payment.PrepareToUpdate(paymentEntityForm.Name, paymentEntityForm.PaymentType, paymentEntityForm.IsActive);
+
         await _paymentRepository.UpdateAsync(payment);
         _logger.LogInformation(Messages.LOG_UPDATED_MESSAGE, nameof(PaymentMethod), userId, payment.ToJson());
     }

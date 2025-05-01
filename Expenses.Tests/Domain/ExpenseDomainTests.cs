@@ -15,7 +15,7 @@ public class ExpenseDomainTests
     [TestCase(1, 10.133)]
     public void Should_Divide_Expense_By_Installments(int installment, decimal totalPrice)
     {
-        var paymentMethod = new PaymentMethod("credit card", PaymentType.CreditCard);
+        var paymentMethod = new PaymentMethod("credit card", PaymentType.CreditCard, true);
         var originalExpense = new Expense(null, "Test description", totalPrice, DateTime.Now, null, paymentMethod, installment);
 
         var expenses = originalExpense.DivideByInstallments(paymentMethod);
@@ -27,7 +27,7 @@ public class ExpenseDomainTests
     [Test]
     public void Should_Not_Divide_Expense_When_Installments_Equal_Zero()
     {
-        var paymentMethod = new PaymentMethod("credit card", PaymentType.CreditCard);
+        var paymentMethod = new PaymentMethod("credit card", PaymentType.CreditCard, true);
         var originalExpense = new Expense(null, "Test description", 10, DateTime.Now, null, paymentMethod);
 
         try
@@ -44,7 +44,7 @@ public class ExpenseDomainTests
     [TestCase(PaymentType.Cash)]
     public void Should_Not_Divide_Expense_When_NotCreditCard(PaymentType paymentType)
     {
-        var paymentMethod = new PaymentMethod("credit card", paymentType);
+        var paymentMethod = new PaymentMethod("credit card", paymentType, true);
         var originalExpense = new Expense(null, "Test description", 10, DateTime.Now, null, paymentMethod);
 
         try
@@ -60,7 +60,7 @@ public class ExpenseDomainTests
     [Test]
     public void Should_Validate_Expense_With_Incorret_PaymentType_For_Installment()
     {
-        var paymentMethod = new PaymentMethod("credit card", PaymentType.Cash);
+        var paymentMethod = new PaymentMethod("credit card", PaymentType.Cash, true);
 
         try
         {
