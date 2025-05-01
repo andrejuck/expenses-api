@@ -13,7 +13,7 @@ public static class MockPaymentMethod
         PaymentType paymentType = PaymentType.Cash
     )
     {
-        var paymentMethod = new PaymentMethod("TestPayment", paymentType);
+        var paymentMethod = new PaymentMethod("TestPayment", paymentType, true);
         paymentMethod.BindUser(loggedUser.Id);
 
         collection.InsertOne(paymentMethod);
