@@ -12,6 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      #TODO - Add openSSL 1.1 cache
       #OpenSSL1.1 dependency must use ubuntu 20.04, latest versions use the following step
       - name: Install OpenSSL 1.1 compatibility
         run: |
