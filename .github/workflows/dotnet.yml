@@ -18,3 +18,4 @@ jobs:
         with:
           working-dir: code
           github-token: ${{ secrets.PACKAGE_TOKEN }}
+          unit-tests-csproj: Expenses.Tests/Expenses.Tests.csproj
