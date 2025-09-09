@@ -2,11 +2,8 @@
 
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="11.11.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\libs-auth\Libs.Auth\Libs.Auth.csproj" />
-    <ProjectReference Include="..\libs-api\Libs.Api\Libs.Api.csproj" />
+    <PackageReference Include="juck.libs.api" Version="1.0.0" />
+    <PackageReference Include="juck.libs.auth" Version="1.0.0" />
   </ItemGroup>
 
   <PropertyGroup>
