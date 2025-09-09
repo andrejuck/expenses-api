@@ -11,11 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Expenses.Infra", "Expenses.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Expenses.Tests", "Expenses.Tests\Expenses.Tests.csproj", "{C2651725-8244-4742-BB05-311FB8F4EC4C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_deploy", "_deploy", "{16ACCA9E-98DE-483D-B048-51907048D9C2}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{8A417B6D-EDAB-41FD-B796-C261C9F414F5}"
 	ProjectSection(SolutionItems) = preProject
-		_deploy\scripts\commands.sh = _deploy\scripts\commands.sh
-		_deploy\scripts\init-mongo.js = _deploy\scripts\init-mongo.js
-		_deploy\mongodb = _deploy\mongodb
+		..\.github\workflows\dotnet.yml = ..\.github\workflows\dotnet.yml
 	EndProjectSection
 EndProject
 Global

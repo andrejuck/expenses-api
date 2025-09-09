@@ -17,3 +17,4 @@ jobs:
         uses: andrejuck/reusable-workflows/.github/actions/step-dotnet-build@main
         with:
           working-dir: code
+          github-token: ${{ secrets.PACKAGE_TOKEN }}
