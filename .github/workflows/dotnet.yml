@@ -9,9 +9,16 @@ on:
 jobs:
   build:
     
-    runs-on: ubuntu-latest
+    #OpenSSL1.1 dependency must use ubuntu 20.04, latest versions 
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v4
+
+      #OpenSSL1.1 dependency must use ubuntu 20.04, latest versions use the following step
+#      - name: Install OpenSSL 1.1 compatibility
+#        run: |
+#          sudo apt-get update
+#          sudo apt-get install -y libssl1.1 || true
 
       - name: Setup and build .NET
         uses: andrejuck/reusable-workflows/.github/actions/step-dotnet-build@main
