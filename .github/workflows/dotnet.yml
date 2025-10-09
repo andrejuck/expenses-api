@@ -4,41 +4,18 @@ on:
   push:
     branches-ignore:
       - develop
-      - release
-
+      - main
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
-    - name: Restore OpenSSL from cache
-      uses: actions/cache@v3
-      with:
-        path: /usr/local/openssl-1.1.1
-        key: openssl-1.1.1-${{ runner.os }}
-        restore-keys: openssl-1.1.1-
-    - name: Setup OpenSSL 1.1 if not cached
-      run: |
-        if [ ! -d /usr/local/openssl-1.1.1 ]; then
-          sudo apt update
-          sudo apt install -y build-essential wget
-          wget https://www.openssl.org/source/openssl-1.1.1u.tar.gz
-          tar -xvf openssl-1.1.1u.tar.gz
-          cd openssl-1.1.1u
-          ./config
-          make
-          sudo make install
-          sudo ldconfig
-        fi
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+      - uses: actions/checkout@v4
+      - name: Setup and build .NET
+        uses: andrejuck/reusable-workflows/.github/actions/step-dotnet-build@main
+        env:
+          DOTNET_INTEGRATION_TESTS: true
+        with:
+          working-dir: code
+          github-token: ${{ secrets.PACKAGE_TOKEN }}
+          unit-tests-csproj: Expenses.Tests/Expenses.Tests.csproj
+          ssl-testing: true

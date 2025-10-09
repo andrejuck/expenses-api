@@ -2,14 +2,13 @@
 # This .gitignore file was automatically created by Microsoft(R) Visual Studio.
 ################################################################################
 
-/Expenses.Api/.vs
-/Expenses.Api/bin/Debug/net8.0
-/Expenses.Api/obj
+**/.vs
+**/bin/Debug/net8.0
+**/obj
 /libs-auth/Libs.Auth/.vs
 /libs-auth/Libs.Auth/bin/Debug/net8.0
 /libs-auth/Libs.Auth/obj
 .vscode
-*/obj
 */bin/Debug
 */.vs
 */*/obj
@@ -19,3 +18,5 @@
 /.vs/ProjectEvaluation
 /Expenses.Api/Expenses.Api.csproj.user
 /.vs
+.idea/.idea.Expenses.Api/.idea/vcs.xml
+/.idea
