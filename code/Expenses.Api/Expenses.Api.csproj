@@ -30,4 +30,8 @@
     <ProjectReference Include="..\Expenses.Infra\Expenses.Infra.csproj" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(DOTNET_ENVIRONMENT)' == 'Staging'">
+    <Content Include="appsettings.Staging.json" CopyToOutputDirectory="Always" />
+  </ItemGroup>
+
 </Project>
