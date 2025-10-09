@@ -50,7 +50,7 @@ public class ExpenseGetIntegrationTests : BaseExpenseIntegrationTests
         var payment = MockPaymentMethod.CreatePaymentMethod(Factory.DbContext.PaymentMethods, AdminUser);
         var existingExpense = MockExpense.CreateMultipleExpenses(5, AdminUser, payment, Factory.DbContext.Expenses);
         var request = new PagedRequest() { CurrentPage = 1, PageSize = 2 };
-        var searchParam = new ExpenseSearchParam() { Description = "3" };
+        var searchParam = new ExpenseSearchParam() { Description = "2" };
         BaseUri.Query = request.BuildQueryParams();
         BaseUri.Query += searchParam.BuildQueryParams();
 

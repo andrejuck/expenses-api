@@ -2,8 +2,8 @@
 
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="11.11.0" />
-    <PackageReference Include="juck.libs.api" Version="1.0.0" />
-    <PackageReference Include="juck.libs.auth" Version="1.0.0" />
+    <PackageReference Include="juck.libs.api" Version="1.0.0-alpha.20" />
+    <PackageReference Include="juck.libs.auth" Version="1.0.0-alpha.5" />
   </ItemGroup>
 
   <PropertyGroup>

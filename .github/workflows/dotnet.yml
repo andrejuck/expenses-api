@@ -5,13 +5,11 @@ on:
     branches-ignore:
       - develop
       - main
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Setup and build .NET
         uses: andrejuck/reusable-workflows/.github/actions/step-dotnet-build@main
         env:
