@@ -13,7 +13,7 @@ jobs:
       - name: Setup and build .NET
         uses: andrejuck/reusable-workflows/.github/actions/step-dotnet-build@main
         env:
-          DOTNET_ENVIRONMENT: Staging
+          ASPNETCORE_ENVIRONMENT: Staging
         with:
           working-dir: code
           github-token: ${{ secrets.PACKAGE_TOKEN }}
