@@ -2,7 +2,7 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 
-COPY ./publish ./app/publish
+COPY ./code/publish ./app/publish
 
 # Definindo a porta e o comando de entrada
 EXPOSE 8080
