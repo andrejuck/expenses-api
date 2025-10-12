@@ -1,0 +1,20 @@
+name: Pipeline - Dev
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build:
+      uses: andrejuck/reusable-workflows/.github/workflows/dotnet-build-push-dockerhub.yml@main
+      with:
+        working-dir: code
+        image-tag: latest-snapshot
+        unit-tests-csproj: Expenses.Tests/Expenses.Tests.csproj
+        ssl-testing: true
+      secrets:
+        github-token: ${{ secrets.PACKAGE_TOKEN }}
+        docker-hub-username: ${{ secrets.DOCKERHUB_USERNAME }}
+        docker-hub-password: ${{ secrets.DOCKERHUB_TOKEN }}
+        docker-hub-repository: ${{ secrets.DOCKERHUB_REPOSITORY }}
