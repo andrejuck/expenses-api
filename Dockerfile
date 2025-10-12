@@ -1,6 +1,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS base
 WORKDIR /app
 
+COPY ./nuget.config .
 COPY ./code/Expenses.Api.sln .
 COPY ./code/Expenses.Api/Expenses.Api.csproj ./Expenses.Api/
 COPY ./code/Expenses.Domain/Expenses.Domain.csproj ./Expenses.Domain/
