@@ -5,7 +5,6 @@ COPY ./Expenses.Api.sln .
 COPY ./Expenses.Api/Expenses.Api.csproj ./Expenses.Api/
 COPY ./Expenses.Domain/Expenses.Domain.csproj ./Expenses.Domain/
 COPY ./Expenses.Infra/Expenses.Infra.csproj ./Expenses.Infra/
-COPY ./Expenses.Tests/Expenses.Tests.csproj ./Expenses.Tests/
 RUN dotnet restore Expenses.Api/Expenses.Api.csproj
 
 COPY . .
