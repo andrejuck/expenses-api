@@ -16,5 +16,5 @@ jobs:
       secrets:
         github-token: ${{ secrets.PACKAGE_TOKEN }}
         docker-hub-username: ${{ secrets.DOCKERHUB_USERNAME }}
-        docker-hub-password: ${{ secrets.DOCKERHUB_TOKEN }}
+        docker-hub-token: ${{ secrets.DOCKERHUB_TOKEN }}
         docker-hub-repository: ${{ secrets.DOCKERHUB_REPOSITORY }}
