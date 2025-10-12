@@ -1,10 +1,10 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS base
 WORKDIR /app
 
-COPY ./Expenses.Api.sln .
-COPY ./Expenses.Api/Expenses.Api.csproj ./Expenses.Api/
-COPY ./Expenses.Domain/Expenses.Domain.csproj ./Expenses.Domain/
-COPY ./Expenses.Infra/Expenses.Infra.csproj ./Expenses.Infra/
+COPY ./code/Expenses.Api.sln .
+COPY ./code/Expenses.Api/Expenses.Api.csproj ./Expenses.Api/
+COPY ./code/Expenses.Domain/Expenses.Domain.csproj ./Expenses.Domain/
+COPY ./code/Expenses.Infra/Expenses.Infra.csproj ./Expenses.Infra/
 RUN dotnet restore Expenses.Api/Expenses.Api.csproj
 
 COPY . .
