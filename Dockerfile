@@ -4,7 +4,7 @@ WORKDIR /app
 
 RUN ls -l
 
-COPY ./code/publish .
+COPY ./publish .
 
 # Definindo a porta e o comando de entrada
 EXPOSE 8080
