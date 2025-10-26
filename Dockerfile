@@ -1,4 +1,4 @@
-# Usando a imagem runtime do .NET para execu��o
+# Usando a imagem runtime do .NET para execução
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 
