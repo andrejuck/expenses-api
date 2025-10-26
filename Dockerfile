@@ -2,6 +2,8 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 WORKDIR /app
 
+RUN ls -l
+
 COPY ./code/publish .
 
 # Definindo a porta e o comando de entrada
