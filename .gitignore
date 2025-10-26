@@ -11,8 +11,9 @@
 .vscode
 */bin/Debug
 */.vs
+*/*/publish
 */*/obj
-*/*/bin/Debug
+*/*/bin
 */*/.vs
 /.vs/Expenses.Api
 /.vs/ProjectEvaluation
@@ -20,3 +21,4 @@
 /.vs
 .idea/.idea.Expenses.Api/.idea/vcs.xml
 /.idea
+
