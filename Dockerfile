@@ -1,8 +1,10 @@
 # Usando a imagem runtime do .NET para execução
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+
+RUN ls -l
+
 WORKDIR /app
 
-RUN ls -l ./code
 
 COPY ./code/publish .
 
