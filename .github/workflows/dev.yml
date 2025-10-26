@@ -15,6 +15,7 @@ jobs:
         ssl-testing: true
         publish-artifact: true
         app-name: expenses-api
+        linux-arch: linux-arm64
       secrets:
         github-token: ${{ secrets.PACKAGE_TOKEN }}
         docker-hub-username: ${{ secrets.DOCKERHUB_USERNAME }}
