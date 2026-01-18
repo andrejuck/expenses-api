@@ -1,0 +1,32 @@
+name: Build & Push NGINX image
+description: Build NGINX and push
+
+inputs:
+  working-dir:
+    required: true
+    description: Dockerfile working directory
+  dockerfile-name:
+    required: false
+    default: Dockerfile.nginx
+    description: NGINX Dockerfile name, with default value of Dockerfile.nginx
+  github-token:
+    description: Github token
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+      
+    - name: Build and push nginx image
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.GIT_HUB_TOKEN }}
+      run: |
+        export DOCKER_BUILDKIT=1
+        cd ${{ inputs.working-dir }}
+        docker buildx build \
+          -f ${{ inputs.dockerfile-name }} \
+          --secret id=github_token,env=GITHUB_TOKEN \
+          -t "${{ env.IMAGE_NAME }}:nginx" \
+          --push \
+          .

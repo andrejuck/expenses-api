@@ -1,0 +1,42 @@
+name: Build & Tests
+
+on:
+  push:
+    branches-ignore:
+      - 'main'
+    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup and build .NET
+        uses: ./.gitea/actions/step-dotnet-build
+        with:
+          working-dir: code/backend
+          github-token: ${{ secrets.GIT_HUB_TOKEN }}
+          
+      - name: Set up Docker Buildx
+        run: |
+          docker buildx create --use --name gitea-builder || docker buildx use gitea-builder
+
+      - name: Login to GitLab Container Registry
+        run: |
+          echo "${{ secrets.GITLAB_PAT }}" | docker login registry.gitlab.com \
+            -u "${{ secrets.GITLAB_USER }}" \
+            --password-stdin
+
+      - name: Build and push image
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_HUB_TOKEN }}
+          IMAGE_NAME: registry.gitlab.com/${{ vars.REPOSITORY_OWNER }}/${{ vars.REPOSITORY_NAME }}
+          BUILD_NUMBER: ${{ gitea.run_number }}
+        run: |
+          export DOCKER_BUILDKIT=1
+          cd code/backend
+          docker buildx build \
+            --secret id=github_token,env=GITHUB_TOKEN \
+            -t "${IMAGE_NAME}:latest" \
+            -t "${IMAGE_NAME}:rc-${BUILD_NUMBER}" \
+            --push \
+            .

@@ -1,0 +1,82 @@
+name: Build & Tests
+
+on:
+  push:
+    branches:
+      - "main"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        
+      - name: Setup and build .NET
+        uses: ./.gitea/actions/step-dotnet-build
+        with:
+          working-dir: ${{ vars.WORKING_DIRECTORY }}
+          github-token: ${{ secrets.GIT_HUB_TOKEN }}
+          
+      - name: Get application version
+        id: get_version
+        run: |
+          APPLICATION_VERSION=$(dotnet msbuild ${{ vars.WORKING_DIRECTORY }}/Gw2ItemTracker.App/Gw2ItemTracker.App.csproj /pp | grep "<Version>" | head -n 1 | sed -E 's/.*<Version>(.*)<\/Version>.*/\1/')
+          echo "APPLICATION_VERSION=$APPLICATION_VERSION" >> $GITEA_ENV
+          echo "${APPLICATION_VERSION}"
+
+      - name: Set image name env
+        id: set_imageName
+        run: |
+          echo "${IMAGE_NAME}"
+          IMAGE_NAME=registry.gitlab.com/${{ vars.REPOSITORY_OWNER }}/${{ vars.REPOSITORY_NAME  }}
+          echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
+          echo "${IMAGE_NAME}"
+
+      - name: Set up Docker Buildx
+        run: |
+          docker buildx create --use --name gitea-builder || docker buildx use gitea-builder
+
+      - name: Login to GitLab Container Registry
+        run: |
+          echo "${{ secrets.GITLAB_PAT }}" | docker login registry.gitlab.com \
+            -u "${{ secrets.GITLAB_USER }}" \
+            --password-stdin
+
+      - name: Build and push image
+        env:
+          GITHUB_TOKEN: ${{ secrets.GIT_HUB_TOKEN }}
+          BUILD_NUMBER: ${{ gitea.run_number }}
+        run: |
+          export DOCKER_BUILDKIT=1
+          cd ${{ vars.WORKING_DIRECTORY }}
+          docker buildx build \
+            --secret id=github_token,env=GITHUB_TOKEN \
+            -t "${{ env.IMAGE_NAME }}:latest" \
+            -t "${{ env.IMAGE_NAME }}:${{ env.APPLICATION_VERSION }}" \
+            --push \
+            .
+      - name: Setup and build .NET
+        uses: ./.gitea/actions/step-nginx-push-image
+        env:
+          IMAGE_NAME: ${{ env.IMAGE_NAME }}
+        with:
+          working-dir: ${{ vars.WORKING_DIRECTORY }}
+
+#      - name: Copy docker-compose files
+#        run: |
+#          scp ${{ vars.WORKING_DIRECTORY }} compose.yml \
+#          ${{ secrets.SERVER_SSH_USER }}@${{ secrets.SERVER_SSH_HOST }}:/app/${{ vars.REPOSITORY_NAME  }}/.deploy
+#          
+#      - name: Setup SSH
+#        run: |
+#          mkdir -p ~/.ssh
+#          echo "${{ secrets.SERVER_SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+#          chmod 600 ~/.ssh/id_ed25519
+#          ssh-keyscan -H ${{ secrets.SERVER_SSH_HOST }} >> ~/.ssh/known_hosts
+#          
+#      - name: Deploy
+#        env:
+#          PROJECT_IMAGE_NAME: ${{ env.IMAGE_NAME }}
+#          PROJECT_IMAGE_TAG: ${{ env.APPLICATION_VERSION }}
+#        run: |
+#          ssh ${{ secrets.SERVER_SSH_USER }}@${{ secrets.SERVER_SSH_HOST }} "cd /app/${{ vars.REPOSITORY_NAME  }}/.deploy && docker compose pull && docker compose up -d"

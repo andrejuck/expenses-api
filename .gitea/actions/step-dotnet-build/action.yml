@@ -1,0 +1,52 @@
+name: Build & Test dotnet
+description: Setup, restore dependencies and build dotnet app
+
+inputs:
+  working-dir:
+    description: Diretory path containing sln file
+    required: true
+  app-name:
+    description: App name
+    required: true
+  dotnet-version:
+    description: Dotnet version
+    required: false
+    default: "8"
+  unit-tests-csproj:
+    description: Unit Tests csproj path with working-dir root
+    required: false
+  linux-arch:
+    description: Linux base architecture
+    required: false
+    default: linux-x64
+  github-token:
+    description: Github token
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      env:
+        NUGET_AUTH_TOKEN: ${{ inputs.github-token }}
+      with:
+        dotnet-version: '${{ inputs.dotnet-version }}.0.x'
+        source-url: https://nuget.pkg.github.com/andrejuck/index.json
+        
+    - name: Restore
+      shell: sh
+      run: dotnet restore
+      working-directory: ${{ inputs.working-dir }}
+
+    - name: Build (Release)
+      shell: sh
+      run: dotnet build --configuration Release --no-restore
+      working-directory: ${{ inputs.working-dir }}
+
+    - name: Run tests
+      if: ${{ inputs.unit-tests-csproj }}
+      shell: sh
+      run: dotnet test ${{ inputs.unit-tests-csproj }} --no-build --configuration Release
+      working-directory: ${{ inputs.working-dir }}
