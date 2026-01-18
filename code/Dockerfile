@@ -12,10 +12,10 @@ RUN --mount=type=secret,id=github_token \
     --store-password-in-clear-text
 
 
-COPY ./code .
+COPY . .
 RUN dotnet restore Expenses.Api.sln
 
-WORKDIR /src/code/Expenses.Api
+WORKDIR /src/Expenses.Api
 RUN dotnet publish -c Release -o /app/publish --no-self-contained
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
