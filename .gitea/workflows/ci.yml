@@ -13,7 +13,7 @@ jobs:
       - name: Setup and build .NET
         uses: ./.gitea/actions/step-dotnet-build
         with:
-          working-dir: code/backend
+          working-dir: code
           github-token: ${{ secrets.GIT_HUB_TOKEN }}
           
       - name: Set up Docker Buildx
