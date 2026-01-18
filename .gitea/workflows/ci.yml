@@ -33,7 +33,7 @@ jobs:
           BUILD_NUMBER: ${{ gitea.run_number }}
         run: |
           export DOCKER_BUILDKIT=1
-          cd ${{ inputs.working-dir }}
+          cd code
           docker buildx build \
             --secret id=github_token,env=GITHUB_TOKEN \
             -t "${IMAGE_NAME}:latest" \
