@@ -1,8 +1,8 @@
-using Expenses.Api.PresentationContracts;
-using Expenses.Api.PresentationContracts.Forms;
+using Transactions.Api.PresentationContracts;
+using Transactions.Api.PresentationContracts.Forms;
 using System.Security.Claims;
 
-namespace Expenses.Api.DataContracts.Applications;
+namespace Transactions.Api.DataContracts.Applications;
 
 public interface IModuleApplication
 {

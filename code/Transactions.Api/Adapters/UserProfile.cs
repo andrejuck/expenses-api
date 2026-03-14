@@ -1,8 +1,8 @@
 using AutoMapper;
-using Expenses.Api.PresentationContracts;
+using Transactions.Api.PresentationContracts;
 using Libs.Auth.Models;
 
-namespace Expenses.Api.Adapters;
+namespace Transactions.Api.Adapters;
 
 public class UserProfile : Profile
 {

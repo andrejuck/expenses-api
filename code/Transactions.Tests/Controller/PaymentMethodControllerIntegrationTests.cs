@@ -1,5 +1,5 @@
-using Expenses.Api.PresentationContracts.Forms;
-using Expenses.Api.PresentationContracts.PaymentMethods;
+using Transactions.Api.PresentationContracts.Forms;
+using Transactions.Api.PresentationContracts.PaymentMethods;
 using Transactions.Domain.Models;
 using Transactions.Domain.Models.Enum;
 using Transactions.Tests.Helpers;

@@ -1,5 +1,5 @@
 ﻿
-namespace Expenses.Api.Dtos
+namespace Transactions.Api.Dtos
 {
     public class LoginDto
     {

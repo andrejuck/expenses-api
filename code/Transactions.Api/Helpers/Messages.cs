@@ -1,4 +1,4 @@
-namespace Expenses.Api.Helpers;
+namespace Transactions.Api.Helpers;
 
 public static class Messages
 {

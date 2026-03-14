@@ -1,9 +1,9 @@
-using Expenses.Api.PresentationContracts.PaymentMethods;
+using Transactions.Api.PresentationContracts.PaymentMethods;
 
 
-namespace Expenses.Api.PresentationContracts.Expenses;
+namespace Transactions.Api.PresentationContracts.Expenses;
 
-public class ExpenseFileResponse
+public class TransactionFileResponse
 {
     public DateTime TransactionDate { get; set; }
     public string Description { get; set; }

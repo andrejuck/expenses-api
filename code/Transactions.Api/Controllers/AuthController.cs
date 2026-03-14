@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
-using Expenses.Api.DataContracts;
-using Expenses.Api.Dtos;
-using Expenses.Api.PresentationContracts;
-using Expenses.Api.Settings;
+using Transactions.Api.DataContracts;
+using Transactions.Api.Dtos;
+using Transactions.Api.PresentationContracts;
+using Transactions.Api.Settings;
 using Transactions.Domain.DataContracts;
 using Libs.Auth.Helpers;
 using Libs.Auth.Models;
@@ -15,9 +15,13 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
+using Transactions.Api.DataContracts;
+using Transactions.Api.Dtos;
+using Transactions.Api.PresentationContracts;
+using Transactions.Api.Settings;
 
 
-namespace Expenses.Api.Controllers
+namespace Transactions.Api.Controllers
 {
     [ApiController]
     [Route("api/auth")]

@@ -1,5 +1,5 @@
-using Expenses.Api.DataContracts.Applications;
-using Expenses.Api.PresentationContracts.Expenses;
+using Transactions.Api.DataContracts.Applications;
+using Transactions.Api.PresentationContracts.Expenses;
 using Transactions.Domain.Models;
 using Libs.Api.Models;
 using Libs.Auth.Helpers;
@@ -9,18 +9,19 @@ using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Net;
+using Transactions.Domain.Models.Transaction;
 
-namespace Expenses.Api.Controllers;
+namespace Transactions.Api.Controllers;
 
 [ApiController]
-[Route("api/expense")]
+[Route("api/transaction")]
 [Authorize]
-public class ExpenseController : ControllerBase
+public class TransactionController : ControllerBase
 {
-    private readonly IExpenseApplication _application;
+    private readonly ITransactionApplication _application;
     private readonly CustomClaimSettings _claimSettings;
     private Guid UserId => UserClaimsHelper.GetUserGuidIdFromClaims(User, _claimSettings);
-    public ExpenseController(IExpenseApplication application, IOptions<CustomClaimSettings> claimSettings)
+    public TransactionController(ITransactionApplication application, IOptions<CustomClaimSettings> claimSettings)
     {
         _application = application;
         _claimSettings = claimSettings.Value;
@@ -30,9 +31,9 @@ public class ExpenseController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.Accepted)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult> CreateExpenseAsync([FromBody] ExpenseForm form)
+    public async Task<ActionResult> CreateTransactionAsync([FromBody] TransactionForm form)
     {
-        await _application.CreateNewExpenseAsync(UserId, form);
+        await _application.CreateNewTransactionAsync(UserId, form);
         return Accepted();
     }
 
@@ -40,29 +41,31 @@ public class ExpenseController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.Accepted)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult> CreateExpenseAsync(Guid id, [FromBody] JsonPatchDocument<ExpenseForm> patchForm)
+    public async Task<ActionResult> PatchTransactionAsync(Guid id, [FromBody] JsonPatchDocument<TransactionForm> patchForm)
     {
-        await _application.UpdateExpenseAsync(id, UserId, patchForm);
+        await _application.UpdateTransactionAsync(id, UserId, patchForm);
         return Accepted();
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(PagedResponse<ExpenseResponse>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(PagedResponse<TransactionResponse>), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<PagedResponse<ExpenseResponse>>> GetPagedExpenseAsync([FromQuery] ExpenseSearchParam searchParams, [FromQuery] PagedRequest pagedRequest)
+    public async Task<ActionResult<PagedResponse<TransactionResponse>>> GetPagedTransactionsAsync(
+        [FromQuery] TransactionSearchParam searchParams,
+        [FromQuery] PagedRequest pagedRequest)
     {
-        var result = await _application.GetPagedExpenseAsync(searchParams, pagedRequest, UserId);
+        var result = await _application.GetPagedTransactionAsync(searchParams, pagedRequest, UserId);
         return Ok(result);
     }
 
     [HttpGet("{id}")]
-    [ProducesResponseType(typeof(ExpenseResponse), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(TransactionResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<PagedResponse<ExpenseResponse>>> GetExpenseByIdAsync(Guid id)
+    public async Task<ActionResult<PagedResponse<TransactionResponse>>> GetTransactionByIdAsync(Guid id)
     {
-        var result = await _application.GetExpenseAsync(id, UserId);
+        var result = await _application.GetTransactionAsync(id, UserId);
         return Ok(result);
     }
 
@@ -80,9 +83,9 @@ public class ExpenseController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.Accepted)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<List<string>>> DeleteExpenseAsync(Guid id)
+    public async Task<ActionResult<List<string>>> DeleteTransactionAsync(Guid id)
     {
-        await _application.DeleteExpenseAsync(id, UserId);
+        await _application.DeleteTransactionAsync(id, UserId);
         return Accepted();
     }
 }

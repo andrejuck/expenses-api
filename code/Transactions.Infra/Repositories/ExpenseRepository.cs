@@ -5,10 +5,11 @@ using Libs.Api.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
+using Transactions.Domain.Models.Transaction;
 
 namespace Transactions.Infra.Repositories;
 
-public class ExpenseRepository : BasePageableMongoRepository<Expense>, IExpenseRepository
+public class ExpenseRepository : BasePageableMongoRepository<Transaction>, IExpenseRepository
 {
     private DBContext _dbContext;
 
@@ -18,58 +19,58 @@ public class ExpenseRepository : BasePageableMongoRepository<Expense>, IExpenseR
         _dbContext = dbContext;
     }
 
-    private FilterDefinition<Expense> IdFilter(Guid id)
+    private FilterDefinition<Transaction> IdFilter(Guid id)
     {
         return _filterBuilder.Eq(x => x.Id, id);
     }
 
     private BsonDocument BuildPaymentMethodAggregation() =>
-        BuildAggregation(_dbContext.PaymentMethods.CollectionNamespace.CollectionName, nameof(Expense.PaymentMethodId), nameof(PaymentMethod));
+        BuildAggregation(_dbContext.PaymentMethods.CollectionNamespace.CollectionName, nameof(Transaction.PaymentMethodId), nameof(PaymentMethod));
 
     private BsonDocument BuildIdFilter(Guid id) =>
-        BuildEqualFilter(nameof(Expense.Id), id);
+        BuildEqualFilter(nameof(Transaction.Id), id);
 
     private BsonDocument BuildUserIdFilter(Guid id) =>
-        BuildEqualFilter(nameof(Expense.UserId), id);
+        BuildEqualFilter(nameof(Transaction.UserId), id);
 
-    public async Task<Expense> FindByIdAsync(Guid id, Guid userId)
+    public async Task<Transaction> FindByIdAsync(Guid id, Guid userId)
     {
         var pipeline = new[] {
             BuildIdFilter(id),
-            BuildEqualFilter(nameof(Expense.DeletedAt), null),
+            BuildEqualFilter(nameof(Transaction.DeletedAt), null),
             BuildUserIdFilter(userId),
             BuildPaymentMethodAggregation(),
             BuildFlatChildAggregation(nameof(PaymentMethod))
         };
 
-        return await Collection.Aggregate<Expense>(pipeline).FirstOrDefaultAsync();
+        return await Collection.Aggregate<Transaction>(pipeline).FirstOrDefaultAsync();
     }
 
-    public async Task<Expense> UpdateAsync(Expense entity)
+    public async Task<Transaction> UpdateAsync(Transaction entity)
     {
         var filter = IdFilter(entity.Id);
         await base.UpdateAsync(entity, filter);
         return entity;
     }
 
-    public Task<long> GetAllCountAsync(ExpenseSearchParam searchParams, Guid userId)
+    public Task<long> GetAllCountAsync(TransactionSearchParam searchParams, Guid userId)
     {
         var filter = _filterBuilder.And(_filterBuilder.Eq(x => x.UserId, userId), _filterBuilder.Eq(x => x.DeletedAt, null));
         filter = DefineFilters(searchParams, filter);
-        filter = BuildDateFilter(filter, nameof(Expense.TransactionDate), searchParams.StartTransactionDate, searchParams.EndTransactionDate);
+        filter = BuildDateFilter(filter, nameof(Transaction.TransactionDate), searchParams.StartTransactionDate, searchParams.EndTransactionDate);
         return base.GetAllCountAsync(filter);
     }
 
     public async Task<List<TResponse>> GetAllPagedAsync<TResponse>(
-        ExpenseSearchParam searchParam,
+        TransactionSearchParam searchParam,
         PagedRequest request,
         Guid userId)
     {
         var sortDefinition = _sortBuilder.Descending(x => x.TransactionDate);
         var aggregatedBson = new BsonDocument[] {
-            BuildEqualFilter(nameof(Expense.UserId), userId),
-            BuildDateFilter(nameof(Expense.TransactionDate), searchParam.StartTransactionDate, searchParam.EndTransactionDate),
-            BuildEqualFilter(nameof(Expense.DeletedAt), null),
+            BuildEqualFilter(nameof(Transaction.UserId), userId),
+            BuildDateFilter(nameof(Transaction.TransactionDate), searchParam.StartTransactionDate, searchParam.EndTransactionDate),
+            BuildEqualFilter(nameof(Transaction.DeletedAt), null),
             BuildFilters(searchParam),
             BuildPaymentMethodAggregation(),
             BuildFlatChildAggregation(nameof(PaymentMethod)),
@@ -82,16 +83,16 @@ public class ExpenseRepository : BasePageableMongoRepository<Expense>, IExpenseR
     }
 
     public async Task<List<TResponse>> GetAllGroupedPagedAsync<TResponse>(
-        ExpenseSearchParam searchParam,
+        TransactionSearchParam searchParam,
         PagedRequest request,
         Guid userId)
     {
         //TODO - Apply pagination
         var sortDefinition = _sortBuilder.Descending(x => x.TransactionDate);
         var aggregatedBson = new List<BsonDocument> {
-            BuildEqualFilter(nameof(Expense.UserId), userId),
-            BuildDateFilter(nameof(Expense.TransactionDate), searchParam.StartTransactionDate, searchParam.EndTransactionDate),
-            BuildEqualFilter(nameof(Expense.DeletedAt), null),
+            BuildEqualFilter(nameof(Transaction.UserId), userId),
+            BuildDateFilter(nameof(Transaction.TransactionDate), searchParam.StartTransactionDate, searchParam.EndTransactionDate),
+            BuildEqualFilter(nameof(Transaction.DeletedAt), null),
             BuildFilters(searchParam),
             BuildPaymentMethodAggregation(),
             BuildFlatChildAggregation(nameof(PaymentMethod)),
@@ -105,14 +106,14 @@ public class ExpenseRepository : BasePageableMongoRepository<Expense>, IExpenseR
     }
 
     public async Task<List<TResponse>> GetAllAsync<TResponse>(
-        ExpenseSearchParam searchParam,
+        TransactionSearchParam searchParam,
         Guid userId)
     {
         var sortDefinition = _sortBuilder.Descending(x => x.TransactionDate);
         var aggregatedBson = new List<BsonDocument> {
-            BuildEqualFilter(nameof(Expense.UserId), userId),
-            BuildDateFilter(nameof(Expense.TransactionDate), searchParam.StartTransactionDate, searchParam.EndTransactionDate),
-            BuildEqualFilter(nameof(Expense.DeletedAt), null),
+            BuildEqualFilter(nameof(Transaction.UserId), userId),
+            BuildDateFilter(nameof(Transaction.TransactionDate), searchParam.StartTransactionDate, searchParam.EndTransactionDate),
+            BuildEqualFilter(nameof(Transaction.DeletedAt), null),
             BuildFilters(searchParam),
             BuildPaymentMethodAggregation(),
             BuildFlatChildAggregation(nameof(PaymentMethod)),

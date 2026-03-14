@@ -1,9 +1,9 @@
 using AutoMapper;
-using Expenses.Api.PresentationContracts.Forms;
-using Expenses.Api.PresentationContracts.PaymentMethods;
+using Transactions.Api.PresentationContracts.Forms;
+using Transactions.Api.PresentationContracts.PaymentMethods;
 using Transactions.Domain.Models;
 
-namespace Expenses.Api.Adapters;
+namespace Transactions.Api.Adapters;
 
 public class PaymentMethodProfile : Profile
 {

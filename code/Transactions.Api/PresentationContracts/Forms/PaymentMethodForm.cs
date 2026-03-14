@@ -2,7 +2,7 @@ using Transactions.Domain.Models.Enum;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
-namespace Expenses.Api.PresentationContracts.Forms;
+namespace Transactions.Api.PresentationContracts.Forms;
 
 public class PaymentMethodForm
 {

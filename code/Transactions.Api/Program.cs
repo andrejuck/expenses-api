@@ -1,5 +1,5 @@
-using Expenses.Api.ExtensionMethods;
-using Expenses.Api.Settings;
+using Transactions.Api.ExtensionMethods;
+using Transactions.Api.Settings;
 using Transactions.Domain;
 using Transactions.Infra.Settings;
 using FluentValidation;

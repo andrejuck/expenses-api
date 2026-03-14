@@ -5,7 +5,6 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>a6d8340b-48f3-45f7-93db-da278d63b85f</UserSecretsId>
-    <RootNamespace>Expenses.Api</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

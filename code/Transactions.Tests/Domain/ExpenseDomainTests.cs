@@ -2,6 +2,7 @@ using Transactions.Domain.Models;
 using Transactions.Domain.Models.Enum;
 using Libs.Api.ErrorHandling.Exceptions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Transactions.Domain.Models.Transaction;
 
 namespace Transactions.Tests.Domain;
 
@@ -16,7 +17,7 @@ public class ExpenseDomainTests
     public void Should_Divide_Expense_By_Installments(int installment, decimal totalPrice)
     {
         var paymentMethod = new PaymentMethod("credit card", PaymentType.CreditCard, true);
-        var originalExpense = new Expense(null, "Test description", totalPrice, DateTime.Now, null, paymentMethod, installment);
+        var originalExpense = new Transaction(null, "Test description", totalPrice, DateTime.Now, null, paymentMethod, TransactionType.Expense, installment);
 
         var expenses = originalExpense.DivideByInstallments(paymentMethod);
 
@@ -28,7 +29,7 @@ public class ExpenseDomainTests
     public void Should_Not_Divide_Expense_When_Installments_Equal_Zero()
     {
         var paymentMethod = new PaymentMethod("credit card", PaymentType.CreditCard, true);
-        var originalExpense = new Expense(null, "Test description", 10, DateTime.Now, null, paymentMethod);
+        var originalExpense = new Transaction(null, "Test description", 10, DateTime.Now, null, paymentMethod, TransactionType.Expense);
 
         try
         {
@@ -45,7 +46,7 @@ public class ExpenseDomainTests
     public void Should_Not_Divide_Expense_When_NotCreditCard(PaymentType paymentType)
     {
         var paymentMethod = new PaymentMethod("credit card", paymentType, true);
-        var originalExpense = new Expense(null, "Test description", 10, DateTime.Now, null, paymentMethod);
+        var originalExpense = new Transaction(null, "Test description", 10, DateTime.Now, null, paymentMethod, TransactionType.Expense);
 
         try
         {
@@ -64,7 +65,7 @@ public class ExpenseDomainTests
 
         try
         {
-            var originalExpense = new Expense(null, "Test description", 10, DateTime.Now, null, paymentMethod, 1);
+            var originalExpense = new Transaction(null, "Test description", 10, DateTime.Now, null, paymentMethod, TransactionType.Expense, 1);
         }
         catch (DomainException ex)
         {

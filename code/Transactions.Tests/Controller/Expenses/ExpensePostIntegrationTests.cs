@@ -1,4 +1,4 @@
-﻿using Expenses.Api.PresentationContracts.Expenses;
+﻿using Transactions.Api.PresentationContracts.Expenses;
 using Transactions.Tests.Helpers;
 using Libs.Api.ErrorHandling.Exceptions;
 using Libs.Api.ErrorHandling.Model;
@@ -13,7 +13,7 @@ internal class ExpensePostIntegrationTests : BaseExpenseIntegrationTests
     public async Task Should_Create_New_Expense()
     {
         var payment = MockPaymentMethod.CreatePaymentMethod(Factory.DbContext.PaymentMethods, AdminUser);
-        var form = new ExpenseForm()
+        var form = new TransactionForm()
         {
             Description = "test",
             ExpenseCategories = new List<string>() { "testCat" },
@@ -42,7 +42,7 @@ internal class ExpensePostIntegrationTests : BaseExpenseIntegrationTests
     public async Task Should_Not_Create_Expense_Invalid_TotalPrice()
     {
         var payment = MockPaymentMethod.CreatePaymentMethod(Factory.DbContext.PaymentMethods, AdminUser);
-        var form = new ExpenseForm()
+        var form = new TransactionForm()
         {
             Description = "test",
             ExpenseCategories = new List<string>() { "testCat" },
@@ -63,7 +63,7 @@ internal class ExpensePostIntegrationTests : BaseExpenseIntegrationTests
     public async Task Should_Not_Create_Expense_Invalid_Description()
     {
         var payment = MockPaymentMethod.CreatePaymentMethod(Factory.DbContext.PaymentMethods, AdminUser);
-        var form = new ExpenseForm()
+        var form = new TransactionForm()
         {
             Description = "",
             ExpenseCategories = new List<string>() { "testCat" },
@@ -84,7 +84,7 @@ internal class ExpensePostIntegrationTests : BaseExpenseIntegrationTests
     public async Task Should_Not_Create_Expense_Invalid_PaymentType_With_Installment()
     {
         var payment = MockPaymentMethod.CreatePaymentMethod(Factory.DbContext.PaymentMethods, AdminUser);
-        var form = new ExpenseForm()
+        var form = new TransactionForm()
         {
             Description = "aaa",
             ExpenseCategories = new List<string>() { "testCat" },
@@ -110,7 +110,7 @@ internal class ExpensePostIntegrationTests : BaseExpenseIntegrationTests
         MockUser("newuser", "test", UserRole.GeneralUser);
         Authenticate("newuser");
 
-        var form = new ExpenseForm()
+        var form = new TransactionForm()
         {
             Description = "test",
             ExpenseCategories = new List<string>() { "testCat" },
@@ -133,7 +133,7 @@ internal class ExpensePostIntegrationTests : BaseExpenseIntegrationTests
     public async Task Should_Return_DomainException_Invalid_TotalPrice_BadRequest(int totalPrice)
     {
         var payment = MockPaymentMethod.CreatePaymentMethod(Factory.DbContext.PaymentMethods, AdminUser);
-        var form = new ExpenseForm()
+        var form = new TransactionForm()
         {
             Description = "test",
             ExpenseCategories = new List<string>() { "testCat" },
@@ -157,7 +157,7 @@ internal class ExpensePostIntegrationTests : BaseExpenseIntegrationTests
     public async Task Should_Return_DomainException_Invalid_Description_BadRequest()
     {
         var payment = MockPaymentMethod.CreatePaymentMethod(Factory.DbContext.PaymentMethods, AdminUser);
-        var form = new ExpenseForm()
+        var form = new TransactionForm()
         {
             Description = string.Empty,
             ExpenseCategories = new List<string>() { "testCat" },
@@ -181,7 +181,7 @@ internal class ExpensePostIntegrationTests : BaseExpenseIntegrationTests
     public async Task Should_Return_DomainException_Invalid_Installments_BadRequest()
     {
         var payment = MockPaymentMethod.CreatePaymentMethod(Factory.DbContext.PaymentMethods, AdminUser);
-        var form = new ExpenseForm()
+        var form = new TransactionForm()
         {
             Description = "desc",
             ExpenseCategories = new List<string>() { "testCat" },

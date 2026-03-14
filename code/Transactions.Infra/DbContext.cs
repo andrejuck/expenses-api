@@ -3,6 +3,7 @@ using Transactions.Domain.Models;
 using Libs.Api.Infra;
 using Libs.Auth.Models;
 using MongoDB.Driver;
+using Transactions.Domain.Models.Transaction;
 using Transactions.Infra.Settings;
 
 namespace Transactions.Infra;
@@ -11,7 +12,7 @@ public class DBContext : MongoDbContext
     public IMongoCollection<User> Users { get; set; }
     public IMongoCollection<Module> Modules { get; set; }
     public IMongoCollection<PaymentMethod> PaymentMethods { get; set; }
-    public IMongoCollection<Expense> Expenses { get; set; }
+    public IMongoCollection<Transaction> Expenses { get; set; }
 
     public DBContext(string connectionString, MongoDbSettings settings)
         : base(connectionString, settings.DbName)
@@ -23,7 +24,7 @@ public class DBContext : MongoDbContext
         Users = Database.GetCollection<User>("users");
         Modules = Database.GetCollection<Module>("modules");
         PaymentMethods = Database.GetCollection<PaymentMethod>("payment-methods");
-        Expenses = Database.GetCollection<Expense>("expenses");
+        Expenses = Database.GetCollection<Transaction>("expenses");
     }
 
     public void InitializeData()

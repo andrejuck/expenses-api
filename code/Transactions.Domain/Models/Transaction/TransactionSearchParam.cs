@@ -1,6 +1,6 @@
-namespace Transactions.Domain.Models;
+namespace Transactions.Domain.Models.Transaction;
 
-public class ExpenseSearchParam
+public class TransactionSearchParam
 {
     public string? Description { get; set; }
     public DateTime? StartTransactionDate { get; set; }

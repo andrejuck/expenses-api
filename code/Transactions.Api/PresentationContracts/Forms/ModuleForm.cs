@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Expenses.Api.PresentationContracts.Forms;
+namespace Transactions.Api.PresentationContracts.Forms;
 
 public class ModuleForm
 {

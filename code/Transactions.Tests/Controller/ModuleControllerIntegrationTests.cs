@@ -1,5 +1,5 @@
-using Expenses.Api.PresentationContracts;
-using Expenses.Api.PresentationContracts.Forms;
+using Transactions.Api.PresentationContracts;
+using Transactions.Api.PresentationContracts.Forms;
 using Transactions.Domain.Models;
 using Transactions.Tests.Helpers;
 using Libs.Auth.Models;

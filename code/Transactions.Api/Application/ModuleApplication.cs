@@ -1,8 +1,8 @@
 using AutoMapper;
-using Expenses.Api.DataContracts.Applications;
-using Expenses.Api.Helpers;
-using Expenses.Api.PresentationContracts;
-using Expenses.Api.PresentationContracts.Forms;
+using Transactions.Api.DataContracts.Applications;
+using Transactions.Api.Helpers;
+using Transactions.Api.PresentationContracts;
+using Transactions.Api.PresentationContracts.Forms;
 using Transactions.Domain.DataContracts;
 using Transactions.Domain.Models;
 using Libs.Api.ErrorHandling;
@@ -12,8 +12,9 @@ using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using System.Net;
 using System.Security.Claims;
+using Transactions.Domain.Models.Transaction;
 
-namespace Expenses.Api.Application;
+namespace Transactions.Api.Application;
 
 public class ModuleApplication : IModuleApplication
 {
@@ -58,7 +59,7 @@ public class ModuleApplication : IModuleApplication
         }
 
         await _repository.AddAsync(entity);
-        _logger.LogInformation(Messages.LOG_CREATED_MESSAGE, nameof(Expense), userId, entity.ToJson());
+        _logger.LogInformation(Messages.LOG_CREATED_MESSAGE, nameof(Transaction), userId, entity.ToJson());
     }
 
     public async Task<List<ModuleResponse>> FetchAllAsync(ClaimsPrincipal user)

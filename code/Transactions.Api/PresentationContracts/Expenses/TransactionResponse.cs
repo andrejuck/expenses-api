@@ -1,8 +1,8 @@
-using Expenses.Api.PresentationContracts.PaymentMethods;
+using Transactions.Api.PresentationContracts.PaymentMethods;
 
-namespace Expenses.Api.PresentationContracts.Expenses;
+namespace Transactions.Api.PresentationContracts.Expenses;
 
-public class ExpenseResponse
+public class TransactionResponse
 {
     public Guid Id { get; set; }
     public string Location { get; set; } = string.Empty;

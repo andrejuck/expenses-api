@@ -1,4 +1,4 @@
-namespace Expenses.Api.Settings;
+namespace Transactions.Api.Settings;
 
 public class EmailingSettings
 {

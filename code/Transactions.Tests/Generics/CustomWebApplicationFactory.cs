@@ -1,4 +1,4 @@
-using Expenses.Api.ExtensionMethods;
+using Transactions.Api.ExtensionMethods;
 using Transactions.Infra;
 using Transactions.Infra.Settings;
 using Libs.Api.Infra;

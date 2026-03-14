@@ -1,4 +1,4 @@
-namespace Expenses.Api.DataContracts;
+namespace Transactions.Api.DataContracts;
 
 public interface IEmailService
 {

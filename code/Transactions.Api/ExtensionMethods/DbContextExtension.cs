@@ -5,7 +5,7 @@ using Libs.Api.Serializers;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
 
-namespace Expenses.Api.ExtensionMethods;
+namespace Transactions.Api.ExtensionMethods;
 
 public static class DbContextExtension
 {

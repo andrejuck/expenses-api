@@ -1,9 +1,10 @@
 ﻿using FluentValidation;
 using Transactions.Domain.Models;
+using Transactions.Domain.Models.Transaction;
 
 namespace Transactions.Domain.Validators.Expense
 {
-    public class ExpenseSearchParamValidator : AbstractValidator<ExpenseSearchParam>
+    public class ExpenseSearchParamValidator : AbstractValidator<TransactionSearchParam>
     {
         public ExpenseSearchParamValidator()
         {

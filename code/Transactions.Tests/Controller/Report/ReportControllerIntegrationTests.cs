@@ -1,5 +1,5 @@
-﻿using Expenses.Api.Adapters;
-using Expenses.Api.PresentationContracts.Expenses;
+﻿using Transactions.Api.Adapters;
+using Transactions.Api.PresentationContracts.Expenses;
 using Transactions.Domain.Models;
 using Transactions.Tests.Helpers;
 using MongoDB.Driver.Linq;
@@ -8,6 +8,7 @@ using System.Globalization;
 using System.Net;
 using System.Net.Http.Headers;
 using System.Resources;
+using Transactions.Domain.Models.Transaction;
 using Transactions.Tests.Generics;
 using Transactions.Tests.Mock;
 
@@ -50,7 +51,7 @@ internal class ReportControllerIntegrationTests : BaseIntegrationTest
         var result = await Client.GetAsync(BaseUri.Uri + "expenses/csv");
         Assert.That(result.Content.Headers.ContentType?.MediaType, Is.EqualTo("text/csv"));
 
-        var records = _csvAdapter.ReadCsv<ExpenseFileResponse, ExpenseMap>(result.Content.ReadAsStringAsync().Result, CultureInfo.CurrentCulture).Records;
+        var records = _csvAdapter.ReadCsv<TransactionFileResponse, ExpenseMap>(result.Content.ReadAsStringAsync().Result, CultureInfo.CurrentCulture).Records;
         Assert.That(records.Count, Is.EqualTo(5));
         Assert.That(records.GroupBy(x => x.TransactionDate).Count(), Is.EqualTo(2));
     }
@@ -65,13 +66,13 @@ internal class ReportControllerIntegrationTests : BaseIntegrationTest
         MockExpense.CreateExpense(Factory.DbContext.Expenses, AdminUser, payment, DateTime.Now.AddDays(-1), totalPrice: 20.18M);
         MockExpense.CreateExpense(Factory.DbContext.Expenses, AdminUser, payment, DateTime.Now.AddDays(-5), totalPrice: 25.23M);
         MockExpense.CreateExpense(Factory.DbContext.Expenses, AdminUser, payment, DateTime.Now.AddDays(-5), totalPrice: 26.37M);
-        var searchParam = new ExpenseSearchParam() { StartTransactionDate = DateTime.Now.AddDays(-3), EndTransactionDate = DateTime.Now };
+        var searchParam = new TransactionSearchParam() { StartTransactionDate = DateTime.Now.AddDays(-3), EndTransactionDate = DateTime.Now };
         BaseUri.Query = searchParam.BuildQueryParams();
 
         var result = await Client.GetAsync(BaseUri.Uri);
         Assert.That(result.Content.Headers.ContentType?.MediaType, Is.EqualTo("text/csv"));
 
-        var records = _csvAdapter.ReadCsv<ExpenseFileResponse, ExpenseMap>(result.Content.ReadAsStringAsync().Result).Records;
+        var records = _csvAdapter.ReadCsv<TransactionFileResponse, ExpenseMap>(result.Content.ReadAsStringAsync().Result).Records;
         Assert.That(records.Count, Is.EqualTo(3));
     }
 
@@ -103,7 +104,7 @@ internal class ReportControllerIntegrationTests : BaseIntegrationTest
         var result = await Client.GetAsync(BaseUri.Uri + "expenses/csv");
         Assert.That(result.Content.Headers.ContentType?.MediaType, Is.EqualTo("text/csv"));
 
-        var csvRecords = _csvAdapter.ReadCsv<ExpenseFileResponse, ExpenseMap>(
+        var csvRecords = _csvAdapter.ReadCsv<TransactionFileResponse, ExpenseMap>(
             result.Content.ReadAsStringAsync().Result,
             culture
             );

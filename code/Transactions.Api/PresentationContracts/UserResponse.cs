@@ -1,4 +1,4 @@
-namespace Expenses.Api.PresentationContracts;
+namespace Transactions.Api.PresentationContracts;
 
 public class UserResponse
 {

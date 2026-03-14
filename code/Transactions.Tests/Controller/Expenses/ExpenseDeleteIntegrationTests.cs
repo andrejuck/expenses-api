@@ -1,6 +1,7 @@
 ﻿using Transactions.Domain.Models;
 using MongoDB.Driver;
 using System.Net;
+using Transactions.Domain.Models.Transaction;
 using Transactions.Tests.Mock;
 
 namespace Transactions.Tests.Controller.Expenses;
@@ -16,7 +17,7 @@ public class ExpenseDeleteIntegrationTests : BaseExpenseIntegrationTests
 
         var result = await Client.DeleteAsync(BaseUri.Uri + $"{expenses.First().Id}");
 
-        var deleted = Factory.DbContext.Expenses.Find(Builders<Expense>.Filter.Eq(x => x.Id, expenses.First().Id)).First();
+        var deleted = Factory.DbContext.Expenses.Find(Builders<Transaction>.Filter.Eq(x => x.Id, expenses.First().Id)).First();
         Assert.That(result.IsSuccessStatusCode, Is.True);
         Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.Accepted));
         Assert.IsNotNull(deleted.DeletedAt);
@@ -32,7 +33,7 @@ public class ExpenseDeleteIntegrationTests : BaseExpenseIntegrationTests
 
         var result = await Client.DeleteAsync(BaseUri.Uri + $"{expenses.First().Id}");
 
-        var deleted = Factory.DbContext.Expenses.Find(Builders<Expense>.Filter.Eq(x => x.Id, expenses.First().Id)).First();
+        var deleted = Factory.DbContext.Expenses.Find(Builders<Transaction>.Filter.Eq(x => x.Id, expenses.First().Id)).First();
         Assert.That(result.IsSuccessStatusCode, Is.False);
         Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
         Assert.IsNull(deleted.DeletedAt);

@@ -1,6 +1,6 @@
-using Expenses.Api.PresentationContracts.GraphQL;
+using Transactions.Api.PresentationContracts.GraphQL;
 
-namespace Expenses.Api.ExtensionMethods;
+namespace Transactions.Api.ExtensionMethods;
 public static class GraphQLServicesExtension
 {
 

@@ -2,17 +2,18 @@ using Libs.Api.ErrorHandling.Exceptions;
 using Transactions.Domain.Exceptions;
 using Transactions.Domain.Models.Enum;
 
-namespace Transactions.Domain.Models;
+namespace Transactions.Domain.Models.Transaction;
 
-public class Expense : BaseUserEntity
+public class Transaction : BaseUserEntity
 {
-    public Expense(
-        string location,
+    public Transaction(
+        string? location,
         string description,
         decimal totalPrice,
         DateTime transactionDate,
-        List<string> expenseCategories,
+        List<string>? expenseCategories,
         PaymentMethod paymentMethod,
+        TransactionType transactionType,
         int? installment = null)
     {
         Location = location;
@@ -21,25 +22,27 @@ public class Expense : BaseUserEntity
         TransactionDate = transactionDate;
         ExpenseCategories = expenseCategories;
         PaymentMethodId = paymentMethod.Id;
+        TransactionType = transactionType;
         Installment = installment;
 
         Validate(paymentMethod);
     }
 
-    public string Location { get; private set; }
+    public string? Location { get; private set; }
     public string Description { get; private set; }
     public decimal TotalPrice { get; private set; }
     public DateTime TransactionDate { get; private set; }
-    public List<string> ExpenseCategories { get; private set; }
+    public List<string>? ExpenseCategories { get; private set; }
     public Guid PaymentMethodId { get; private set; }
-    public PaymentMethod PaymentMethod { get; set; }
+    public PaymentMethod PaymentMethod { get; private set; }
     public int? Installment { get; private set; }
+    public TransactionType TransactionType { get; private set; }
 
-    public void PrepareToUpdate(string location,
+    public void PrepareToUpdate(string? location,
         string description,
         decimal totalPrice,
         DateTime transactionDate,
-        List<string> expenseCategories,
+        List<string>? expenseCategories,
         PaymentMethod paymentMethod,
         int? installment = null)
     {
@@ -55,20 +58,20 @@ public class Expense : BaseUserEntity
         Validate(paymentMethod);
     }
 
-    public List<Expense> DivideByInstallments(PaymentMethod paymentMethod)
+    public List<Transaction> DivideByInstallments(PaymentMethod paymentMethod)
     {
         if (!paymentMethod.PaymentType.Equals(PaymentType.CreditCard))
             throw new DomainException(DomainMessages.EXPENSE_INSTALLMENT_ALLOWED_ONLY_TO_CREDIT_CARD);
 
-        if (Installment == 0 || !Installment.HasValue)
+        if (Installment is 0 or null)
             throw new DomainException("Number of Installments should be higher than zero.");
 
         var unitPrice = TotalPrice / Installment;
-        var expenses = new List<Expense>();
+        var expenses = new List<Transaction>();
         for (int i = 1; i <= Installment; i++)
         {
             var adaptedDescription = $"{Description} {i}|{Installment}";
-            var expense = new Expense(Location, adaptedDescription, unitPrice.Value, TransactionDate, ExpenseCategories, paymentMethod);
+            var expense = new Transaction(Location, adaptedDescription, unitPrice.Value, TransactionDate, ExpenseCategories, paymentMethod, TransactionType);
             expenses.Add(expense);
         }
 

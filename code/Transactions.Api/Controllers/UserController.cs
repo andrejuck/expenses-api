@@ -1,6 +1,6 @@
 using AutoMapper;
-using Expenses.Api.Helpers;
-using Expenses.Api.PresentationContracts;
+using Transactions.Api.Helpers;
+using Transactions.Api.PresentationContracts;
 using Transactions.Domain.DataContracts;
 using Transactions.Domain.Models;
 using Libs.Api.Adapters;
@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Net;
 
-namespace Expenses.Api.Controllers;
+namespace Transactions.Api.Controllers;
 
 [ApiController]
 [Route("api/user")]

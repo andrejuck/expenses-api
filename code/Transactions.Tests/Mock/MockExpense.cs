@@ -1,13 +1,15 @@
-using Expenses.Api.PresentationContracts;
+using Transactions.Api.PresentationContracts;
 using Transactions.Domain.Models;
 using MongoDB.Driver;
+using Transactions.Domain.Models.Enum;
+using Transactions.Domain.Models.Transaction;
 
 namespace Transactions.Tests.Mock;
 
 public static class MockExpense
 {
-    public static Expense CreateExpense(
-        IMongoCollection<Expense> collection,
+    public static Transaction CreateExpense(
+        IMongoCollection<Transaction> collection,
         UserResponse loggedUser,
         PaymentMethod paymentMethod,
         DateTime? transactionDate = null,
@@ -15,7 +17,7 @@ public static class MockExpense
         decimal totalPrice = 10
     )
     {
-        var expense = new Expense("test", "test", totalPrice, transactionDate ?? DateTime.Now, categories ?? new List<string>() { "test" }, paymentMethod);
+        var expense = new Transaction("test", "test", totalPrice, transactionDate ?? DateTime.Now, categories ?? new List<string>() { "test" }, paymentMethod, TransactionType.Expense);
         expense.BindUser(loggedUser.Id);
 
         collection.InsertOne(expense);
@@ -23,12 +25,12 @@ public static class MockExpense
         return expense;
     }
 
-    public static List<Expense> CreateMultipleExpenses(int count, UserResponse loggedUser, PaymentMethod paymentMethod, IMongoCollection<Expense> collection)
+    public static List<Transaction> CreateMultipleExpenses(int count, UserResponse loggedUser, PaymentMethod paymentMethod, IMongoCollection<Transaction> collection)
     {
-        var listExpense = new List<Expense>();
+        var listExpense = new List<Transaction>();
         for (int i = 0; i < count; i++)
         {
-            var expense = new Expense("test", $"test {i}", 10 + i, DateTime.Now, new List<string>() { $"test {i}" }, paymentMethod);
+            var expense = new Transaction("test", $"test {i}", 10 + i, DateTime.Now, new List<string>() { $"test {i}" }, paymentMethod, TransactionType.Expense);
             expense.BindUser(loggedUser.Id);
 
             listExpense.Add(expense);

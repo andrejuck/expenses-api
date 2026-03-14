@@ -1,4 +1,4 @@
-using Expenses.Api.PresentationContracts;
+using Transactions.Api.PresentationContracts;
 using Transactions.Domain.Models;
 using Transactions.Domain.Models.Enum;
 using MongoDB.Driver;

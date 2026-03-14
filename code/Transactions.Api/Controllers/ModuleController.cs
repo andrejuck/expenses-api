@@ -1,6 +1,6 @@
-using Expenses.Api.DataContracts.Applications;
-using Expenses.Api.PresentationContracts;
-using Expenses.Api.PresentationContracts.Forms;
+using Transactions.Api.DataContracts.Applications;
+using Transactions.Api.PresentationContracts;
+using Transactions.Api.PresentationContracts.Forms;
 using Libs.Auth.Helpers;
 using Libs.Auth.Models.Config;
 using Microsoft.AspNetCore.Authorization;
@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.Net;
 
-namespace Expenses.Api.Controllers;
+namespace Transactions.Api.Controllers;
 
 [ApiController]
 [Route("api/module")]

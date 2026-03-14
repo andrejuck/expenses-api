@@ -1,4 +1,4 @@
-﻿using Expenses.Api.PresentationContracts.Expenses;
+﻿using Transactions.Api.PresentationContracts.Expenses;
 using Transactions.Tests.Helpers;
 using Microsoft.AspNetCore.JsonPatch;
 using System.Net;
@@ -14,7 +14,7 @@ internal class ExpensePatchPutIntegrationTests : BaseExpenseIntegrationTests
         var payment = MockPaymentMethod.CreatePaymentMethod(Factory.DbContext.PaymentMethods, AdminUser);
         var payment2 = MockPaymentMethod.CreatePaymentMethod(Factory.DbContext.PaymentMethods, AdminUser);
         var existingExpense = MockExpense.CreateExpense(Factory.DbContext.Expenses, AdminUser, payment);
-        var patchRequest = new ExpenseForm
+        var patchRequest = new TransactionForm
         {
             Description = "Cash2",
             ExpenseCategories = new List<string> { "test2" },
@@ -23,7 +23,7 @@ internal class ExpensePatchPutIntegrationTests : BaseExpenseIntegrationTests
             TransactionDate = DateTime.Now.AddDays(1).ToUniversalTime(),
             PaymentMethodId = payment2.Id
         };
-        var patch = new JsonPatchDocument<ExpenseForm>();
+        var patch = new JsonPatchDocument<TransactionForm>();
         patch.Replace(x => x.Description, patchRequest.Description);
         patch.Replace(x => x.Location, patchRequest.Location);
         patch.Replace(x => x.ExpenseCategories, patchRequest.ExpenseCategories);
@@ -55,7 +55,7 @@ internal class ExpensePatchPutIntegrationTests : BaseExpenseIntegrationTests
         Authenticate("newuser");
 
         var existingExpense = MockExpense.CreateExpense(Factory.DbContext.Expenses, AdminUser, payment);
-        var patch = new JsonPatchDocument<ExpenseForm>();
+        var patch = new JsonPatchDocument<TransactionForm>();
         patch.Replace(x => x.Description, "Cash2");
         var body = patch.Operations.BuildJsonContent("application/json-patch+json");
 
@@ -74,7 +74,7 @@ internal class ExpensePatchPutIntegrationTests : BaseExpenseIntegrationTests
         MockUser("newuser", "test", UserRole.GeneralUser);
         Authenticate("newuser");
 
-        var patch = new JsonPatchDocument<ExpenseForm>();
+        var patch = new JsonPatchDocument<TransactionForm>();
         patch.Replace(x => x.Description, "Cash2");
         var body = patch.Operations.BuildJsonContent("application/json-patch+json");
 

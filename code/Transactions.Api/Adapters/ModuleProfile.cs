@@ -1,9 +1,9 @@
 using AutoMapper;
-using Expenses.Api.PresentationContracts;
-using Expenses.Api.PresentationContracts.Forms;
+using Transactions.Api.PresentationContracts;
+using Transactions.Api.PresentationContracts.Forms;
 using Transactions.Domain.Models;
 
-namespace Expenses.Api.Adapters;
+namespace Transactions.Api.Adapters;
 
 public class ModuleProfile : Profile
 {

@@ -1,9 +1,9 @@
-﻿using Expenses.Api.Dtos;
+﻿using Transactions.Api.Dtos;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace Expenses.Api.Controllers
+namespace Transactions.Api.Controllers
 {
     [ApiController]
     [Route("api/home")]

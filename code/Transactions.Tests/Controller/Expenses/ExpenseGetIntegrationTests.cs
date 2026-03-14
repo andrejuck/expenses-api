@@ -1,8 +1,9 @@
-﻿using Expenses.Api.PresentationContracts.Expenses;
+﻿using Transactions.Api.PresentationContracts.Expenses;
 using Transactions.Domain.Models;
 using Transactions.Tests.Helpers;
 using Libs.Api.Models;
 using System.Net;
+using Transactions.Domain.Models.Transaction;
 using Transactions.Tests.Mock;
 
 namespace Transactions.Tests.Controller.Expenses;
@@ -19,7 +20,7 @@ public class ExpenseGetIntegrationTests : BaseExpenseIntegrationTests
         BaseUri.Query = request.BuildQueryParams();
 
         var result = await Client.GetAsync(BaseUri.Uri);
-        var content = result.Content.ReadAsStringAsync().Result.Deserialize<PagedResponse<ExpenseResponse>>();
+        var content = result.Content.ReadAsStringAsync().Result.Deserialize<PagedResponse<TransactionResponse>>();
 
         Assert.That(result.IsSuccessStatusCode, Is.True);
         Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -36,7 +37,7 @@ public class ExpenseGetIntegrationTests : BaseExpenseIntegrationTests
         BaseUri.Query = request.BuildQueryParams();
 
         var result = await Client.GetAsync(BaseUri.Uri);
-        var content = result.Content.ReadAsStringAsync().Result.Deserialize<PagedResponse<ExpenseResponse>>();
+        var content = result.Content.ReadAsStringAsync().Result.Deserialize<PagedResponse<TransactionResponse>>();
 
         Assert.That(result.IsSuccessStatusCode, Is.True);
         Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -50,12 +51,12 @@ public class ExpenseGetIntegrationTests : BaseExpenseIntegrationTests
         var payment = MockPaymentMethod.CreatePaymentMethod(Factory.DbContext.PaymentMethods, AdminUser);
         var existingExpense = MockExpense.CreateMultipleExpenses(5, AdminUser, payment, Factory.DbContext.Expenses);
         var request = new PagedRequest() { CurrentPage = 1, PageSize = 2 };
-        var searchParam = new ExpenseSearchParam() { Description = "2" };
+        var searchParam = new TransactionSearchParam() { Description = "2" };
         BaseUri.Query = request.BuildQueryParams();
         BaseUri.Query += searchParam.BuildQueryParams();
 
         var result = await Client.GetAsync(BaseUri.Uri);
-        var content = result.Content.ReadAsStringAsync().Result.Deserialize<PagedResponse<ExpenseResponse>>();
+        var content = result.Content.ReadAsStringAsync().Result.Deserialize<PagedResponse<TransactionResponse>>();
 
         Assert.That(result.IsSuccessStatusCode, Is.True);
         Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -69,12 +70,12 @@ public class ExpenseGetIntegrationTests : BaseExpenseIntegrationTests
         MockExpense.CreateMultipleExpenses(5, AdminUser, payment, Factory.DbContext.Expenses);
         MockExpense.CreateExpense(Factory.DbContext.Expenses, AdminUser, payment, DateTime.Now.AddDays(-1));
         var request = new PagedRequest() { CurrentPage = 1, PageSize = 2 };
-        var searchParam = new ExpenseSearchParam() { StartTransactionDate = DateTime.Now.AddDays(-1) };
+        var searchParam = new TransactionSearchParam() { StartTransactionDate = DateTime.Now.AddDays(-1) };
         BaseUri.Query = request.BuildQueryParams();
         BaseUri.Query += searchParam.BuildQueryParams();
 
         var result = await Client.GetAsync(BaseUri.Uri);
-        var content = result.Content.ReadAsStringAsync().Result.Deserialize<PagedResponse<ExpenseResponse>>();
+        var content = result.Content.ReadAsStringAsync().Result.Deserialize<PagedResponse<TransactionResponse>>();
 
         Assert.That(result.IsSuccessStatusCode, Is.True);
         Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -88,12 +89,12 @@ public class ExpenseGetIntegrationTests : BaseExpenseIntegrationTests
         MockExpense.CreateMultipleExpenses(5, AdminUser, payment, Factory.DbContext.Expenses);
         MockExpense.CreateExpense(Factory.DbContext.Expenses, AdminUser, payment);
         var request = new PagedRequest() { CurrentPage = 1, PageSize = 2 };
-        var searchParam = new ExpenseSearchParam() { ExpenseCategories = new List<string>() { "test" } };
+        var searchParam = new TransactionSearchParam() { ExpenseCategories = new List<string>() { "test" } };
         BaseUri.Query = request.BuildQueryParams();
         BaseUri.Query += searchParam.BuildQueryParams();
 
         var result = await Client.GetAsync(BaseUri.Uri);
-        var content = result.Content.ReadAsStringAsync().Result.Deserialize<PagedResponse<ExpenseResponse>>();
+        var content = result.Content.ReadAsStringAsync().Result.Deserialize<PagedResponse<TransactionResponse>>();
 
         Assert.That(result.IsSuccessStatusCode, Is.True);
         Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -108,12 +109,12 @@ public class ExpenseGetIntegrationTests : BaseExpenseIntegrationTests
         var payment2 = MockPaymentMethod.CreatePaymentMethod(Factory.DbContext.PaymentMethods, AdminUser);
         MockExpense.CreateExpense(Factory.DbContext.Expenses, AdminUser, payment2);
         var request = new PagedRequest() { CurrentPage = 1, PageSize = 2 };
-        var searchParam = new ExpenseSearchParam() { PaymentMethodId = payment2.Id };
+        var searchParam = new TransactionSearchParam() { PaymentMethodId = payment2.Id };
         BaseUri.Query = request.BuildQueryParams();
         BaseUri.Query += searchParam.BuildQueryParams();
 
         var result = await Client.GetAsync(BaseUri.Uri);
-        var content = result.Content.ReadAsStringAsync().Result.Deserialize<PagedResponse<ExpenseResponse>>();
+        var content = result.Content.ReadAsStringAsync().Result.Deserialize<PagedResponse<TransactionResponse>>();
 
         Assert.That(result.IsSuccessStatusCode, Is.True);
         Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -131,12 +132,12 @@ public class ExpenseGetIntegrationTests : BaseExpenseIntegrationTests
         var payment2 = MockPaymentMethod.CreatePaymentMethod(Factory.DbContext.PaymentMethods, AdminUser);
         MockExpense.CreateExpense(Factory.DbContext.Expenses, AdminUser, payment2);
         var request = new PagedRequest() { CurrentPage = 1, PageSize = 2 };
-        var searchParam = new ExpenseSearchParam() { PaymentMethodId = payment2.Id };
+        var searchParam = new TransactionSearchParam() { PaymentMethodId = payment2.Id };
         BaseUri.Query = request.BuildQueryParams();
         BaseUri.Query += searchParam.BuildQueryParams();
 
         var result = await Client.GetAsync(BaseUri.Uri);
-        var content = result.Content.ReadAsStringAsync().Result.Deserialize<PagedResponse<ExpenseResponse>>();
+        var content = result.Content.ReadAsStringAsync().Result.Deserialize<PagedResponse<TransactionResponse>>();
 
         Assert.That(result.IsSuccessStatusCode, Is.True);
         Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -154,7 +155,7 @@ public class ExpenseGetIntegrationTests : BaseExpenseIntegrationTests
         BaseUri.Query = request.BuildQueryParams();
 
         var result = await Client.GetAsync(BaseUri.Uri);
-        var content = result.Content.ReadAsStringAsync().Result.Deserialize<PagedResponse<ExpenseResponse>>();
+        var content = result.Content.ReadAsStringAsync().Result.Deserialize<PagedResponse<TransactionResponse>>();
 
         Assert.That(result.IsSuccessStatusCode, Is.True);
         Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK));
@@ -169,7 +170,7 @@ public class ExpenseGetIntegrationTests : BaseExpenseIntegrationTests
         var expenses = MockExpense.CreateMultipleExpenses(5, AdminUser, payment, Factory.DbContext.Expenses);
 
         var result = await Client.GetAsync(BaseUri.Uri + $"{expenses.First().Id}");
-        var content = result.Content.ReadAsStringAsync().Result.Deserialize<ExpenseResponse>();
+        var content = result.Content.ReadAsStringAsync().Result.Deserialize<TransactionResponse>();
 
         Assert.That(result.IsSuccessStatusCode, Is.True);
         Assert.That(result.StatusCode, Is.EqualTo(HttpStatusCode.OK));

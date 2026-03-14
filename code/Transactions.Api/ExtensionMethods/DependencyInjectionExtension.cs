@@ -1,14 +1,14 @@
-using Expenses.Api.Adapters;
-using Expenses.Api.Application;
-using Expenses.Api.DataContracts;
-using Expenses.Api.DataContracts.Applications;
-using Expenses.Api.Services;
+using Transactions.Api.Adapters;
+using Transactions.Api.Application;
+using Transactions.Api.DataContracts;
+using Transactions.Api.DataContracts.Applications;
+using Transactions.Api.Services;
 using Transactions.Domain.DataContracts;
 using Transactions.Infra.Repositories;
 using Libs.Api.Adapters;
 using Libs.Api.ErrorHandling;
 
-namespace Expenses.Api.ExtensionMethods;
+namespace Transactions.Api.ExtensionMethods;
 
 public static class DependencyInjectionExtension
 {
@@ -23,7 +23,7 @@ public static class DependencyInjectionExtension
         services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
         services.AddScoped<IPaymentMethodApplication, PaymentMethodApplication>();
 
-        services.AddScoped<IExpenseApplication, ExpenseApplication>();
+        services.AddScoped<ITransactionApplication, TransactionApplication>();
         services.AddScoped<IExpenseRepository, ExpenseRepository>();
 
         services.AddScoped<IEmailService, EmailService>();

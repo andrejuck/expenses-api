@@ -1,2 +1,2 @@
-namespace Expenses.Api.Resources;
+namespace Transactions.Api.Resources;
 public class SharedResources { }

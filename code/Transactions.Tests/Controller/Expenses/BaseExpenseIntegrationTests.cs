@@ -1,6 +1,7 @@
 ﻿
 using Transactions.Domain.Models;
 using MongoDB.Driver;
+using Transactions.Domain.Models.Transaction;
 using Transactions.Tests.Generics;
 
 namespace Transactions.Tests.Controller.Expenses;
@@ -23,8 +24,8 @@ public abstract class BaseExpenseIntegrationTests : BaseIntegrationTest
         base.Dispose();
     }
 
-    protected virtual List<Expense> FindByDesc(string desc)
+    protected virtual List<Transaction> FindByDesc(string desc)
     {
-        return Factory.DbContext.Expenses.Find(Builders<Expense>.Filter.Eq(x => x.Description, desc)).ToList();
+        return Factory.DbContext.Expenses.Find(Builders<Transaction>.Filter.Eq(x => x.Description, desc)).ToList();
     }
 }

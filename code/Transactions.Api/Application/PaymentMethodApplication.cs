@@ -1,8 +1,8 @@
 using AutoMapper;
-using Expenses.Api.DataContracts.Applications;
-using Expenses.Api.Helpers;
-using Expenses.Api.PresentationContracts.Forms;
-using Expenses.Api.PresentationContracts.PaymentMethods;
+using Transactions.Api.DataContracts.Applications;
+using Transactions.Api.Helpers;
+using Transactions.Api.PresentationContracts.Forms;
+using Transactions.Api.PresentationContracts.PaymentMethods;
 using Transactions.Domain.DataContracts;
 using Transactions.Domain.Models;
 using Libs.Api.ErrorHandling;
@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.JsonPatch;
 using MongoDB.Bson;
 using System.Net;
 
-namespace Expenses.Api.Application;
+namespace Transactions.Api.Application;
 
 public class PaymentMethodApplication : IPaymentMethodApplication
 {

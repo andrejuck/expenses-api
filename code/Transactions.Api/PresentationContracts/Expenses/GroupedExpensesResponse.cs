@@ -1,6 +1,6 @@
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Expenses.Api.PresentationContracts.Expenses;
+namespace Transactions.Api.PresentationContracts.Expenses;
 
 public class GroupedExpensesResponse
 {

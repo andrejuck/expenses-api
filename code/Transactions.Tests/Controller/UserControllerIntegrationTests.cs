@@ -1,4 +1,4 @@
-using Expenses.Api.PresentationContracts;
+using Transactions.Api.PresentationContracts;
 using Transactions.Tests.Helpers;
 using Libs.Api.Models;
 using Libs.Auth.Models;

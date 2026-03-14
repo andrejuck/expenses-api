@@ -1,11 +1,11 @@
 using CsvHelper;
 using CsvHelper.Configuration;
-using Expenses.Api.Resources;
+using Transactions.Api.Resources;
 using Microsoft.Extensions.Localization;
 using System.Globalization;
 using System.Text;
 
-namespace Expenses.Api.Adapters;
+namespace Transactions.Api.Adapters;
 
 public class CsvHelperAdapter
 {

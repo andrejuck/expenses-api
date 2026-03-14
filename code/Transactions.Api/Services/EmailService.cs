@@ -1,10 +1,10 @@
-using Expenses.Api.DataContracts;
-using Expenses.Api.Settings;
+using Transactions.Api.DataContracts;
+using Transactions.Api.Settings;
 using Microsoft.Extensions.Options;
 using System.Net;
 using System.Net.Mail;
 
-namespace Expenses.Api.Services;
+namespace Transactions.Api.Services;
 
 public class EmailService : IEmailService
 {
