@@ -44,6 +44,7 @@ public class TransactionApplication : ITransactionApplication
         var paymentMethod = await FindPaymentBydId(form.PaymentMethodId, userId);
         if (paymentMethod == null) return;
 
+        //TODO - Adapter
         var entity = new Transaction(form.Location,
             form.Description,
             form.TotalPrice,

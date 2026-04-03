@@ -54,7 +54,7 @@ public class Transaction : BaseUserEntity
         PaymentMethodId = paymentMethod.Id;
         Installment = installment;
 
-        SetUpdateAt();
+        SetUpdatedAt();
         Validate(paymentMethod);
     }
 

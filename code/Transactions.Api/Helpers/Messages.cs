@@ -10,6 +10,7 @@ public static class Messages
     public const string BAD_REQUEST_LENGTH_VALUE_HIGHER_THAN = "Field {0} should have at least {1} characters.";
     public const string BAD_REQUEST_EMPTY_CONDITIONAL_FIELD = "Field {0} should be filled when {1} is filled with {2}.";
     public const string BAD_REQUEST_FILLED_CONDITIONAL_FIELD = "Field {0} should be empty when {1} is filled with {2}.";
+    public const string BAD_REQUEST_FILLED_MUST_BE_EMPTY = "Field {0} should be empty.";
 
     public const string LOG_CREATED_MESSAGE = "{0} created succesfully by userid {1} | {2}";
     public const string LOG_UPDATED_MESSAGE = "{0} updated succesfully by userid {1} | {2}";

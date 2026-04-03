@@ -4,9 +4,9 @@ using FluentValidation;
 
 namespace Transactions.Api.Validators;
 
-public class ExpenseFormValidator : AbstractValidator<TransactionForm>
+public class TransactionFormValidator : AbstractValidator<TransactionForm>
 {
-    public ExpenseFormValidator()
+    public TransactionFormValidator()
     {
         RuleFor(x => x.Description)
             .NotEmpty()

@@ -21,7 +21,8 @@ public class TransactionController : ControllerBase
     private readonly ITransactionApplication _application;
     private readonly CustomClaimSettings _claimSettings;
     private Guid UserId => UserClaimsHelper.GetUserGuidIdFromClaims(User, _claimSettings);
-    public TransactionController(ITransactionApplication application, IOptions<CustomClaimSettings> claimSettings)
+    public TransactionController(ITransactionApplication application,
+        IOptions<CustomClaimSettings> claimSettings)
     {
         _application = application;
         _claimSettings = claimSettings.Value;

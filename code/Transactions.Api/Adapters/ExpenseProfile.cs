@@ -2,7 +2,6 @@ using AutoMapper;
 using CsvHelper.Configuration;
 using Transactions.Api.PresentationContracts.Expenses;
 using Transactions.Api.Resources;
-using Transactions.Domain.Models;
 using Microsoft.Extensions.Localization;
 using Transactions.Domain.Models.Transaction;
 

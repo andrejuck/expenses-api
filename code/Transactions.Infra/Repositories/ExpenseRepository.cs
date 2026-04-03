@@ -9,23 +9,16 @@ using Transactions.Domain.Models.Transaction;
 
 namespace Transactions.Infra.Repositories;
 
-public class ExpenseRepository : BasePageableMongoRepository<Transaction>, IExpenseRepository
+public class ExpenseRepository(DBContext dbContext)
+    : BasePageableMongoRepository<Transaction>(dbContext.Expenses), IExpenseRepository
 {
-    private DBContext _dbContext;
-
-    public ExpenseRepository(DBContext dbContext)
-        : base(dbContext.Expenses)
-    {
-        _dbContext = dbContext;
-    }
-
     private FilterDefinition<Transaction> IdFilter(Guid id)
     {
         return _filterBuilder.Eq(x => x.Id, id);
     }
 
     private BsonDocument BuildPaymentMethodAggregation() =>
-        BuildAggregation(_dbContext.PaymentMethods.CollectionNamespace.CollectionName, nameof(Transaction.PaymentMethodId), nameof(PaymentMethod));
+        BuildAggregation(dbContext.PaymentMethods.CollectionNamespace.CollectionName, nameof(Transaction.PaymentMethodId), nameof(PaymentMethod));
 
     private BsonDocument BuildIdFilter(Guid id) =>
         BuildEqualFilter(nameof(Transaction.Id), id);
@@ -53,12 +46,12 @@ public class ExpenseRepository : BasePageableMongoRepository<Transaction>, IExpe
         return entity;
     }
 
-    public Task<long> GetAllCountAsync(TransactionSearchParam searchParams, Guid userId)
+    public async Task<long> GetAllCountAsync(TransactionSearchParam searchParams, Guid userId)
     {
         var filter = _filterBuilder.And(_filterBuilder.Eq(x => x.UserId, userId), _filterBuilder.Eq(x => x.DeletedAt, null));
         filter = DefineFilters(searchParams, filter);
         filter = BuildDateFilter(filter, nameof(Transaction.TransactionDate), searchParams.StartTransactionDate, searchParams.EndTransactionDate);
-        return base.GetAllCountAsync(filter);
+        return await base.GetAllCountAsync(filter);
     }
 
     public async Task<List<TResponse>> GetAllPagedAsync<TResponse>(

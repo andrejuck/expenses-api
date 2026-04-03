@@ -3,6 +3,8 @@ using Transactions.Domain.Models;
 using Libs.Api.Infra;
 using Libs.Auth.Models;
 using MongoDB.Driver;
+using Transactions.Domain.Models.Accounts;
+using Transactions.Domain.Models.Families;
 using Transactions.Domain.Models.Transaction;
 using Transactions.Infra.Settings;
 
@@ -13,6 +15,8 @@ public class DBContext : MongoDbContext
     public IMongoCollection<Module> Modules { get; set; }
     public IMongoCollection<PaymentMethod> PaymentMethods { get; set; }
     public IMongoCollection<Transaction> Expenses { get; set; }
+    public IMongoCollection<Account> Accounts { get; set; }
+    public IMongoCollection<Family> Families { get; set; }
 
     public DBContext(string connectionString, MongoDbSettings settings)
         : base(connectionString, settings.DbName)
@@ -25,6 +29,8 @@ public class DBContext : MongoDbContext
         Modules = Database.GetCollection<Module>("modules");
         PaymentMethods = Database.GetCollection<PaymentMethod>("payment-methods");
         Expenses = Database.GetCollection<Transaction>("expenses");
+        Accounts = Database.GetCollection<Account>("accounts");
+        Families = Database.GetCollection<Family>("families");
     }
 
     public void InitializeData()
@@ -32,8 +38,19 @@ public class DBContext : MongoDbContext
         var adminModule = Modules.Find(NameFilter<Module>("Admin Module")).FirstOrDefault();
         if (adminModule == null) Modules.InsertOne(new Module("Admin Module", Guid.NewGuid(), UserRole.Admin));
 
-        var configModule = Modules.Find(NameFilter<Module>("Configuration Module")).FirstOrDefault();
-        if (configModule == null) Modules.InsertOne(new Module("Configuration Module", Guid.NewGuid(), UserRole.Admin, UserRole.GeneralUser));
+        SetupModules();
+    }
+
+    private void SetupModules()
+    {
+        var configModule = new Module("Configuration Module", Guid.NewGuid(), UserRole.Admin, UserRole.GeneralUser);
+        if (!Modules.Find(NameFilter<Module>(configModule.Name)).Any()) Modules.InsertOne(configModule);
+        
+        var accountModule = new Module("Account Module", Guid.NewGuid(), UserRole.Admin, UserRole.GeneralUser);
+        if (!Modules.Find(NameFilter<Module>(accountModule.Name)).Any()) Modules.InsertOne(accountModule);
+        
+        var familyModule = new Module("Family Module", Guid.NewGuid(), UserRole.Admin, UserRole.GeneralUser);
+        if (!Modules.Find(NameFilter<Module>(familyModule.Name)).Any()) Modules.InsertOne(familyModule);
     }
 
     private FilterDefinition<T> NameFilter<T>(string name)

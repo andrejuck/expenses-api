@@ -7,24 +7,37 @@ using Transactions.Domain.DataContracts;
 using Transactions.Infra.Repositories;
 using Libs.Api.Adapters;
 using Libs.Api.ErrorHandling;
+using Transactions.Api.DataContracts.Adapters;
 
 namespace Transactions.Api.ExtensionMethods;
 
 public static class DependencyInjectionExtension
 {
 
-    public static IServiceCollection AddExpensesDependencies(this IServiceCollection services)
+    public static IServiceCollection AddDependencies(this IServiceCollection services)
     {
         services.AddScoped<IUserRepository, UserRepository>();
 
-        services.AddScoped<IModuleRepository, ModuleRepository>();
-        services.AddScoped<IModuleApplication, ModuleApplication>();
+        services.AddTransient<IModuleRepository, ModuleRepository>();
+        services.AddTransient<IModuleApplication, ModuleApplication>();
 
-        services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
-        services.AddScoped<IPaymentMethodApplication, PaymentMethodApplication>();
+        services.AddTransient<IPaymentMethodRepository, PaymentMethodRepository>();
+        services.AddTransient<IPaymentMethodApplication, PaymentMethodApplication>();
 
-        services.AddScoped<ITransactionApplication, TransactionApplication>();
-        services.AddScoped<IExpenseRepository, ExpenseRepository>();
+        services.AddTransient<ITransactionApplication, TransactionApplication>();
+        services.AddTransient<IExpenseRepository, ExpenseRepository>();
+        
+        services.AddTransient<IAccountAdapter, AccountAdapter>();
+        services.AddTransient<IAccountApplication, AccountApplication>();
+        services.AddTransient<IAccountRepository, AccountRepository>();
+        
+        services.AddTransient<IAccountAdapter, AccountAdapter>();
+        services.AddTransient<IAccountApplication, AccountApplication>();
+        services.AddTransient<IAccountRepository, AccountRepository>();
+        
+        services.AddTransient<IFamilyAdapter, FamilyAdapter>();
+        services.AddTransient<IFamilyApplication, FamilyApplication>();
+        services.AddTransient<IFamilyRepository, FamilyRepository>();
 
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IPaginationAdapter, PaginationAdapter>();

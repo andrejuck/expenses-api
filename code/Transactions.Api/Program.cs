@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Globalization;
+using System.Reflection;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,6 +33,7 @@ builder.Services
 
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssembly(typeof(DomainAssembly).Assembly);
+builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
 builder.Logging.ClearProviders();
 builder.Logging.AddProvider(new CustomLoggerProvider());
@@ -42,7 +44,7 @@ if (builder.Environment.IsDevelopment())
 }
 
 //Dependency injection
-builder.Services.AddExpensesDependencies();
+builder.Services.AddDependencies();
 builder.Services.Configure<EmailingSettings>(builder.Configuration.GetSection("EmailingSettings"));
 builder.Services.Configure<CustomClaimSettings>(builder.Configuration.GetSection("CustomClaims"));
 
