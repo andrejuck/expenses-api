@@ -39,6 +39,7 @@ public class AccountApplication(
         existing.PrepareToUpdate(form.AccountName, form.AccountType, existing.FamilyId);
         await repository.UpdateAsync(existing);
         
+        logger.LogInformation(Messages.LOG_UPDATED_MESSAGE, nameof(Account), userId, existing.ToJson());
         return adapter.ConvertToResponse(existing);
     }
 

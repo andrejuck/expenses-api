@@ -1,6 +1,6 @@
 namespace Transactions.Domain.Exceptions;
 
-internal static class DomainMessages
+public static class DomainMessages
 {
     internal const string EMPTY_FIELD = "{0} should be filled.";
     internal const string HIGHER_THAN = "{0} should be higher than {1}.";
@@ -8,4 +8,6 @@ internal static class DomainMessages
 
     internal const string ACCOUNT_FAMILYBIND_NOT_ALLOWED_FOR_PERSONAL_ACCOUNT =
         "It is not allowed to bind a Family to a personal account.";
+
+    public const string FAMILY_UPDATING_USER_INVALID = "A family can only be updated by the Owner";
 }

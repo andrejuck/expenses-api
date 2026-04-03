@@ -8,4 +8,5 @@ public interface IAccountRepository : IBaseEntityRepository<Account>
 {
     Task<List<TResponse>> GetAllPagedAsync<TResponse>(AccountSearchParam searchParams, PagedRequest pagedRequest, Guid userId);
     Task<long> GetAllCountAsync(AccountSearchParam searchParams, Guid userId);
+    Task<Account?> FetchByIdAsync(Guid formAccountGuid);
 }

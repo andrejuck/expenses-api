@@ -8,74 +8,75 @@ using Microsoft.Extensions.Options;
 using Transactions.Api.DataContracts.Applications;
 using Transactions.Api.PresentationContracts;
 using Transactions.Api.PresentationContracts.Accounts;
+using Transactions.Api.PresentationContracts.Families;
 using Transactions.Api.PresentationContracts.Forms;
 using Transactions.Domain.Models.Accounts;
 
 namespace Transactions.Api.Controllers;
 
 [ApiController]
-[Route("api/account")]
+[Route("api/family")]
 [Authorize]
-public class AccountController : ControllerBase
+public class FamilyController : ControllerBase
 {
-    private readonly IAccountApplication _application;
+    private readonly IFamilyApplication _application;
     private readonly CustomClaimSettings _claimSettings;
     private Guid UserId => UserClaimsHelper.GetUserGuidIdFromClaims(User, _claimSettings);
-    public AccountController(IAccountApplication application,
+    public FamilyController(IFamilyApplication application,
         IOptions<CustomClaimSettings> claimSettings)
     {
         _application = application;
         _claimSettings = claimSettings.Value;
     }
 
-    [HttpGet("{id:guid}", Name = "FetchAccountById")]
-    [ProducesResponseType(typeof(AccountResponse), (int)HttpStatusCode.OK)]
+    [HttpGet("{id:guid}", Name = "FetchFamilyById")]
+    [ProducesResponseType(typeof(List<FamilyResponse>), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.Conflict)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<AccountResponse>> FetchAccountByIdAsync(Guid id)
+    public async Task<ActionResult<FamilyResponse>> FetchFamilyByIdAsync(Guid id)
     {
-        var result = await _application.FetchAccountByIdAsync(id, UserId);
+        var result = await _application.FetchFamilyByIdAsync(id, UserId);
         return Ok(result);
     }
     
     [HttpGet]
-    [ProducesResponseType(typeof(List<AccountResponse>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(List<FamilyResponse>), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.Conflict)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<PagedResponse<AccountResponse>>> FetchPagedUserAccountsAsync(
+    public async Task<ActionResult<List<FamilyResponse>>> FetchUserFamiliesAsync(
         [FromQuery] AccountSearchParam searchParams,
         [FromQuery] PagedRequest pagedRequest)
     {
-        var result = await _application.FetchPagedAccountsAsync(searchParams, pagedRequest, UserId);
+        var result = await _application.FetchUserFamiliesAsync(searchParams, UserId);
         return Ok(result);
     }
 
     [HttpPost]
-    [ProducesResponseType(typeof(AccountResponse), (int)HttpStatusCode.Created)]
+    [ProducesResponseType(typeof(FamilyResponse), (int)HttpStatusCode.Created)]
     [ProducesResponseType((int)HttpStatusCode.Conflict)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult> CreateAccount([FromBody] AccountForm form)
+    public async Task<ActionResult> CreateFamilyAsync([FromBody] FamilyForm form)
     {
-        var response = await _application.CreateAccountAsync(form, UserId);
-        return CreatedAtRoute("FetchAccountById", new { id = response.Id }, response);
+        var response = await _application.CreateFamilyAsync(form, UserId);
+        return CreatedAtRoute("FetchFamilyById", new { id = response.Id }, response);
     }
     
-    [HttpPut("{accountId:guid}")]
-    [ProducesResponseType(typeof(AccountResponse), (int)HttpStatusCode.OK)]
+    [HttpPut("{familyId:guid}")]
+    [ProducesResponseType(typeof(FamilyResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.Conflict)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult> UpdateAccount(Guid accountId, [FromBody] AccountForm form)
+    public async Task<ActionResult> UpdateFamilyAsync(Guid familyId, [FromBody] FamilyForm form)
     {
-        var response = await _application.UpdateAccountAsync(accountId, form, UserId);
+        var response = await _application.UpdateFamilyAsync(familyId, form, UserId);
         
         if(response is null)
             return Ok(response);
 
-        return AcceptedAtRoute("FetchAccountById", new { id = response.Id }, response);
+        return AcceptedAtRoute("FetchFamilyById", new { id = response.Id }, response);
     }
 
     [HttpDelete("{id:guid}")]

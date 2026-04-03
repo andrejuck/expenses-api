@@ -5,5 +5,5 @@ namespace Transactions.Domain.DataContracts;
 
 public interface IFamilyRepository : IBaseEntityRepository<Family>
 {
-    
+    Task<IEnumerable<Family>> FetchAllUserFamiliesAsync(Guid userId);
 }

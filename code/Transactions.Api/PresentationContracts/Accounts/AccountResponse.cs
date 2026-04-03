@@ -1,4 +1,4 @@
-namespace Transactions.Api.PresentationContracts;
+namespace Transactions.Api.PresentationContracts.Accounts;
 
 public class AccountResponse
 {
