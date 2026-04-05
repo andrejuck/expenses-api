@@ -9,14 +9,31 @@ public class FamilyRepository(DBContext context)
     : BasePageableMongoRepository<Family>(context.Families), IFamilyRepository
 {
     
-    
-    public Task<Family> UpdateAsync(Family entity)
+    //TODO - Add to Libs
+    public async Task<Family> UpdateAsync(Family entity)
     {
-        throw new NotImplementedException();
+        var idFilter = _filterBuilder.Eq(family => family.Id, entity.Id);
+        return await context.Families.FindOneAndReplaceAsync(idFilter, entity);
     }
 
-    public Task<Family?> FindByIdAsync(Guid id, Guid userId)
+    public async Task<Family?> FindByIdAsync(Guid id, Guid userId)
     {
-        throw new NotImplementedException();
+        return await context.Families
+            .Find(_filterBuilder.Eq(fam => fam.Id, id))
+            .FirstOrDefaultAsync();
+    }
+
+    public async Task<IEnumerable<Family>> FetchAllUserFamiliesAsync(Guid userId)
+    {
+        return await context.Families
+            .Find(
+                _filterBuilder.Or(
+                    _filterBuilder.ElemMatch(
+                        family => family.Members,
+                        member => member.Id.Equals(userId)
+                    ),
+                    _filterBuilder.Eq(family => family.OwnerUserId, userId)
+                )
+            ).ToListAsync();
     }
 }

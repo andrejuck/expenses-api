@@ -7,8 +7,8 @@ namespace Transactions.Domain.DataContracts;
 
 public interface IUserRepository : IBaseRepository<User>
 {
-    Task<User> FindByIdAsync(Guid id);
-    Task<User> GetByEmailAsync(string email);
+    Task<User?> FindByIdAsync(Guid id);
+    Task<User?> GetByEmailAsync(string email);
     Task<List<TResponse>> GetAllPagedAsync<TResponse>(UserSearchParam searchParam, PagedRequest request);
     Task<long> GetAllCountAsync(UserSearchParam searchParam);
 }

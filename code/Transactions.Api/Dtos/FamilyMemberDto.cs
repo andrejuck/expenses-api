@@ -2,6 +2,7 @@ namespace Transactions.Api.Dtos;
 
 public class FamilyMemberDto
 {
-    public required string MemberName { get; set; }
-    public required Guid MemberId { get; set; }
+    public string? MemberName { get; set; }
+    public Guid? MemberId { get; set; }
+    public required string MemberEmail { get; set; }
 }

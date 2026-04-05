@@ -1,4 +1,5 @@
 using System.Net;
+using System.Security.Claims;
 using Libs.Api.Models;
 using Libs.Auth.Helpers;
 using Libs.Auth.Models.Config;
@@ -22,6 +23,7 @@ public class FamilyController : ControllerBase
     private readonly IFamilyApplication _application;
     private readonly CustomClaimSettings _claimSettings;
     private Guid UserId => UserClaimsHelper.GetUserGuidIdFromClaims(User, _claimSettings);
+    private string? UserName => User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.NameIdentifier))?.Value;
     public FamilyController(IFamilyApplication application,
         IOptions<CustomClaimSettings> claimSettings)
     {
@@ -30,7 +32,7 @@ public class FamilyController : ControllerBase
     }
 
     [HttpGet("{id:guid}", Name = "FetchFamilyById")]
-    [ProducesResponseType(typeof(List<FamilyResponse>), (int)HttpStatusCode.OK)]
+    [ProducesResponseType(typeof(FamilyResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.Conflict)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
@@ -45,11 +47,9 @@ public class FamilyController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.Conflict)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<List<FamilyResponse>>> FetchUserFamiliesAsync(
-        [FromQuery] AccountSearchParam searchParams,
-        [FromQuery] PagedRequest pagedRequest)
+    public async Task<ActionResult<List<FamilyResponse>>> FetchUserFamiliesAsync()
     {
-        var result = await _application.FetchUserFamiliesAsync(searchParams, UserId);
+        var result = await _application.FetchUserFamiliesAsync(UserId);
         return Ok(result);
     }
 
@@ -60,7 +60,7 @@ public class FamilyController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     public async Task<ActionResult> CreateFamilyAsync([FromBody] FamilyForm form)
     {
-        var response = await _application.CreateFamilyAsync(form, UserId);
+        var response = await _application.CreateFamilyAsync(form, UserId, UserName ?? string.Empty);
         return CreatedAtRoute("FetchFamilyById", new { id = response.Id }, response);
     }
     

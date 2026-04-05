@@ -16,17 +16,13 @@ namespace Transactions.Api.Controllers;
 [ApiController]
 [Route("api/account")]
 [Authorize]
-public class AccountController : ControllerBase
+public class AccountController(
+    IAccountApplication application,
+    IOptions<CustomClaimSettings> claimSettings)
+    : ControllerBase
 {
-    private readonly IAccountApplication _application;
-    private readonly CustomClaimSettings _claimSettings;
+    private readonly CustomClaimSettings _claimSettings = claimSettings.Value;
     private Guid UserId => UserClaimsHelper.GetUserGuidIdFromClaims(User, _claimSettings);
-    public AccountController(IAccountApplication application,
-        IOptions<CustomClaimSettings> claimSettings)
-    {
-        _application = application;
-        _claimSettings = claimSettings.Value;
-    }
 
     [HttpGet("{id:guid}", Name = "FetchAccountById")]
     [ProducesResponseType(typeof(AccountResponse), (int)HttpStatusCode.OK)]
@@ -35,7 +31,7 @@ public class AccountController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     public async Task<ActionResult<AccountResponse>> FetchAccountByIdAsync(Guid id)
     {
-        var result = await _application.FetchAccountByIdAsync(id, UserId);
+        var result = await application.FetchAccountByIdAsync(id, UserId);
         return Ok(result);
     }
     
@@ -48,7 +44,7 @@ public class AccountController : ControllerBase
         [FromQuery] AccountSearchParam searchParams,
         [FromQuery] PagedRequest pagedRequest)
     {
-        var result = await _application.FetchPagedAccountsAsync(searchParams, pagedRequest, UserId);
+        var result = await application.FetchPagedAccountsAsync(searchParams, pagedRequest, UserId);
         return Ok(result);
     }
 
@@ -59,18 +55,18 @@ public class AccountController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     public async Task<ActionResult> CreateAccount([FromBody] AccountForm form)
     {
-        var response = await _application.CreateAccountAsync(form, UserId);
+        var response = await application.CreateAccountAsync(form, UserId);
         return CreatedAtRoute("FetchAccountById", new { id = response.Id }, response);
     }
     
-    [HttpPut("{accountId:guid}")]
+    [HttpPut("{id:guid}")]
     [ProducesResponseType(typeof(AccountResponse), (int)HttpStatusCode.OK)]
     [ProducesResponseType((int)HttpStatusCode.Conflict)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult> UpdateAccount(Guid accountId, [FromBody] AccountForm form)
+    public async Task<ActionResult> UpdateAccount(Guid id, [FromBody] AccountForm form)
     {
-        var response = await _application.UpdateAccountAsync(accountId, form, UserId);
+        var response = await application.UpdateAccountAsync(id, form, UserId);
         
         if(response is null)
             return Ok(response);
@@ -85,7 +81,7 @@ public class AccountController : ControllerBase
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     public async Task<ActionResult> DeleteModule(Guid id)
     {
-        await _application.DeleteByIdAsync(id, UserId);
+        await application.DeleteByIdAsync(id, UserId);
         return NoContent();
     }
 }

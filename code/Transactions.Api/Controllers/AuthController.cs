@@ -15,11 +15,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
-using Transactions.Api.DataContracts;
-using Transactions.Api.Dtos;
-using Transactions.Api.PresentationContracts;
-using Transactions.Api.Settings;
-
 
 namespace Transactions.Api.Controllers
 {

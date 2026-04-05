@@ -31,12 +31,12 @@ namespace Transactions.Infra.Repositories
             return entity;
         }
 
-        public async Task<User> GetByEmailAsync(string email)
+        public async Task<User?> GetByEmailAsync(string email)
         {
             return await _dbContext.Users.Find(_filterBuilder.Eq(u => u.Email, email)).FirstOrDefaultAsync();
         }
 
-        public async Task<User> FindByIdAsync(Guid id)
+        public async Task<User?> FindByIdAsync(Guid id)
         {
             var filter = IdFilter(id);
 

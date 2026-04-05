@@ -1,5 +1,5 @@
 using Libs.Api.ErrorHandling.Exceptions;
-using Libs.Auth.Models;
+using Transactions.Domain.Exceptions;
 using Transactions.Domain.Models.Accounts;
 using Transactions.Domain.Models.Enum;
 
@@ -9,11 +9,13 @@ public class Family : BaseEntity
 {
     public Family(string name,
         Guid ownerUser,
+        string ownerUserName,
         IEnumerable<FamilyMember> members,
-        IEnumerable<Account> accounts)
+        IEnumerable<FamilyAccount> accounts)
     {
         Name = name;
-        OwnerUser = ownerUser;
+        OwnerUserId = ownerUser;
+        OwnerUserName = ownerUserName;
         Members = members;
         Accounts = accounts;
         
@@ -21,13 +23,14 @@ public class Family : BaseEntity
     }
     
     public string Name { get; set; } 
-    public Guid OwnerUser { get; set; }
+    public Guid OwnerUserId { get; set; }
+    public string OwnerUserName { get; set; }
     public IEnumerable<FamilyMember> Members { get; set; }
-    public IEnumerable<Account> Accounts { get; set; }
+    public IEnumerable<FamilyAccount> Accounts { get; set; }
 
     public void PrepareToUpdate(string familyName, 
         IEnumerable<FamilyMember> members, 
-        IEnumerable<Account> accounts)
+        IEnumerable<FamilyAccount> accounts)
     {
         Name = familyName;
         Members = members;
@@ -39,10 +42,10 @@ public class Family : BaseEntity
     private void Validate()
     {
         if (!Members.Any() || Members.Count() > 5)
-            throw new DomainException("A family must have at least 1 member and a maximum of 5 members");
+            throw new DomainException(DomainMessages.FAMILY_INVALID_MEMBERS_QUANTITY);
         if (!Accounts.Any())
-            throw new DomainException("A family must have at least 1 shared account");
+            throw new DomainException(DomainMessages.FAMILY_INVALID_ACCOUNTS_QUANTITY);
         if (Accounts.Any(account => account.AccountType.Equals(AccountType.Personal)))
-            throw new DomainException("A family should not have personal accounts");
+            throw new DomainException(DomainMessages.FAMILY_INVALID_ACCOUNTS_TYPE);
     }
 }

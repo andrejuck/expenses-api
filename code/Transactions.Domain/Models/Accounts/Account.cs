@@ -35,9 +35,10 @@ public class Account : BaseUserEntity
           Validate();
      }
 
-     public void BindFamily(Family family)
+     public void BindFamily(Guid familyId)
      {
-          FamilyId = family.Id;
+          FamilyId = familyId;
+          SetUpdatedAt();
      }
 
      private void Validate()

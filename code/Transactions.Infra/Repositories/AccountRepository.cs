@@ -23,7 +23,8 @@ public class AccountRepository(DBContext context)
             _filterBuilder.Eq(account => account.UserId, userId)
         )).FirstOrDefaultAsync();
 
-    public async Task<List<TResponse>> GetAllPagedAsync<TResponse>(AccountSearchParam searchParams, PagedRequest pagedRequest, Guid userId)
+    public async Task<List<TResponse>> GetAllPagedAsync<TResponse>(AccountSearchParam searchParams,
+        PagedRequest pagedRequest, Guid userId)
     {
         var sortDefinition = _sortBuilder.Ascending(x => x.Name);
         var aggregationPipeline = new BsonDocument[]
@@ -35,21 +36,26 @@ public class AccountRepository(DBContext context)
             BuildFamilyAggregation(),
             BuildFlatChildAggregation(nameof(Family))
         };
-        
+
         return await base.GetAllPagedAsync<TResponse>(pagedRequest, aggregationPipeline);
     }
 
     public async Task<long> GetAllCountAsync(AccountSearchParam searchParams, Guid userId)
     {
         var filter = _filterBuilder.And(
-            _filterBuilder.Eq(x => x.UserId, userId), 
+            _filterBuilder.Eq(x => x.UserId, userId),
             _filterBuilder.Eq(x => x.DeletedAt, null)
         );
-        
+
         filter = DefineFilters(searchParams, filter);
         return await base.GetAllCountAsync(filter);
     }
-    
+
+    public async Task<Account?> FetchByIdAsync(Guid formAccountGuid) =>
+        await context.Accounts.Find(
+            _filterBuilder.Eq(account => account.Id, formAccountGuid)
+        ).FirstOrDefaultAsync();
+
     private BsonDocument BuildFamilyAggregation() =>
         BuildAggregation(context.Families.CollectionNamespace.CollectionName, nameof(Account.FamilyId), nameof(Family));
 }

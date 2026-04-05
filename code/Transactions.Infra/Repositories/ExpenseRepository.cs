@@ -26,7 +26,7 @@ public class ExpenseRepository(DBContext dbContext)
     private BsonDocument BuildUserIdFilter(Guid id) =>
         BuildEqualFilter(nameof(Transaction.UserId), id);
 
-    public async Task<Transaction> FindByIdAsync(Guid id, Guid userId)
+    public async Task<Transaction?> FindByIdAsync(Guid id, Guid userId)
     {
         var pipeline = new[] {
             BuildIdFilter(id),

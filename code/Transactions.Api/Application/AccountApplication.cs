@@ -43,6 +43,17 @@ public class AccountApplication(
         return adapter.ConvertToResponse(existing);
     }
 
+    public async Task BindFamilyToAccountAsync(Guid familyId, IEnumerable<Account> accounts)
+    {
+        foreach (var account in accounts)
+        {
+            if (account.FamilyId.Equals(familyId)) continue;
+            
+            account.BindFamily(familyId);
+            await repository.UpdateAsync(account);
+        }
+    }
+
     public async Task<PagedResponse<AccountResponse>> FetchPagedAccountsAsync(AccountSearchParam searchParams,
         PagedRequest pagedRequest,
         Guid userId)
@@ -62,6 +73,9 @@ public class AccountApplication(
         return entity is null ? null : adapter.ConvertToResponse(entity);
     }
 
+    public async Task<Account?> FetchAccountByIdAsync(Guid id) =>
+        await repository.FetchByIdAsync(id);
+
     public async Task DeleteByIdAsync(Guid id, Guid userId)
     {
         var entity = await FindByIdAsync(id, userId);
@@ -71,6 +85,8 @@ public class AccountApplication(
         await repository.UpdateAsync(entity);
         logger.LogInformation(Messages.LOG_DELETED_MESSAGE, nameof(Account), userId, entity.ToJson());
     }
+    
+    
 
     private async Task<Account?> FindByIdAsync(Guid id, Guid userId)
     {
