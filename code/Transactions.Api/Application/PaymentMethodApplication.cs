@@ -44,7 +44,7 @@ public class PaymentMethodApplication : IPaymentMethodApplication
     {
         var payments = await _paymentRepository.FindAllByUserIdAsync(userId);
         var result = _mapper.Map<List<PaymentMethodResponse>>(payments);
-        _logger.LogInformation(Messages.LOG_GET_MULTIPLE_MESSAGE, nameof(PaymentMethodResponse), payments.Count, userId, result.ToJson());
+        _logger.LogInformation(Messages.LOG_GET_PAGED_MULTIPLE_MESSAGE, nameof(PaymentMethodResponse), payments.Count, userId, result.ToJson());
         return result;
     }
 

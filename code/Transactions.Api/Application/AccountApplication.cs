@@ -16,6 +16,7 @@ namespace Transactions.Api.Application;
 public class AccountApplication(
     IAccountAdapter adapter,
     IAccountRepository repository,
+    IFamilyRepository familyRepository,
     IErrorService errorService,
     ILogger<AccountApplication> logger,
     IPaginationAdapter pageAdapter) : IAccountApplication
@@ -54,17 +55,14 @@ public class AccountApplication(
         }
     }
 
-    public async Task<PagedResponse<AccountResponse>> FetchPagedAccountsAsync(AccountSearchParam searchParams,
-        PagedRequest pagedRequest,
-        Guid userId)
+    public async Task<IEnumerable<AccountResponse>> FetchAllAccountsAsync(Guid userId)
     {
-        var result = await repository.GetAllPagedAsync<AccountResponse>(searchParams, pagedRequest, userId);
-        var total = await repository.GetAllCountAsync(searchParams, userId);
-        var pagedResponse = pageAdapter.ConvertToResponse(pagedRequest, total, result);
 
-        logger.LogInformation(Messages.LOG_GET_MULTIPLE_MESSAGE, pagedResponse.Result.Count(), nameof(AccountResponse),
-            total, userId);
-        return pagedResponse;
+        var userAccounts = (await repository.GetAllUserAccountsAsync(userId)).ToList();
+        userAccounts.AddRange(await familyRepository.GetAllUserFamilyAccountsAsync(userId));
+
+        logger.LogInformation(Messages.LOG_GET_MULTIPLE_MESSAGE, userAccounts.Count, nameof(AccountResponse), userId);
+        return adapter.ConvertToResponse(userAccounts);
     }
 
     public async Task<AccountResponse?> FetchAccountByIdAsync(Guid id, Guid userId)
@@ -81,13 +79,11 @@ public class AccountApplication(
         var entity = await FindByIdAsync(id, userId);
         if (entity is null) return;
         
-        entity.SetDeleted();
+        entity.PrepareToDelete();
         await repository.UpdateAsync(entity);
         logger.LogInformation(Messages.LOG_DELETED_MESSAGE, nameof(Account), userId, entity.ToJson());
     }
     
-    
-
     private async Task<Account?> FindByIdAsync(Guid id, Guid userId)
     {
         var account = await repository.FindByIdAsync(id, userId);

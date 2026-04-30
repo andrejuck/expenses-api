@@ -88,7 +88,7 @@ public class UserController : ControllerBase
         var usersResponse = _mapper.Map<List<UserResponse>>(users);
         var response = _pageAdapter.ConvertToResponse(request, totalUsers, usersResponse);
 
-        _logger.LogInformation(Messages.LOG_GET_MULTIPLE_MESSAGE, nameof(UserResponse), users.Count, totalUsers, UserId);
+        _logger.LogInformation(Messages.LOG_GET_PAGED_MULTIPLE_MESSAGE, nameof(UserResponse), users.Count, totalUsers, UserId);
         return Ok(response);
     }
 

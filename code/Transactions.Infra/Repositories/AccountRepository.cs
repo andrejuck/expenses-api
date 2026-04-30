@@ -23,7 +23,7 @@ public class AccountRepository(DBContext context)
             _filterBuilder.Eq(account => account.UserId, userId)
         )).FirstOrDefaultAsync();
 
-    public async Task<List<TResponse>> GetAllPagedAsync<TResponse>(AccountSearchParam searchParams,
+    public async Task<List<TResponse>> GetAllAccountsAsync<TResponse>(AccountSearchParam searchParams,
         PagedRequest pagedRequest, Guid userId)
     {
         var sortDefinition = _sortBuilder.Ascending(x => x.Name);
@@ -39,6 +39,12 @@ public class AccountRepository(DBContext context)
 
         return await base.GetAllPagedAsync<TResponse>(pagedRequest, aggregationPipeline);
     }
+
+    public async Task<IEnumerable<Account>> GetAllUserAccountsAsync(Guid userId) =>
+        await context.Accounts.Find(_filterBuilder.And(
+            _filterBuilder.Eq(acc => acc.UserId, userId)
+            ))
+            .ToListAsync();
 
     public async Task<long> GetAllCountAsync(AccountSearchParam searchParams, Guid userId)
     {

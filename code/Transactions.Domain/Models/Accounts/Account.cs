@@ -41,6 +41,12 @@ public class Account : BaseUserEntity
           SetUpdatedAt();
      }
 
+     public void PrepareToDelete()
+     {
+          FamilyId = null;
+          SetDeletedAt();
+     }
+
      private void Validate()
      {
           if(AccountType.Equals(AccountType.Personal) && FamilyId.HasValue)

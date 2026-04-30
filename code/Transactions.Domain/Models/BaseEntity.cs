@@ -12,7 +12,7 @@ public abstract class BaseEntity
         UpdatedAt = DateTime.Now;
     }
 
-    public virtual void SetDeleted()
+    public virtual void SetDeletedAt()
     {
         DeletedAt = DateTime.Now;
         SetUpdatedAt();

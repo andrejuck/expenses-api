@@ -10,4 +10,5 @@ public interface IAccountAdapter
 {
     Account ConvertToDomain(AccountForm form, Guid userId);
     AccountResponse ConvertToResponse(Account domain);
+    IEnumerable<AccountResponse> ConvertToResponse(IEnumerable<Account> entities);
 }

@@ -15,7 +15,8 @@ public static class Messages
     public const string LOG_CREATED_MESSAGE = "{0} created succesfully by userid {1} | {2}";
     public const string LOG_UPDATED_MESSAGE = "{0} updated succesfully by userid {1} | {2}";
     public const string LOG_DELETED_MESSAGE = "{0} marked for deletion succesfully by userid {1} | {2}";
-    public const string LOG_GET_MULTIPLE_MESSAGE = "Fetched {0} {1} of total {2} succesfully by userid {3}";
+    public const string LOG_GET_PAGED_MULTIPLE_MESSAGE = "Fetched {0} {1} of total {2} succesfully by userid {3}";
+    public const string LOG_GET_MULTIPLE_MESSAGE = "Fetched a total of {Count} {Entity} succesfully by userid {User}";
     public const string LOG_GET_SINGLE_MESSAGE = "{0} fetched succesfully by userid {1} | {2}";
 
 }

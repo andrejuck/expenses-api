@@ -69,7 +69,7 @@ public class ModuleApplication : IModuleApplication
 
         var result = _mapper.Map<List<ModuleResponse>>(modules);
         _logger.LogInformation(
-            Messages.LOG_GET_MULTIPLE_MESSAGE,
+            Messages.LOG_GET_PAGED_MULTIPLE_MESSAGE,
             result.Count,
             nameof(ModuleResponse),
             result.Count,
@@ -97,7 +97,7 @@ public class ModuleApplication : IModuleApplication
             return;
         }
 
-        existingModule.SetDeleted();
+        existingModule.SetDeletedAt();
         await _repository.UpdateAsync(existingModule);
         _logger.LogInformation(Messages.LOG_DELETED_MESSAGE, nameof(existingModule), userId, existingModule.ToJson());
     }

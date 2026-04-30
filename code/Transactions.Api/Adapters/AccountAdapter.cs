@@ -27,4 +27,7 @@ public class AccountAdapter : IAccountAdapter
             FamilyId = domain.FamilyId,
             UserId = domain.UserId
         };
+
+    public IEnumerable<AccountResponse> ConvertToResponse(IEnumerable<Account> entities) =>
+        entities.Select(ConvertToResponse);
 }

@@ -66,7 +66,7 @@ public class TransactionApplication : ITransactionApplication
         var total = await _repository.GetAllCountAsync(searchParams, userId);
         var pagedResponse = _pageAdapter.ConvertToResponse(pagedRequest, total, expensesResponse);
 
-        _logger.LogInformation(Messages.LOG_GET_MULTIPLE_MESSAGE, pagedResponse.Result.Count(), nameof(TransactionResponse), total, userId);
+        _logger.LogInformation(Messages.LOG_GET_PAGED_MULTIPLE_MESSAGE, pagedResponse.Result.Count(), nameof(TransactionResponse), total, userId);
         return pagedResponse;
     }
 
@@ -82,7 +82,7 @@ public class TransactionApplication : ITransactionApplication
     public async Task<List<string>> GetUserCategoriesAsync(Guid userId)
     {
         var result = await _repository.GetAllUserCategories(userId);
-        _logger.LogInformation(Messages.LOG_GET_MULTIPLE_MESSAGE, result.Count, nameof(TransactionResponse), result.Count, userId);
+        _logger.LogInformation(Messages.LOG_GET_PAGED_MULTIPLE_MESSAGE, result.Count, nameof(TransactionResponse), result.Count, userId);
         return result;
     }
 
@@ -124,7 +124,7 @@ public class TransactionApplication : ITransactionApplication
         var expense = await FindByIdAsync(id, userId);
         if (expense is null) return;
 
-        expense.SetDeleted();
+        expense.SetDeletedAt();
         await _repository.UpdateAsync(expense);
         _logger.LogInformation(Messages.LOG_DELETED_MESSAGE, nameof(expense), userId, expense.ToJson());
     }
@@ -132,7 +132,7 @@ public class TransactionApplication : ITransactionApplication
     public async Task<List<TransactionFileResponse>> GetAllExpensesAsync(TransactionSearchParam searchParams, Guid userId)
     {
         var result = await _repository.GetAllAsync<TransactionFileResponse>(searchParams, userId);
-        _logger.LogInformation(Messages.LOG_GET_MULTIPLE_MESSAGE, result.Count, nameof(TransactionResponse), result.Count, userId);
+        _logger.LogInformation(Messages.LOG_GET_PAGED_MULTIPLE_MESSAGE, result.Count, nameof(TransactionResponse), result.Count, userId);
         return result;
     }
 

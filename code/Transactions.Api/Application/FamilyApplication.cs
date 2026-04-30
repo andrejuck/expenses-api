@@ -81,7 +81,7 @@ public class FamilyApplication(
         var entity = await FindByIdAsync(id, userId);
         if (entity is null) return;
         
-        entity.SetDeleted();
+        entity.SetDeletedAt();
         await repository.UpdateAsync(entity);
         logger.LogInformation(Messages.LOG_DELETED_MESSAGE, nameof(Family), userId, entity.ToJson());
     }
@@ -143,7 +143,13 @@ public class FamilyApplication(
         foreach (var formMember in formMembers)
         {
             var user = await  userRepository.GetByEmailAsync(formMember);
-            if (user is not null) existingMembers.Add(adapter.ConvertToDomain(user));
+            if (user is not null)
+            {
+                existingMembers.Add(adapter.ConvertToDomain(user));
+                continue;
+            }
+            
+            existingMembers.Add(new  FamilyMember { Email = formMember });
         }
     }
 

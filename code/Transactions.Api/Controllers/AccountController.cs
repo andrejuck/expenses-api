@@ -40,11 +40,9 @@ public class AccountController(
     [ProducesResponseType((int)HttpStatusCode.Conflict)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult<PagedResponse<AccountResponse>>> FetchPagedUserAccountsAsync(
-        [FromQuery] AccountSearchParam searchParams,
-        [FromQuery] PagedRequest pagedRequest)
+    public async Task<ActionResult<List<AccountResponse>>> FetchPagedUserAccountsAsync()
     {
-        var result = await application.FetchPagedAccountsAsync(searchParams, pagedRequest, UserId);
+        var result = await application.FetchAllAccountsAsync(UserId);
         return Ok(result);
     }
 
