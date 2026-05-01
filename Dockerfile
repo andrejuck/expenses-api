@@ -1,9 +1,9 @@
-ARG NUGET_TOKEN
-
 # Build stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY ./code .
+
+ARG NUGET_TOKEN
 
 RUN dotnet nuget add source https://nuget.pkg.github.com/andrejuck/index.json \
     --name github \
@@ -23,4 +23,4 @@ COPY --from=build /app/publish .
 RUN ls -l
 
 EXPOSE 8080
-ENTRYPOINT ["dotnet", "Expenses.Api.dll"]
+ENTRYPOINT ["dotnet", "Transactions.Api.dll"]

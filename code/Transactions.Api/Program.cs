@@ -14,9 +14,46 @@ using Microsoft.OpenApi.Models;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
+using Grafana.OpenTelemetry;
+using OpenTelemetry;
+using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
 var isTesting = Environment.GetEnvironmentVariable("DOTNET_INTEGRATION_TESTS") == "true";
+
+var resourceBuilder = ResourceBuilder.CreateDefault()
+    .AddService(serviceName: "Transaction.Api");
+
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(resource => resource.AddService(serviceName: "Transactions.Api"));
+
+builder.Services.AddOpenTelemetry()
+    .WithMetrics(metrics =>
+    {
+        metrics
+            .UseGrafana()
+            .SetResourceBuilder(resourceBuilder)
+            .AddHttpClientInstrumentation();
+    });
+
+builder.Services.AddOpenTelemetry()
+    .WithTracing(traceBuilder =>
+    {
+        traceBuilder
+            .UseGrafana()
+            .SetResourceBuilder(resourceBuilder)
+            .AddHttpClientInstrumentation();
+    });
+
+builder.Logging.AddOpenTelemetry(logging =>
+{
+    logging.UseGrafana()
+        .SetResourceBuilder(resourceBuilder);
+});
+
 // Add services to the container.
 
 builder.Services
@@ -57,20 +94,20 @@ builder.Services.AddGraphQL();
 // Configure JWT Authentication
 var key = Encoding.ASCII.GetBytes(builder.Configuration.GetSection("JWT:key").Value);
 builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(key),
-        ValidateIssuer = false,
-        ValidateAudience = false
-    };
-});
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+    });
 
 builder.Services.AddAuthorization(options =>
 {
@@ -90,7 +127,8 @@ builder.Services.AddSwaggerGen(c =>
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Enter 'Bearer' [space] and then your token in the text input below.\n\nExample: \"Bearer eyJhbGciOiJI...\""
+        Description =
+            "Enter 'Bearer' [space] and then your token in the text input below.\n\nExample: \"Bearer eyJhbGciOiJI...\""
     });
 
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -147,4 +185,6 @@ app.MapGraphQL();
 app.Run();
 
 //Access point for integrated Tests
-public partial class Program { }
+public partial class Program
+{
+}
