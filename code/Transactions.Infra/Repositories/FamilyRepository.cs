@@ -1,4 +1,5 @@
 using Libs.Api.Infra;
+using Microsoft.CodeAnalysis.Operations;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Transactions.Domain.DataContracts;
@@ -41,23 +42,15 @@ public class FamilyRepository(DBContext context)
     
     public async Task<IEnumerable<Account>> GetAllUserFamilyAccountsAsync(Guid userId)
     {
-        // var familyAccounts = await context.Families
-        //     .Aggregate()
-        //     .Match(a => a.Members.Any(x => x.Id.Equals(userId)))
-        //     .Lookup(
-        //         foreignCollection: context.Accounts,
-        //         localField: f => f.Accounts,
-        //         
-        //         )
-        
-        
-        var aggregationPipeline = new BsonDocument[]
+        var aggregationPipeline = new []
         {
             BuildElemMatch("_id", userId),
-            BuildAggregation(context.Accounts.CollectionNamespace.CollectionName, nameof(Account.Id), nameof(Account)),
+            BuildAggregation(context.Accounts.CollectionNamespace.CollectionName, "Accounts._id", nameof(Account)),
+            BuildUnwind(nameof(Account)),
+            BuildReplaceRoot(nameof(Account))
         };
         
-        var result = await context.Families.Aggregate<Account>(aggregationPipeline).ToListAsync(); 
+        var result = await Collection.Aggregate<Account>(aggregationPipeline).ToListAsync(); 
         return result;
     }
 
@@ -77,5 +70,15 @@ public class FamilyRepository(DBContext context)
                 }
             }
         });
+    }
+
+    private BsonDocument BuildUnwind(string fieldName)
+    {
+        return new BsonDocument("$unwind", "$" + fieldName);
+    }
+
+    private BsonDocument BuildReplaceRoot(string fieldName)
+    {
+        return new BsonDocument("$replaceRoot", new BsonDocument("newRoot", "$" + fieldName));
     }
 }
