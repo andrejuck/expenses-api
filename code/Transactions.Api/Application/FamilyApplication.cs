@@ -1,5 +1,6 @@
 using System.Net;
 using Libs.Api.ErrorHandling;
+using Libs.Auth.Models;
 using MongoDB.Bson;
 using Transactions.Api.DataContracts.Adapters;
 using Transactions.Api.DataContracts.Applications;
@@ -25,7 +26,7 @@ public class FamilyApplication(
     
     public async Task<FamilyResponse?> FetchFamilyByIdAsync(Guid id, Guid userId)
     {
-        var entity = await FindByIdAsync(id, userId);
+        var entity = await repository.FindAndProjectByIdAsync(id);
         return entity is null ? null : adapter.ConvertToResponse(entity);
     }
 
@@ -35,45 +36,43 @@ public class FamilyApplication(
         return adapter.ConvertToResponse(families);
     }
 
-    public async Task<FamilyResponse?> CreateFamilyAsync(FamilyForm form, Guid userId, string userName)
+    public async Task<Guid?> CreateFamilyAsync(FamilyForm form, Guid userId, string userName)
     {
-        var existingAccounts = new List<Account>();
-        var existingMembers = new List<FamilyMember>();
-        if (!await ValidateAccountsAsync(form.Accounts, existingAccounts)) return null;
+        var membersId = new List<Guid>();
+        if (!await ValidateAccountsAsync(form.Accounts)) return null;
         
-        await FetchFamilyMembersAsync(form.Members, existingMembers);
+        await FetchFamilyMembersAsync(form.Members, membersId);
         
-        var entity = adapter.ConvertToDomain(form, userId, userName, existingAccounts, existingMembers);
-        
-        await repository.AddAsync(entity);
-        await accountApplication.BindFamilyToAccountAsync(entity.Id, existingAccounts);
+        //TODO - Refactor
+        var entity = adapter.ConvertToDomain(form, userId, userName, form.Accounts, membersId);
+        var result = await repository.AddAsync(entity);
+        await accountApplication.BindFamilyToAccountAsync(entity.Id, result.Accounts);
         
         logger.LogInformation(Messages.LOG_CREATED_MESSAGE, nameof(Family), userId, entity.ToJson());
-        return adapter.ConvertToResponse(entity);
+        return entity.Id;
     }
 
-    public async Task<FamilyResponse?> UpdateFamilyAsync(Guid familyId, FamilyForm form, Guid userId)
+    public async Task<Guid?> UpdateFamilyAsync(Guid familyId, FamilyForm form, Guid userId)
     {
         var existing = await FindByIdAsync(familyId, userId);
-        var existingAccounts = new List<Account>();
-        var existingMembers = new List<FamilyMember>();
+        var existingMembers = new List<Guid>();
         if(existing is null) return null;
         
         if(!ValidateForUpdate(existing, userId)) return null;
-        if(!await ValidateAccountsAsync(form.Accounts, existingAccounts)) return null;
+        if(!await ValidateAccountsAsync(form.Accounts)) return null;
         
         await FetchFamilyMembersAsync(form.Members, existingMembers);
         
         existing.PrepareToUpdate(form.FamilyName,
             existingMembers,
-            adapter.ConvertToDomain(existingAccounts)
+            form.Accounts
             );
         
         await repository.UpdateAsync(existing);
-        await accountApplication.BindFamilyToAccountAsync(existing.Id, existingAccounts);
+        await accountApplication.BindFamilyToAccountAsync(existing.Id, existing.Accounts);
         
         logger.LogInformation(Messages.LOG_UPDATED_MESSAGE, nameof(Account), userId, existing.ToJson());
-        return adapter.ConvertToResponse(existing);
+        return existing.Id;
     }
 
     public async Task DeleteByIdAsync(Guid id, Guid userId)
@@ -112,7 +111,7 @@ public class FamilyApplication(
         return false;
     }
     
-    private async Task<bool> ValidateAccountsAsync(IEnumerable<Guid> accountIds, List<Account> accounts)
+    private async Task<bool> ValidateAccountsAsync(IEnumerable<Guid> accountIds)
     {
         foreach (var formAccountGuid in accountIds)
         {
@@ -128,28 +127,24 @@ public class FamilyApplication(
                 errorService.AddError(nameof(ValidateAccountsAsync),
                     DomainMessages.FAMILY_INVALID_ACCOUNTS_TYPE,
                     HttpStatusCode.BadRequest);
-                
-                continue;
             }
-            
-            accounts.Add(account);
         }
         
         return !errorService.HasErrors;
     }
     
-    private async Task FetchFamilyMembersAsync(IEnumerable<string> formMembers, List<FamilyMember> existingMembers)
+    private async Task FetchFamilyMembersAsync(IEnumerable<string> formMembers, List<Guid> membersIds)
     {
         foreach (var formMember in formMembers)
         {
             var user = await  userRepository.GetByEmailAsync(formMember);
-            if (user is not null)
+            if (user is null)
             {
-                existingMembers.Add(adapter.ConvertToDomain(user));
+                logger.LogWarning(Messages.NOT_FOUND_MESSAGE_PATTERN, nameof(User), nameof(User.Email), formMember);
                 continue;
             }
             
-            existingMembers.Add(new  FamilyMember { Email = formMember });
+            membersIds.Add(user.Id);
         }
     }
 

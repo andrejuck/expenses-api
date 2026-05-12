@@ -2,6 +2,7 @@ using Libs.Auth.Models;
 using Transactions.Api.DataContracts.Adapters;
 using Transactions.Api.Dtos;
 using Transactions.Api.PresentationContracts.Families;
+using Transactions.Domain.Dtos;
 using Transactions.Domain.Models.Accounts;
 using Transactions.Domain.Models.Families;
 
@@ -9,78 +10,31 @@ namespace Transactions.Api.Adapters;
 
 public class FamilyAdapter : IFamilyAdapter
 {
-    public FamilyResponse ConvertToResponse(Family entity) =>
-        new()
-        {
-            Id = entity.Id,
-            FamilyName = entity.Name,
-            OwnerName = entity.OwnerUserName,
-            Members = ConvertToDto(entity.Members),
-            Accounts = ConvertToDto(entity.Accounts),
-        };
+    public FamilyResponse ConvertToResponse(FamilyDto dto) =>
+        new(dto.Id, 
+            dto.FamilyName,
+            dto.OwnerUserName,
+            ConvertToResponse(dto.Members),
+            ConvertToResponse(dto.Accounts)
+        );
 
-    public List<FamilyResponse> ConvertToResponse(IEnumerable<Family> families) =>
-        families.Select(ConvertToResponse).ToList();
+    private IEnumerable<FamilyMemberResponse> ConvertToResponse(IEnumerable<UserDto> dtoMembers) =>
+        dtoMembers.Select(user => new FamilyMemberResponse(user.Username, user.Email));
+
+    private IEnumerable<FamilyAccountResponse> ConvertToResponse(IEnumerable<AccountDto> dtoAccounts) =>
+        dtoAccounts.Select(account => new FamilyAccountResponse(account.Id, account.AccountName, account.AccountType));
+
+    public List<FamilyResponse> ConvertToResponse(IEnumerable<FamilyDto> dtoList) =>
+        dtoList.Select(ConvertToResponse).ToList();
 
     public Family ConvertToDomain(FamilyForm form, 
         Guid userId, 
         string userName,
-        IEnumerable<Account> accounts,
-        IEnumerable<FamilyMember> members) =>
+        IEnumerable<Guid> accounts,
+        IEnumerable<Guid> members) =>
         new(form.FamilyName,
             userId,
             userName,
             members,
-            ConvertToDomain(accounts));
-
-    public IEnumerable<FamilyMember> ConvertToDomain(IEnumerable<string> emails)
-    {
-        return emails.Select(email => new FamilyMember()
-        {
-            Email = email,
-            Id = Guid.Parse("f526bcd2-75f2-436d-8605-12440771340d"),
-            Username = email,
-        });
-    }
-    
-    public IEnumerable<FamilyAccount> ConvertToDomain(IEnumerable<Account> accounts) =>
-        accounts.Select(account => new FamilyAccount
-        {
-            Id = account.Id,
-            AccountName = account.Name,
-            AccountType = account.AccountType
-        });
-
-    public FamilyMember ConvertToDomain(User user) =>
-        new()
-        {
-            Email = user.Email,
-            Id = user.Id,
-            Username = user.Username,
-        };
-
-    public FamilyAccount ConvertToDomain(Account account) =>
-        new()
-        {
-            Id = account.Id,
-            AccountName = account.Name,
-            AccountType = account.AccountType
-        };
-
-    private IEnumerable<FamilyMemberDto> ConvertToDto(IEnumerable<FamilyMember> entityMembers) =>
-        entityMembers.Select(familyMember =>
-            new FamilyMemberDto
-            {
-                MemberName = familyMember.Username,
-                MemberId = familyMember.Id,
-                MemberEmail = familyMember.Email
-            });
-
-    private IEnumerable<AccountDto> ConvertToDto(IEnumerable<FamilyAccount> entityAccounts) =>
-        entityAccounts.Select(account =>
-            new AccountDto
-            {
-                AccountId = account.Id,
-                AccountName = account.AccountName,
-            });
+            accounts);
 }

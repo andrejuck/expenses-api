@@ -30,4 +30,7 @@ public class AccountAdapter : IAccountAdapter
 
     public IEnumerable<AccountResponse> ConvertToResponse(IEnumerable<Account> entities) =>
         entities.Select(ConvertToResponse);
+
+    public IEnumerable<RecentAccountResponse> ConvertToRecentAccountResponse(IEnumerable<Account> entities) =>
+        entities.Select(acc => new RecentAccountResponse(acc.Id, acc.Name, acc.Balance, acc.UpdatedAt));
 }

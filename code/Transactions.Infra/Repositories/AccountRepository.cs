@@ -17,6 +17,18 @@ public class AccountRepository(DBContext context)
         return await context.Accounts.FindOneAndReplaceAsync(idFilter, entity);
     }
 
+    public async Task BindFamilyToAccountAsync(Guid familyId, Guid accountId)
+    {
+        var idFilter = _filterBuilder.Eq(account => account.Id, accountId);
+        var updates = new List<UpdateDefinition<Account>>()
+        {
+            _updateBuilder.Set(x => x.FamilyId, familyId),
+            _updateBuilder.Set(x => x.UpdatedAt, DateTime.UtcNow)
+        };
+        
+        await context.Accounts.UpdateOneAsync(idFilter, _updateBuilder.Combine(updates));
+    } 
+
     public async Task<Account?> FindByIdAsync(Guid id, Guid userId) =>
         await context.Accounts.Find(_filterBuilder.And(
             _filterBuilder.Eq(account => account.Id, id),
@@ -61,6 +73,36 @@ public class AccountRepository(DBContext context)
         await context.Accounts.Find(
             _filterBuilder.Eq(account => account.Id, formAccountGuid)
         ).FirstOrDefaultAsync();
+
+    public async Task<Account?> FetchByNameAsync(string formAccountName, Guid userId) =>
+        await context.Accounts.Find(
+            _filterBuilder.And(
+                _filterBuilder.Eq(x => x.UserId, userId),
+                _filterBuilder.Eq(x => x.Name, formAccountName)
+            )
+        ).FirstOrDefaultAsync();
+    
+    public async Task<Account?> FetchByNameAsync(string formAccountName, Guid accountId, Guid userId) =>
+        await context.Accounts.Find(
+            _filterBuilder.And(
+                _filterBuilder.Eq(x => x.UserId, userId),
+                _filterBuilder.Eq(x => x.Name, formAccountName),
+                _filterBuilder.Ne(x => x.Id, accountId)
+            )
+        ).FirstOrDefaultAsync();
+
+    public async Task<IEnumerable<Account>> FetchRecentAccountsSortedByUpdateDateAsync(Guid userId, int limit)
+    {
+        var filter = _filterBuilder.Eq(x => x.UserId, userId);
+
+        return await Collection
+            .Aggregate()
+            .Match(filter)
+            .Sort(_sortBuilder.Descending(x => x.UpdatedAt))
+            .Limit(limit)
+            .ToListAsync();
+    }
+        
 
     private BsonDocument BuildFamilyAggregation() =>
         BuildAggregation(context.Families.CollectionNamespace.CollectionName, nameof(Account.FamilyId), nameof(Family));

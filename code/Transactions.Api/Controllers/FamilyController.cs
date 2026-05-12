@@ -1,17 +1,12 @@
 using System.Net;
 using System.Security.Claims;
-using Libs.Api.Models;
 using Libs.Auth.Helpers;
 using Libs.Auth.Models.Config;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Transactions.Api.DataContracts.Applications;
-using Transactions.Api.PresentationContracts;
-using Transactions.Api.PresentationContracts.Accounts;
 using Transactions.Api.PresentationContracts.Families;
-using Transactions.Api.PresentationContracts.Forms;
-using Transactions.Domain.Models.Accounts;
 
 namespace Transactions.Api.Controllers;
 
@@ -23,7 +18,7 @@ public class FamilyController : ControllerBase
     private readonly IFamilyApplication _application;
     private readonly CustomClaimSettings _claimSettings;
     private Guid UserId => UserClaimsHelper.GetUserGuidIdFromClaims(User, _claimSettings);
-    private string? UserName => User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.NameIdentifier))?.Value;
+    private string? UserName => User.Claims.FirstOrDefault(x => x.Type.Equals(ClaimTypes.Name))?.Value;
     public FamilyController(IFamilyApplication application,
         IOptions<CustomClaimSettings> claimSettings)
     {
@@ -61,7 +56,7 @@ public class FamilyController : ControllerBase
     public async Task<ActionResult> CreateFamilyAsync([FromBody] FamilyForm form)
     {
         var response = await _application.CreateFamilyAsync(form, UserId, UserName ?? string.Empty);
-        return CreatedAtRoute("FetchFamilyById", new { id = response.Id }, response);
+        return CreatedAtRoute("FetchFamilyById", new { id = response }, response);
     }
     
     [HttpPut("{familyId:guid}")]
@@ -76,7 +71,7 @@ public class FamilyController : ControllerBase
         if(response is null)
             return Ok(response);
 
-        return AcceptedAtRoute("FetchFamilyById", new { id = response.Id }, response);
+        return AcceptedAtRoute("FetchFamilyById", new { id = response }, response);
     }
 
     [HttpDelete("{id:guid}")]

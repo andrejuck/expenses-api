@@ -17,7 +17,16 @@ public static class MockExpense
         decimal totalPrice = 10
     )
     {
-        var expense = new Transaction("test", "test", totalPrice, transactionDate ?? DateTime.Now, categories ?? new List<string>() { "test" }, paymentMethod, TransactionType.Expense);
+        var expense = new Transaction(
+            "test",
+            "test",
+            totalPrice,
+            transactionDate ?? DateTime.Now,
+            categories ?? new List<string>() { "test" },
+            paymentMethod,
+            TransactionType.Expense,
+            Guid.NewGuid()
+            );
         expense.BindUser(loggedUser.Id);
 
         collection.InsertOne(expense);
@@ -30,7 +39,15 @@ public static class MockExpense
         var listExpense = new List<Transaction>();
         for (int i = 0; i < count; i++)
         {
-            var expense = new Transaction("test", $"test {i}", 10 + i, DateTime.Now, new List<string>() { $"test {i}" }, paymentMethod, TransactionType.Expense);
+            var expense = new Transaction(
+                "test", 
+                $"test {i}", 
+                10 + i,
+                DateTime.Now,
+                new List<string>() { $"test {i}" },
+                paymentMethod, 
+                TransactionType.Expense,
+                Guid.NewGuid());
             expense.BindUser(loggedUser.Id);
 
             listExpense.Add(expense);

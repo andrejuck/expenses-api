@@ -1,13 +1,16 @@
+using MongoDB.Driver;
 using Transactions.Api.Dtos;
+using Transactions.Domain.Models.Enum;
+using Transactions.Domain.Models.Families;
 
 namespace Transactions.Api.PresentationContracts.Families;
 
-public class FamilyResponse
-{
-    public required Guid Id { get; set; }
-    public required string FamilyName { get; set; }
-    public required string OwnerName { get; set; }
-    public required IEnumerable<FamilyMemberDto> Members { get; set; }
-    public required IEnumerable<AccountDto> Accounts { get; set; }
-    
-}
+public record FamilyResponse(
+    Guid Id,
+    string FamilyName,
+    string OwnerName,
+    IEnumerable<FamilyMemberResponse> Members,
+    IEnumerable<FamilyAccountResponse> Accounts);
+
+public record FamilyAccountResponse(Guid Id, string AccountName, AccountType AccountType);
+public record FamilyMemberResponse(string MemberName, string? MemberEmail);

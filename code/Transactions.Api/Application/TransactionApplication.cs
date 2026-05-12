@@ -10,6 +10,7 @@ using Libs.Api.Models;
 using Microsoft.AspNetCore.JsonPatch;
 using MongoDB.Bson;
 using System.Net;
+using Transactions.Domain.Models.Accounts;
 using Transactions.Domain.Models.Transaction;
 
 namespace Transactions.Api.Application;
@@ -18,6 +19,7 @@ public class TransactionApplication : ITransactionApplication
 {
     private readonly IExpenseRepository _repository;
     private readonly IPaymentMethodRepository _paymentRepo;
+    private readonly IAccountApplication _accountApplication;
     private readonly IMapper _mapper;
     private readonly IErrorService _errorService;
     private readonly IPaginationAdapter _pageAdapter;
@@ -27,13 +29,16 @@ public class TransactionApplication : ITransactionApplication
         IExpenseRepository repository,
         IMapper mapper,
         IPaymentMethodRepository paymentRepo,
+        IAccountApplication accountApplication,
         IErrorService errorService,
         IPaginationAdapter pageAdapter,
-        ILogger<TransactionApplication> logger)
+        ILogger<TransactionApplication> logger 
+        )
     {
         _repository = repository;
         _mapper = mapper;
         _paymentRepo = paymentRepo;
+        _accountApplication = accountApplication;
         _errorService = errorService;
         _pageAdapter = pageAdapter;
         _logger = logger;
@@ -44,6 +49,14 @@ public class TransactionApplication : ITransactionApplication
         var paymentMethod = await FindPaymentBydId(form.PaymentMethodId, userId);
         if (paymentMethod == null) return;
 
+        Account? account = null;
+        if (form.AccountId is not null)
+        {
+            account = await _accountApplication.FindByIdAsync(form.AccountId.Value, userId);
+
+            if (account is null) return;
+        }
+
         //TODO - Adapter
         var entity = new Transaction(form.Location,
             form.Description,
@@ -52,6 +65,7 @@ public class TransactionApplication : ITransactionApplication
             form.ExpenseCategories,
             paymentMethod,
             form.TransactionType,
+            account?.Id,
             form.Installment);
 
         entity.BindUser(userId);
@@ -96,6 +110,14 @@ public class TransactionApplication : ITransactionApplication
         patchForm.ApplyTo(entityForm);
         var paymentMethod = await FindPaymentBydId(entityForm.PaymentMethodId, userId);
         if (paymentMethod == null) return;
+        
+        Account? account = null;
+        if (entityForm.AccountId is not null)
+        {
+            account = await _accountApplication.FindByIdAsync(entityForm.AccountId.Value, userId);
+
+            if (account is null) return;
+        }
 
         expense.PrepareToUpdate(entityForm.Location,
             entityForm.Description,
@@ -103,6 +125,7 @@ public class TransactionApplication : ITransactionApplication
             entityForm.TransactionDate,
             entityForm.ExpenseCategories,
             paymentMethod,
+            account?.Id,
             entityForm.Installment);
 
         await _repository.UpdateAsync(expense);

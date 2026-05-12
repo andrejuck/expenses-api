@@ -10,8 +10,8 @@ public class Family : BaseEntity
     public Family(string name,
         Guid ownerUser,
         string ownerUserName,
-        IEnumerable<FamilyMember> members,
-        IEnumerable<FamilyAccount> accounts)
+        IEnumerable<Guid> members,
+        IEnumerable<Guid> accounts)
     {
         Name = name;
         OwnerUserId = ownerUser;
@@ -25,12 +25,12 @@ public class Family : BaseEntity
     public string Name { get; set; } 
     public Guid OwnerUserId { get; set; }
     public string OwnerUserName { get; set; }
-    public IEnumerable<FamilyMember> Members { get; set; }
-    public IEnumerable<FamilyAccount> Accounts { get; set; }
+    public IEnumerable<Guid> Members { get; set; }
+    public IEnumerable<Guid> Accounts { get; set; }
 
     public void PrepareToUpdate(string familyName, 
-        IEnumerable<FamilyMember> members, 
-        IEnumerable<FamilyAccount> accounts)
+        IEnumerable<Guid> members, 
+        IEnumerable<Guid> accounts)
     {
         Name = familyName;
         Members = members;
@@ -45,7 +45,5 @@ public class Family : BaseEntity
             throw new DomainException(DomainMessages.FAMILY_INVALID_MEMBERS_QUANTITY);
         if (!Accounts.Any())
             throw new DomainException(DomainMessages.FAMILY_INVALID_ACCOUNTS_QUANTITY);
-        if (Accounts.Any(account => account.AccountType.Equals(AccountType.Personal)))
-            throw new DomainException(DomainMessages.FAMILY_INVALID_ACCOUNTS_TYPE);
     }
 }

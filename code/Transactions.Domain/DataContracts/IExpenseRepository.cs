@@ -12,4 +12,5 @@ public interface IExpenseRepository : IBaseEntityRepository<Transaction>
     Task<List<TResponse>> GetAllGroupedPagedAsync<TResponse>(TransactionSearchParam searchParam, PagedRequest request, Guid userId);
     Task<List<string>> GetAllUserCategories(Guid userId);
     Task<List<TResponse>> GetAllAsync<TResponse>(TransactionSearchParam searchParam, Guid userId);
+    Task<bool> GetAnyWithinAccountAsync(Guid accountId, Guid userId);
 }

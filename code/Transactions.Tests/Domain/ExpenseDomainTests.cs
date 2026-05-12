@@ -17,7 +17,15 @@ public class ExpenseDomainTests
     public void Should_Divide_Expense_By_Installments(int installment, decimal totalPrice)
     {
         var paymentMethod = new PaymentMethod("credit card", PaymentType.CreditCard, true);
-        var originalExpense = new Transaction(null, "Test description", totalPrice, DateTime.Now, null, paymentMethod, TransactionType.Expense, installment);
+        var originalExpense = new Transaction(null,
+            "Test description", 
+            totalPrice, 
+            DateTime.Now,
+            null, 
+            paymentMethod, 
+            TransactionType.Expense, 
+            Guid.NewGuid(),
+            installment);
 
         var expenses = originalExpense.DivideByInstallments(paymentMethod);
 
@@ -29,7 +37,14 @@ public class ExpenseDomainTests
     public void Should_Not_Divide_Expense_When_Installments_Equal_Zero()
     {
         var paymentMethod = new PaymentMethod("credit card", PaymentType.CreditCard, true);
-        var originalExpense = new Transaction(null, "Test description", 10, DateTime.Now, null, paymentMethod, TransactionType.Expense);
+        var originalExpense = new Transaction(null, 
+            "Test description",
+            10,
+            DateTime.Now, 
+            null, 
+            paymentMethod, 
+            TransactionType.Expense,
+            Guid.NewGuid());
 
         try
         {
@@ -46,7 +61,14 @@ public class ExpenseDomainTests
     public void Should_Not_Divide_Expense_When_NotCreditCard(PaymentType paymentType)
     {
         var paymentMethod = new PaymentMethod("credit card", paymentType, true);
-        var originalExpense = new Transaction(null, "Test description", 10, DateTime.Now, null, paymentMethod, TransactionType.Expense);
+        var originalExpense = new Transaction(null, 
+            "Test description", 
+            10,
+            DateTime.Now, 
+            null,
+            paymentMethod, 
+            TransactionType.Expense,
+            Guid.NewGuid());
 
         try
         {
@@ -65,7 +87,15 @@ public class ExpenseDomainTests
 
         try
         {
-            var originalExpense = new Transaction(null, "Test description", 10, DateTime.Now, null, paymentMethod, TransactionType.Expense, 1);
+            var originalExpense = new Transaction(null, 
+                "Test description",
+                10, 
+                DateTime.Now, 
+                null, 
+                paymentMethod, 
+                TransactionType.Expense,
+                Guid.NewGuid(),
+                1);
         }
         catch (DomainException ex)
         {

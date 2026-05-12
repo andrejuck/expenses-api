@@ -1,9 +1,11 @@
 using Libs.Api.Infra;
-using Microsoft.CodeAnalysis.Operations;
+using Libs.Auth.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Transactions.Domain.DataContracts;
+using Transactions.Domain.Dtos;
 using Transactions.Domain.Models.Accounts;
+using Transactions.Domain.Models.Enum;
 using Transactions.Domain.Models.Families;
 
 namespace Transactions.Infra.Repositories;
@@ -21,23 +23,35 @@ public class FamilyRepository(DBContext context)
 
     public async Task<Family?> FindByIdAsync(Guid id, Guid userId)
     {
+        var idFilter = _filterBuilder.And(
+            _filterBuilder.Eq(fam => fam.Id, id)
+            );
+        
         return await context.Families
-            .Find(_filterBuilder.Eq(fam => fam.Id, id))
+            .Find(idFilter)
+            .FirstOrDefaultAsync();
+    }
+    
+    public async Task<FamilyDto?> FindAndProjectByIdAsync(Guid id)
+    {
+        var idFilter = _filterBuilder.Eq(fam => fam.Id, id);
+        return await BuildLookup(idFilter)
             .FirstOrDefaultAsync();
     }
 
-    public async Task<IEnumerable<Family>> FetchAllUserFamiliesAsync(Guid userId)
+    public async Task<IEnumerable<FamilyDto>> FetchAllUserFamiliesAsync(Guid userId)
     {
-        return await context.Families
-            .Find(
-                _filterBuilder.Or(
-                    _filterBuilder.ElemMatch(
-                        family => family.Members,
-                        member => member.Id.Equals(userId)
-                    ),
-                    _filterBuilder.Eq(family => family.OwnerUserId, userId)
-                )
-            ).ToListAsync();
+        var filter = _filterBuilder.Or(
+            _filterBuilder.ElemMatch(
+                family => family.Members,
+                member => member == userId
+            ),
+            _filterBuilder.Eq(family => family.OwnerUserId, userId)
+        );
+        
+        return await BuildLookup(filter)
+            .Sort(Builders<FamilyDto>.Sort.Ascending(x => x.FamilyName))
+            .ToListAsync();
     }
     
     public async Task<IEnumerable<Account>> GetAllUserFamilyAccountsAsync(Guid userId)
@@ -80,5 +94,20 @@ public class FamilyRepository(DBContext context)
     private BsonDocument BuildReplaceRoot(string fieldName)
     {
         return new BsonDocument("$replaceRoot", new BsonDocument("newRoot", "$" + fieldName));
+    }
+
+    private IAggregateFluent<FamilyDto> BuildLookup(FilterDefinition<Family> filter)
+    {
+        return context.Families
+            .Aggregate()
+            .Match(filter)
+            .Lookup<Family, Account, FamilyDto>(context.Accounts,
+                fam => fam.Accounts,
+                account => account.Id,
+                result => result.Accounts)
+            .Lookup<FamilyDto, User, FamilyDto>(context.Users,
+                fam => fam.Members,
+                user => user.Id,
+                result => result.Members);
     }
 }

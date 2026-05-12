@@ -13,7 +13,8 @@ public class Transaction : BaseUserEntity
         DateTime transactionDate,
         List<string>? expenseCategories,
         PaymentMethod paymentMethod,
-        TransactionType transactionType,
+        TransactionType transactionType, 
+        Guid? accountId, 
         int? installment = null)
     {
         Location = location;
@@ -23,6 +24,7 @@ public class Transaction : BaseUserEntity
         ExpenseCategories = expenseCategories;
         PaymentMethodId = paymentMethod.Id;
         TransactionType = transactionType;
+        AccountId = accountId;
         Installment = installment;
 
         Validate(paymentMethod);
@@ -37,6 +39,7 @@ public class Transaction : BaseUserEntity
     public PaymentMethod PaymentMethod { get; private set; }
     public int? Installment { get; private set; }
     public TransactionType TransactionType { get; private set; }
+    public Guid? AccountId { get; private set; }
 
     public void PrepareToUpdate(string? location,
         string description,
@@ -44,6 +47,7 @@ public class Transaction : BaseUserEntity
         DateTime transactionDate,
         List<string>? expenseCategories,
         PaymentMethod paymentMethod,
+        Guid? accountId,
         int? installment = null)
     {
         Location = location;
@@ -53,6 +57,7 @@ public class Transaction : BaseUserEntity
         ExpenseCategories = expenseCategories;
         PaymentMethodId = paymentMethod.Id;
         Installment = installment;
+        AccountId = accountId;
 
         SetUpdatedAt();
         Validate(paymentMethod);
@@ -71,7 +76,14 @@ public class Transaction : BaseUserEntity
         for (int i = 1; i <= Installment; i++)
         {
             var adaptedDescription = $"{Description} {i}|{Installment}";
-            var expense = new Transaction(Location, adaptedDescription, unitPrice.Value, TransactionDate, ExpenseCategories, paymentMethod, TransactionType);
+            var expense = new Transaction(Location,
+                adaptedDescription,
+                unitPrice.Value,
+                TransactionDate,
+                ExpenseCategories, 
+                paymentMethod,
+                TransactionType,
+                AccountId);
             expenses.Add(expense);
         }
 

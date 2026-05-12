@@ -77,9 +77,20 @@ public class AccountController(
     [ProducesResponseType((int)HttpStatusCode.Conflict)]
     [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
-    public async Task<ActionResult> DeleteModule(Guid id)
+    public async Task<ActionResult> DeleteAccount(Guid id)
     {
         await application.DeleteByIdAsync(id, UserId);
         return NoContent();
+    }
+    
+    [HttpGet("recent/{limit:int}")]
+    [ProducesResponseType((int)HttpStatusCode.OK)]
+    [ProducesResponseType((int)HttpStatusCode.Conflict)]
+    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
+    [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
+    public async Task<ActionResult> FetchRecentUpdatedAccounts(int limit)
+    {
+        var result = await application.FetchRecentAccountsAsync(UserId, limit);
+        return Ok(result);
     }
 }

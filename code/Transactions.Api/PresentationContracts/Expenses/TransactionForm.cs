@@ -12,4 +12,5 @@ public class TransactionForm
     public Guid PaymentMethodId { get; init; }
     public int? Installment { get; init; }
     public TransactionType TransactionType { get; init; }
+    public Guid? AccountId { get; init; }
 }

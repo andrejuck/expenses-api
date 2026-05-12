@@ -35,12 +35,6 @@ public class Account : BaseUserEntity
           Validate();
      }
 
-     public void BindFamily(Guid familyId)
-     {
-          FamilyId = familyId;
-          SetUpdatedAt();
-     }
-
      public void PrepareToDelete()
      {
           FamilyId = null;
