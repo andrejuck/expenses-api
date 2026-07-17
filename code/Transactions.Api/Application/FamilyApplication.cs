@@ -43,7 +43,6 @@ public class FamilyApplication(
         
         await FetchFamilyMembersAsync(form.Members, membersId);
         
-        //TODO - Refactor
         var entity = adapter.ConvertToDomain(form, userId, userName, form.Accounts, membersId);
         var result = await repository.AddAsync(entity);
         await accountApplication.BindFamilyToAccountAsync(entity.Id, result.Accounts);
@@ -90,7 +89,11 @@ public class FamilyApplication(
         var family = await repository.FindByIdAsync(id, userId);
         if (family is null)
         {
-            ErrorIdNotFound<Family>(id);
+            errorService.AddError(
+                nameof(FindByIdAsync),
+                string.Format(Messages.NOT_FOUND_MESSAGE_PATTERN, nameof(Family), "Id", id),
+                HttpStatusCode.NotFound
+            );
             return null;
         }
 
@@ -118,7 +121,11 @@ public class FamilyApplication(
             var account = await accountApplication.FetchAccountByIdAsync(formAccountGuid);
             if (account is null)
             {
-                ErrorIdNotFound<Account>(formAccountGuid);
+                errorService.AddError(
+                    nameof(FindByIdAsync),
+                    string.Format(Messages.NOT_FOUND_MESSAGE_PATTERN, nameof(Account), "Id", formAccountGuid),
+                    HttpStatusCode.NotFound
+                );
                 continue;
             }
 
@@ -149,11 +156,4 @@ public class FamilyApplication(
     }
 
     private bool ValidateOwnerUser(Family existingEntity, Guid userId) => userId.Equals(existingEntity.OwnerUserId);
-    
-    private void ErrorIdNotFound<T>(Guid id) where T : BaseEntity => 
-        errorService.AddError(
-            nameof(FindByIdAsync),
-            string.Format(Messages.NOT_FOUND_MESSAGE_PATTERN, nameof(T), "Id", id),
-            HttpStatusCode.NotFound
-        );
 }

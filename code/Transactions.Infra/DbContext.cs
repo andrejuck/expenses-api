@@ -11,6 +11,7 @@ using Transactions.Infra.Settings;
 namespace Transactions.Infra;
 public class DBContext : MongoDbContext
 {
+    private readonly MongoDbSettings _settings;
     public IMongoCollection<User> Users { get; set; }
     public IMongoCollection<Module> Modules { get; set; }
     public IMongoCollection<PaymentMethod> PaymentMethods { get; set; }
@@ -21,16 +22,17 @@ public class DBContext : MongoDbContext
     public DBContext(string connectionString, MongoDbSettings settings)
         : base(connectionString, settings.DbName)
     {
+        _settings = settings;
     }
 
     protected override void InitializeCollections()
     {
-        Users = Database.GetCollection<User>("users");
-        Modules = Database.GetCollection<Module>("modules");
-        PaymentMethods = Database.GetCollection<PaymentMethod>("payment-methods");
-        Expenses = Database.GetCollection<Transaction>("expenses");
-        Accounts = Database.GetCollection<Account>("accounts");
-        Families = Database.GetCollection<Family>("families");
+        Users = Database.GetCollection<User>("users").SetupCollection();
+        Modules = Database.GetCollection<Module>("modules").SetupCollection();
+        PaymentMethods = Database.GetCollection<PaymentMethod>("payment-methods").SetupCollection();
+        Expenses = Database.GetCollection<Transaction>("expenses").SetupCollection();
+        Accounts = Database.GetCollection<Account>("accounts").SetupCollection();
+        Families = Database.GetCollection<Family>("families").SetupCollection();
     }
 
     public void InitializeData()
@@ -39,6 +41,19 @@ public class DBContext : MongoDbContext
         if (adminModule == null) Modules.InsertOne(new Module("Admin Module", Guid.NewGuid(), UserRole.Admin));
 
         SetupModules();
+        
+        var adminUser = Users.Find(Builders<User>.Filter.Eq(x => x.Username, "Admin")).FirstOrDefault();
+        if (adminUser is null && _settings.IsDevelopment) SetupAdminUser();
+    }
+
+    private void SetupAdminUser()
+    {
+        var newUser = new User("admin", "Admin");
+        newUser.AddRoles(UserRole.Admin);
+        newUser.ConfirmEmail();
+        newUser.UpdateRegistrationStatus(RegistrationStatus.Approved);
+        newUser.SetPassword(_settings.AdminPassword ?? "admin123");
+        Users.InsertOne(newUser);
     }
 
     private void SetupModules()

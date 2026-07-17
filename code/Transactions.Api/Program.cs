@@ -22,7 +22,6 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 
 var builder = WebApplication.CreateBuilder(args);
-var isTesting = Environment.GetEnvironmentVariable("DOTNET_INTEGRATION_TESTS") == "true";
 
 var resourceBuilder = ResourceBuilder.CreateDefault()
     .AddService(serviceName: "Transaction.Api");
@@ -75,19 +74,21 @@ builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 builder.Logging.ClearProviders();
 builder.Logging.AddProvider(new CustomLoggerProvider());
 
-if (builder.Environment.IsDevelopment())
-{
-    builder.Configuration.AddUserSecrets<Program>();
-}
-
 //Dependency injection
 builder.Services.AddDependencies();
 builder.Services.Configure<EmailingSettings>(builder.Configuration.GetSection("EmailingSettings"));
 builder.Services.Configure<CustomClaimSettings>(builder.Configuration.GetSection("CustomClaims"));
 
 var mongoConn = builder.Configuration.GetSection("MongoDbSettings").Get<MongoDbSettings>();
-if (!isTesting) builder.Services.AddMongoDbContext(mongoConn);
+if(mongoConn is null) throw new ArgumentNullException(nameof(MongoDbSettings));
 
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddUserSecrets<Program>();
+    mongoConn.IsDevelopment = true;
+}
+
+builder.Services.AddMongoDbContext(mongoConn);
 builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddGraphQL();
 

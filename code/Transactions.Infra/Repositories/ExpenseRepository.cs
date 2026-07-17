@@ -17,8 +17,7 @@ public class ExpenseRepository(DBContext dbContext)
         return _filterBuilder.Eq(x => x.Id, id);
     }
 
-    private BsonDocument BuildPaymentMethodAggregation() =>
-        BuildAggregation(dbContext.PaymentMethods.CollectionNamespace.CollectionName, nameof(Transaction.PaymentMethodId), nameof(PaymentMethod));
+    private BsonDocument BuildPaymentMethodAggregation() => BuildAggregation(dbContext.PaymentMethods.CollectionNamespace.CollectionName, nameof(Transaction.PaymentMethodId), nameof(PaymentMethod));
 
     private BsonDocument BuildIdFilter(Guid id) =>
         BuildEqualFilter(nameof(Transaction.Id), id);
@@ -27,7 +26,7 @@ public class ExpenseRepository(DBContext dbContext)
         BuildEqualFilter(nameof(Transaction.UserId), id);
 
     public async Task<Transaction?> FindByIdAsync(Guid id, Guid userId)
-    {
+    { 
         var pipeline = new[] {
             BuildIdFilter(id),
             BuildEqualFilter(nameof(Transaction.DeletedAt), null),
