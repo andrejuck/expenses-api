@@ -1,0 +1,103 @@
+using Transactions.Api.DataContracts.Adapters;
+using Transactions.Api.DataContracts.Applications;
+using Transactions.Api.Helpers;
+using Transactions.Api.PresentationContracts;
+using Transactions.Api.PresentationContracts.Forms;
+using Transactions.Domain.DataContracts;
+using Transactions.Domain.Models;
+using Libs.Api.ErrorHandling;
+using Libs.Auth.Helpers;
+using Libs.Auth.Models.Config;
+using Microsoft.Extensions.Options;
+using System.Net;
+using System.Security.Claims;
+using System.Text.Json;
+using Transactions.Domain.Models.Transaction;
+
+namespace Transactions.Api.Application;
+
+public class ModuleApplication : IModuleApplication
+{
+    private readonly IModuleRepository _repository;
+    private readonly IModuleAdapter _adapter;
+    private readonly IErrorService _errorService;
+    private readonly ILogger<ModuleApplication> _logger;
+    private readonly CustomClaimSettings _customClaimSettings;
+
+    public ModuleApplication(
+        IModuleRepository repository,
+        IModuleAdapter adapter,
+        IErrorService errorService,
+        ILogger<ModuleApplication> logger,
+        IOptions<CustomClaimSettings> options)
+    {
+        _repository = repository;
+        _adapter = adapter;
+        _errorService = errorService;
+        _logger = logger;
+        _customClaimSettings = options.Value;
+    }
+
+    public async Task CreateModuleAsync(ModuleForm form, Guid userId)
+    {
+        var entity = _adapter.ConvertToDomain(form, userId);
+
+        if (await _repository.FindByNameAsync(form.Name) is not null)
+        {
+            _errorService.AddError(
+                nameof(CreateModuleAsync),
+                string.Format(
+                    Messages.CONFLICT_MESSAGE_PATTERN,
+                    nameof(Module),
+                    nameof(ModuleForm.Name),
+                    form.Name
+                ),
+                HttpStatusCode.Conflict);
+
+            return;
+        }
+
+        await _repository.AddAsync(entity);
+        _logger.LogInformation(Messages.LOG_CREATED_MESSAGE, nameof(Transaction), userId, JsonSerializer.Serialize(entity));
+    }
+
+    public async Task<List<ModuleResponse>> FetchAllAsync(ClaimsPrincipal user)
+    {
+        var userRoles = user.FindAll(x => x.Type == ClaimTypes.Role).Select(x => x.Value);
+        var modules = await _repository.FindAllByRolesAsync(userRoles);
+
+        var result = _adapter.ConvertToResponse(modules);
+        _logger.LogInformation(
+            Messages.LOG_GET_PAGED_MULTIPLE_MESSAGE,
+            result.Count,
+            nameof(ModuleResponse),
+            result.Count,
+            UserClaimsHelper.GetUserGuidIdFromClaims(user, _customClaimSettings)
+        );
+
+        return result;
+    }
+
+    public async Task DeleteByIdAsync(Guid moduleId, Guid userId)
+    {
+        var existingModule = await _repository.FindByIdAsync(moduleId);
+        if (existingModule is null)
+        {
+            _errorService.AddError(
+                nameof(DeleteByIdAsync),
+                string.Format(
+                    Messages.NOT_FOUND_MESSAGE_PATTERN,
+                    nameof(Module),
+                    nameof(Module.Id),
+                    moduleId
+                ),
+                HttpStatusCode.NotFound);
+
+            return;
+        }
+
+        existingModule.SetDeletedAt();
+        await _repository.UpdateAsync(existingModule);
+        _logger.LogInformation(Messages.LOG_DELETED_MESSAGE, nameof(existingModule), userId, JsonSerializer.Serialize(existingModule));
+    }
+}
