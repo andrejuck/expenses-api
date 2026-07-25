@@ -45,7 +45,7 @@ public class ReportController : ControllerBase
         if (result.IsNullOrEmpty()) return NoContent();
 
         var memoryStream = new MemoryStream();
-        _csvAdapter.GenerateFile<TransactionFileResponse, ExpenseMap>(memoryStream, result, HttpContext.GetCultureFromHeader());
+        _csvAdapter.GenerateFile<TransactionFileResponse, TransactionMap>(memoryStream, result, HttpContext.GetCultureFromHeader());
 
         return File(memoryStream, "text/csv", $"{DateTime.Now.ToString("yyyyMMdd HHmmss")}");
     }
