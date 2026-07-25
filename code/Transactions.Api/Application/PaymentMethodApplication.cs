@@ -9,6 +9,7 @@ using Libs.Api.ErrorHandling;
 using Microsoft.AspNetCore.JsonPatch;
 using MongoDB.Bson;
 using System.Net;
+using System.Text.Json;
 
 namespace Transactions.Api.Application;
 
@@ -44,7 +45,7 @@ public class PaymentMethodApplication : IPaymentMethodApplication
     {
         var payments = await _paymentRepository.FindAllByUserIdAsync(userId);
         var result = _mapper.Map<List<PaymentMethodResponse>>(payments);
-        _logger.LogInformation(Messages.LOG_GET_PAGED_MULTIPLE_MESSAGE, nameof(PaymentMethodResponse), payments.Count, userId, result.ToJson());
+        _logger.LogInformation(Messages.LOG_GET_PAGED_MULTIPLE_MESSAGE, nameof(PaymentMethodResponse), payments.Count, userId, JsonSerializer.Serialize(result));
         return result;
     }
 
@@ -59,7 +60,7 @@ public class PaymentMethodApplication : IPaymentMethodApplication
         payment.PrepareToUpdate(paymentEntityForm.Name, paymentEntityForm.PaymentType, paymentEntityForm.IsActive);
 
         await _paymentRepository.UpdateAsync(payment);
-        _logger.LogInformation(Messages.LOG_UPDATED_MESSAGE, nameof(PaymentMethod), userId, payment.ToJson());
+        _logger.LogInformation(Messages.LOG_UPDATED_MESSAGE, nameof(PaymentMethod), userId, JsonSerializer.Serialize(payment));
     }
 
     public async Task CreateNewPaymentMethodAsync(Guid userId, PaymentMethodForm form)
@@ -83,7 +84,7 @@ public class PaymentMethodApplication : IPaymentMethodApplication
 
         entity.BindUser(userId);
         await _paymentRepository.AddAsync(entity);
-        _logger.LogInformation(Messages.LOG_CREATED_MESSAGE, nameof(PaymentMethod), userId, entity.ToJson());
+        _logger.LogInformation(Messages.LOG_CREATED_MESSAGE, nameof(PaymentMethod), userId, JsonSerializer.Serialize(entity));
     }
 
     private async Task<PaymentMethod> FindPaymentBydIdAsync(Guid id, Guid userId)
@@ -105,7 +106,7 @@ public class PaymentMethodApplication : IPaymentMethodApplication
             return null;
         }
 
-        _logger.LogInformation(Messages.LOG_GET_SINGLE_MESSAGE, nameof(PaymentMethod), userId, payment.ToJson());
+        _logger.LogInformation(Messages.LOG_GET_SINGLE_MESSAGE, nameof(PaymentMethod), userId, JsonSerializer.Serialize(payment));
         return payment;
     }
 }

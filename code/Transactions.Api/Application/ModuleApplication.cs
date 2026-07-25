@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using System.Net;
 using System.Security.Claims;
+using System.Text.Json;
 using Transactions.Domain.Models.Transaction;
 
 namespace Transactions.Api.Application;
@@ -59,7 +60,7 @@ public class ModuleApplication : IModuleApplication
         }
 
         await _repository.AddAsync(entity);
-        _logger.LogInformation(Messages.LOG_CREATED_MESSAGE, nameof(Transaction), userId, entity.ToJson());
+        _logger.LogInformation(Messages.LOG_CREATED_MESSAGE, nameof(Transaction), userId, JsonSerializer.Serialize(entity));
     }
 
     public async Task<List<ModuleResponse>> FetchAllAsync(ClaimsPrincipal user)
@@ -99,6 +100,6 @@ public class ModuleApplication : IModuleApplication
 
         existingModule.SetDeletedAt();
         await _repository.UpdateAsync(existingModule);
-        _logger.LogInformation(Messages.LOG_DELETED_MESSAGE, nameof(existingModule), userId, existingModule.ToJson());
+        _logger.LogInformation(Messages.LOG_DELETED_MESSAGE, nameof(existingModule), userId, JsonSerializer.Serialize(existingModule));
     }
 }

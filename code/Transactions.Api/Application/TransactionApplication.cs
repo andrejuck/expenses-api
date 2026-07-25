@@ -10,6 +10,7 @@ using Libs.Api.Models;
 using Microsoft.AspNetCore.JsonPatch;
 using MongoDB.Bson;
 using System.Net;
+using System.Text.Json;
 using Transactions.Domain.Models.Accounts;
 using Transactions.Domain.Models.Transaction;
 
@@ -71,7 +72,7 @@ public class TransactionApplication : ITransactionApplication
         entity.BindUser(userId);
 
         await _repository.AddAsync(entity);
-        _logger.LogInformation(Messages.LOG_CREATED_MESSAGE, nameof(Transaction), userId, entity.ToJson());
+        _logger.LogInformation(Messages.LOG_CREATED_MESSAGE, nameof(Transaction), userId, JsonSerializer.Serialize(entity));
     }
 
     public async Task<PagedResponse<TransactionResponse>> GetPagedTransactionAsync(TransactionSearchParam searchParams, PagedRequest pagedRequest, Guid userId)
@@ -129,7 +130,7 @@ public class TransactionApplication : ITransactionApplication
             entityForm.Installment);
 
         await _repository.UpdateAsync(expense);
-        _logger.LogInformation(Messages.LOG_UPDATED_MESSAGE, nameof(Transaction), userId, expense.ToJson());
+        _logger.LogInformation(Messages.LOG_UPDATED_MESSAGE, nameof(Transaction), userId, JsonSerializer.Serialize(expense));
     }
 
     public async Task<TransactionResponse?> GetTransactionAsync(Guid id, Guid userId)
@@ -138,7 +139,7 @@ public class TransactionApplication : ITransactionApplication
         if (expense is null) return null;
 
         var result = _mapper.Map<TransactionResponse>(expense);
-        _logger.LogInformation(Messages.LOG_GET_SINGLE_MESSAGE, nameof(TransactionResponse), userId, result.ToJson());
+        _logger.LogInformation(Messages.LOG_GET_SINGLE_MESSAGE, nameof(TransactionResponse), userId, JsonSerializer.Serialize(result));
         return result;
     }
 
@@ -149,7 +150,7 @@ public class TransactionApplication : ITransactionApplication
 
         expense.SetDeletedAt();
         await _repository.UpdateAsync(expense);
-        _logger.LogInformation(Messages.LOG_DELETED_MESSAGE, nameof(expense), userId, expense.ToJson());
+        _logger.LogInformation(Messages.LOG_DELETED_MESSAGE, nameof(expense), userId, JsonSerializer.Serialize(expense));
     }
 
     public async Task<List<TransactionFileResponse>> GetAllExpensesAsync(TransactionSearchParam searchParams, Guid userId)
@@ -173,7 +174,7 @@ public class TransactionApplication : ITransactionApplication
             return null;
         }
 
-        _logger.LogInformation(Messages.LOG_GET_SINGLE_MESSAGE, nameof(PaymentMethod), userId, paymentMethod.ToJson());
+        _logger.LogInformation(Messages.LOG_GET_SINGLE_MESSAGE, nameof(PaymentMethod), userId, JsonSerializer.Serialize(paymentMethod));
         return paymentMethod;
     }
 
@@ -191,7 +192,7 @@ public class TransactionApplication : ITransactionApplication
             return null;
         }
 
-        _logger.LogInformation(Messages.LOG_GET_SINGLE_MESSAGE, nameof(Transaction), userId, expense.ToJson());
+        _logger.LogInformation(Messages.LOG_GET_SINGLE_MESSAGE, nameof(Transaction), userId, JsonSerializer.Serialize(expense));
         return expense;
     }
 }

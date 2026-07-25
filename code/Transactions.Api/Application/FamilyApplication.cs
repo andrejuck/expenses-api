@@ -1,4 +1,5 @@
 using System.Net;
+using System.Text.Json;
 using Libs.Api.ErrorHandling;
 using Libs.Auth.Models;
 using MongoDB.Bson;
@@ -44,10 +45,10 @@ public class FamilyApplication(
         await FetchFamilyMembersAsync(form.Members, membersId);
         
         var entity = adapter.ConvertToDomain(form, userId, userName, form.Accounts, membersId);
-        var result = await repository.AddAsync(entity);
-        await accountApplication.BindFamilyToAccountAsync(entity.Id, result.Accounts);
+        await repository.AddAsync(entity);
+        await accountApplication.BindFamilyToAccountAsync(entity.Id, form.Accounts);
         
-        logger.LogInformation(Messages.LOG_CREATED_MESSAGE, nameof(Family), userId, entity.ToJson());
+        logger.LogInformation(Messages.LOG_CREATED_MESSAGE, nameof(Family), userId, JsonSerializer.Serialize(entity));
         return entity.Id;
     }
 
@@ -70,7 +71,7 @@ public class FamilyApplication(
         await repository.UpdateAsync(existing);
         await accountApplication.BindFamilyToAccountAsync(existing.Id, existing.Accounts);
         
-        logger.LogInformation(Messages.LOG_UPDATED_MESSAGE, nameof(Account), userId, existing.ToJson());
+        logger.LogInformation(Messages.LOG_UPDATED_MESSAGE, nameof(Account), userId, JsonSerializer.Serialize(existing));
         return existing.Id;
     }
 
@@ -81,7 +82,7 @@ public class FamilyApplication(
         
         entity.SetDeletedAt();
         await repository.UpdateAsync(entity);
-        logger.LogInformation(Messages.LOG_DELETED_MESSAGE, nameof(Family), userId, entity.ToJson());
+        logger.LogInformation(Messages.LOG_DELETED_MESSAGE, nameof(Family), userId, JsonSerializer.Serialize(entity));
     }
     
     private async Task<Family?> FindByIdAsync(Guid id, Guid userId)
@@ -97,7 +98,7 @@ public class FamilyApplication(
             return null;
         }
 
-        logger.LogInformation(Messages.LOG_GET_SINGLE_MESSAGE, nameof(Family), userId, family.ToJson());
+        logger.LogInformation(Messages.LOG_GET_SINGLE_MESSAGE, nameof(Family), userId, JsonSerializer.Serialize(family));
         return family;
     }
 

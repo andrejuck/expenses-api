@@ -1,6 +1,6 @@
 using System.Net;
+using System.Text.Json;
 using Libs.Api.ErrorHandling;
-using MongoDB.Bson;
 using Transactions.Api.DataContracts.Adapters;
 using Transactions.Api.DataContracts.Applications;
 using Transactions.Api.Helpers;
@@ -26,7 +26,7 @@ public class AccountApplication(
         var entity = adapter.ConvertToDomain(form, userId);
         await repository.AddAsync(entity);
 
-        logger.LogInformation(Messages.LOG_CREATED_MESSAGE, nameof(Account), userId, entity.ToJson());
+        logger.LogInformation(Messages.LOG_CREATED_MESSAGE, nameof(Account), userId, JsonSerializer.Serialize(entity));
         return adapter.ConvertToResponse(entity);
     }
 
@@ -43,7 +43,7 @@ public class AccountApplication(
         existing.PrepareToUpdate(form.AccountName, form.AccountType, existing.FamilyId);
         await repository.UpdateAsync(existing);
 
-        logger.LogInformation(Messages.LOG_UPDATED_MESSAGE, nameof(Account), userId, existing.ToJson());
+        logger.LogInformation(Messages.LOG_UPDATED_MESSAGE, nameof(Account), userId, JsonSerializer.Serialize(existing));
         return adapter.ConvertToResponse(existing);
     }
 
@@ -83,7 +83,7 @@ public class AccountApplication(
 
         entity.PrepareToDelete();
         await repository.UpdateAsync(entity);
-        logger.LogInformation(Messages.LOG_DELETED_MESSAGE, nameof(Account), userId, entity.ToJson());
+        logger.LogInformation(Messages.LOG_DELETED_MESSAGE, nameof(Account), userId, JsonSerializer.Serialize(entity));
     }
 
     public async Task<Account?> FindByIdAsync(Guid id, Guid userId)
@@ -100,7 +100,7 @@ public class AccountApplication(
             return null;
         }
 
-        logger.LogInformation(Messages.LOG_GET_SINGLE_MESSAGE, nameof(Account), userId, account.ToJson());
+        logger.LogInformation(Messages.LOG_GET_SINGLE_MESSAGE, nameof(Account), userId, JsonSerializer.Serialize(account));
         return account;
     }
 
