@@ -1,15 +1,17 @@
-using AutoMapper;
 using Libs.Api.Adapters;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NUnit.Framework;
+using Transactions.Api.Adapters;
 using Transactions.Api.Application;
+using Transactions.Api.DataContracts.Adapters;
 using Transactions.Api.DataContracts.Applications;
 using Transactions.Api.PresentationContracts.Expenses;
 using Transactions.Domain.DataContracts;
 using Transactions.Domain.Models;
 using Transactions.Domain.Models.Accounts;
 using Transactions.Domain.Models.Enum;
+using Transactions.Domain.Models.PaymentMethod;
 using Transactions.Domain.Models.Transaction;
 using Transactions.Tests.TestHelpers;
 
@@ -40,7 +42,7 @@ public class TransactionApplicationTests
 
         _sut = new TransactionApplication(
             _repository,
-            Substitute.For<IMapper>(),
+            new TransactionAdapter(new PaymentMethodAdapter()),
             _paymentRepository,
             _accountApplication,
             _errorService,

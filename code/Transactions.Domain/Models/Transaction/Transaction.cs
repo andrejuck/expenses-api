@@ -12,7 +12,7 @@ public class Transaction : BaseUserEntity
         decimal totalPrice,
         DateTime transactionDate,
         List<string>? expenseCategories,
-        PaymentMethod paymentMethod,
+        PaymentMethod.PaymentMethod paymentMethod,
         TransactionType transactionType, 
         Guid? accountId, 
         int? installment = null)
@@ -36,7 +36,7 @@ public class Transaction : BaseUserEntity
     public DateTime TransactionDate { get; private set; }
     public List<string>? ExpenseCategories { get; private set; }
     public Guid PaymentMethodId { get; private set; }
-    public PaymentMethod PaymentMethod { get; private set; }
+    public PaymentMethod.PaymentMethod PaymentMethod { get; private set; }
     public int? Installment { get; private set; }
     public TransactionType TransactionType { get; private set; }
     public Guid? AccountId { get; private set; }
@@ -46,7 +46,7 @@ public class Transaction : BaseUserEntity
         decimal totalPrice,
         DateTime transactionDate,
         List<string>? expenseCategories,
-        PaymentMethod paymentMethod,
+        PaymentMethod.PaymentMethod paymentMethod,
         Guid? accountId,
         int? installment = null)
     {
@@ -63,7 +63,7 @@ public class Transaction : BaseUserEntity
         Validate(paymentMethod);
     }
 
-    public List<Transaction> DivideByInstallments(PaymentMethod paymentMethod)
+    public List<Transaction> DivideByInstallments(PaymentMethod.PaymentMethod paymentMethod)
     {
         if (!paymentMethod.PaymentType.Equals(PaymentType.CreditCard))
             throw new DomainException(DomainMessages.EXPENSE_INSTALLMENT_ALLOWED_ONLY_TO_CREDIT_CARD);
@@ -96,7 +96,7 @@ public class Transaction : BaseUserEntity
         return expenses;
     }
 
-    private void Validate(PaymentMethod paymentMethod)
+    private void Validate(PaymentMethod.PaymentMethod paymentMethod)
     {
         if (TotalPrice <= 0)
             throw new DomainException(string.Format(DomainMessages.HIGHER_THAN, nameof(TotalPrice), 0));

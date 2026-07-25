@@ -2,6 +2,7 @@ using Libs.Api.ErrorHandling.Exceptions;
 using NUnit.Framework;
 using Transactions.Domain.Models;
 using Transactions.Domain.Models.Enum;
+using Transactions.Domain.Models.PaymentMethod;
 using Transactions.Domain.Models.Transaction;
 
 namespace Transactions.Tests.Domain;

@@ -1,4 +1,4 @@
-using AutoMapper;
+using Transactions.Api.DataContracts.Adapters;
 using Transactions.Api.DataContracts.Applications;
 using Transactions.Api.Helpers;
 using Transactions.Api.PresentationContracts;
@@ -9,7 +9,6 @@ using Libs.Api.ErrorHandling;
 using Libs.Auth.Helpers;
 using Libs.Auth.Models.Config;
 using Microsoft.Extensions.Options;
-using MongoDB.Bson;
 using System.Net;
 using System.Security.Claims;
 using System.Text.Json;
@@ -20,20 +19,20 @@ namespace Transactions.Api.Application;
 public class ModuleApplication : IModuleApplication
 {
     private readonly IModuleRepository _repository;
-    private readonly IMapper _mapper;
+    private readonly IModuleAdapter _adapter;
     private readonly IErrorService _errorService;
     private readonly ILogger<ModuleApplication> _logger;
     private readonly CustomClaimSettings _customClaimSettings;
 
     public ModuleApplication(
         IModuleRepository repository,
-        IMapper mapper,
+        IModuleAdapter adapter,
         IErrorService errorService,
         ILogger<ModuleApplication> logger,
         IOptions<CustomClaimSettings> options)
     {
         _repository = repository;
-        _mapper = mapper;
+        _adapter = adapter;
         _errorService = errorService;
         _logger = logger;
         _customClaimSettings = options.Value;
@@ -41,8 +40,7 @@ public class ModuleApplication : IModuleApplication
 
     public async Task CreateModuleAsync(ModuleForm form, Guid userId)
     {
-        var entity = _mapper.Map<Module>(form);
-        entity.BindUser(userId);
+        var entity = _adapter.ConvertToDomain(form, userId);
 
         if (await _repository.FindByNameAsync(form.Name) is not null)
         {
@@ -68,7 +66,7 @@ public class ModuleApplication : IModuleApplication
         var userRoles = user.FindAll(x => x.Type == ClaimTypes.Role).Select(x => x.Value);
         var modules = await _repository.FindAllByRolesAsync(userRoles);
 
-        var result = _mapper.Map<List<ModuleResponse>>(modules);
+        var result = _adapter.ConvertToResponse(modules);
         _logger.LogInformation(
             Messages.LOG_GET_PAGED_MULTIPLE_MESSAGE,
             result.Count,

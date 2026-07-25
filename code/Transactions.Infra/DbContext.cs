@@ -5,6 +5,7 @@ using Libs.Auth.Models;
 using MongoDB.Driver;
 using Transactions.Domain.Models.Accounts;
 using Transactions.Domain.Models.Families;
+using Transactions.Domain.Models.PaymentMethod;
 using Transactions.Domain.Models.Transaction;
 using Transactions.Infra.Settings;
 

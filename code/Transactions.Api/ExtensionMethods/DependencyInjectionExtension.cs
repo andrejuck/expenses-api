@@ -18,26 +18,27 @@ public static class DependencyInjectionExtension
     {
         services.AddScoped<IUserRepository, UserRepository>();
 
+        services.AddTransient<IModuleAdapter, ModuleAdapter>();
         services.AddTransient<IModuleRepository, ModuleRepository>();
         services.AddTransient<IModuleApplication, ModuleApplication>();
 
+        services.AddTransient<IPaymentMethodAdapter, PaymentMethodAdapter>();
         services.AddTransient<IPaymentMethodRepository, PaymentMethodRepository>();
         services.AddTransient<IPaymentMethodApplication, PaymentMethodApplication>();
 
+        services.AddTransient<ITransactionAdapter, TransactionAdapter>();
         services.AddTransient<ITransactionApplication, TransactionApplication>();
         services.AddTransient<IExpenseRepository, ExpenseRepository>();
-        
+
         services.AddTransient<IAccountAdapter, AccountAdapter>();
         services.AddTransient<IAccountApplication, AccountApplication>();
         services.AddTransient<IAccountRepository, AccountRepository>();
-        
-        services.AddTransient<IAccountAdapter, AccountAdapter>();
-        services.AddTransient<IAccountApplication, AccountApplication>();
-        services.AddTransient<IAccountRepository, AccountRepository>();
-        
+
         services.AddTransient<IFamilyAdapter, FamilyAdapter>();
         services.AddTransient<IFamilyApplication, FamilyApplication>();
         services.AddTransient<IFamilyRepository, FamilyRepository>();
+
+        services.AddTransient<IUserAdapter, UserAdapter>();
 
         services.AddScoped<IEmailService, EmailService>();
         services.AddScoped<IPaginationAdapter, PaginationAdapter>();

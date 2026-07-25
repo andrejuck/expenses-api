@@ -1,14 +1,15 @@
-using AutoMapper;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NUnit.Framework;
+using Transactions.Api.Adapters;
 using Transactions.Api.Application;
+using Transactions.Api.DataContracts.Adapters;
 using Transactions.Api.PresentationContracts.Forms;
-using Transactions.Api.PresentationContracts.PaymentMethods;
 using Transactions.Domain.DataContracts;
 using Transactions.Domain.Models;
 using Transactions.Domain.Models.Enum;
+using Transactions.Domain.Models.PaymentMethod;
 using Transactions.Tests.TestHelpers;
 
 namespace Transactions.Tests.Applications;
@@ -20,7 +21,7 @@ namespace Transactions.Tests.Applications;
 public class PaymentMethodApplicationTests
 {
     private IPaymentMethodRepository _repository = null!;
-    private IMapper _mapper = null!;
+    private IPaymentMethodAdapter _adapter = null!;
     private Libs.Api.ErrorHandling.IErrorService _errorService = null!;
     private PaymentMethodApplication _sut = null!;
 
@@ -30,12 +31,12 @@ public class PaymentMethodApplicationTests
     public void SetUp()
     {
         _repository = Substitute.For<IPaymentMethodRepository>();
-        _mapper = Substitute.For<IMapper>();
+        _adapter = new PaymentMethodAdapter();
         _errorService = ErrorServiceTestFactory.CreateStateful();
 
         _sut = new PaymentMethodApplication(
             _repository,
-            _mapper,
+            _adapter,
             _errorService,
             Substitute.For<ILogger<PaymentMethodApplication>>());
     }
@@ -52,11 +53,10 @@ public class PaymentMethodApplicationTests
     public async Task Given_a_unique_name_for_the_user_When_creating_a_payment_method_Then_it_is_created_and_bound_to_the_user()
     {
         _repository.FindByNameAsync("Cartão Nubank", _userId).Returns((PaymentMethod?)null);
-        _mapper.Map<PaymentMethod>(Arg.Any<PaymentMethodForm>()).Returns(new PaymentMethod("Cartão Nubank", PaymentType.CreditCard, false));
 
         await _sut.CreateNewPaymentMethodAsync(_userId, ValidForm());
 
-        await _repository.Received(1).AddAsync(Arg.Is<PaymentMethod>(p => p.UserId == _userId));
+        await _repository.Received(1).AddAsync(Arg.Is<PaymentMethod>(p => p.UserId == _userId && p.Name == "Cartão Nubank"));
     }
 
     [Test]
@@ -74,7 +74,6 @@ public class PaymentMethodApplicationTests
     {
         var ownCards = new List<PaymentMethod> { new("Cartão Nubank", PaymentType.CreditCard, false) };
         _repository.FindAllByUserIdAsync(_userId).Returns(ownCards);
-        _mapper.Map<List<PaymentMethodResponse>>(ownCards).Returns([new PaymentMethodResponse { Name = "Cartão Nubank" }]);
 
         var result = await _sut.FetchByUserAsync(_userId);
 
@@ -98,13 +97,6 @@ public class PaymentMethodApplicationTests
     {
         var existing = new PaymentMethod("Cartão Antigo", PaymentType.CreditCard, false);
         _repository.FindByIdAsync(existing.Id, _userId).Returns(existing);
-        _mapper.Map<PaymentMethodForm>(existing).Returns(new PaymentMethodForm
-        {
-            Name = "Cartão Antigo",
-            PaymentType = PaymentType.CreditCard,
-            IsActive = true,
-            IsDefault = false
-        });
 
         var patch = new JsonPatchDocument<PaymentMethodForm>();
         patch.Replace(x => x.Name, "Cartão Renomeado");

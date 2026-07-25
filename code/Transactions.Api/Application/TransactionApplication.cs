@@ -1,4 +1,4 @@
-using AutoMapper;
+using Transactions.Api.DataContracts.Adapters;
 using Transactions.Api.DataContracts.Applications;
 using Transactions.Api.Helpers;
 using Transactions.Api.PresentationContracts.Expenses;
@@ -8,10 +8,10 @@ using Libs.Api.Adapters;
 using Libs.Api.ErrorHandling;
 using Libs.Api.Models;
 using Microsoft.AspNetCore.JsonPatch;
-using MongoDB.Bson;
 using System.Net;
 using System.Text.Json;
 using Transactions.Domain.Models.Accounts;
+using Transactions.Domain.Models.PaymentMethod;
 using Transactions.Domain.Models.Transaction;
 
 namespace Transactions.Api.Application;
@@ -21,23 +21,23 @@ public class TransactionApplication : ITransactionApplication
     private readonly IExpenseRepository _repository;
     private readonly IPaymentMethodRepository _paymentRepo;
     private readonly IAccountApplication _accountApplication;
-    private readonly IMapper _mapper;
+    private readonly ITransactionAdapter _adapter;
     private readonly IErrorService _errorService;
     private readonly IPaginationAdapter _pageAdapter;
     private readonly ILogger<TransactionApplication> _logger;
 
     public TransactionApplication(
         IExpenseRepository repository,
-        IMapper mapper,
+        ITransactionAdapter adapter,
         IPaymentMethodRepository paymentRepo,
         IAccountApplication accountApplication,
         IErrorService errorService,
         IPaginationAdapter pageAdapter,
-        ILogger<TransactionApplication> logger 
+        ILogger<TransactionApplication> logger
         )
     {
         _repository = repository;
-        _mapper = mapper;
+        _adapter = adapter;
         _paymentRepo = paymentRepo;
         _accountApplication = accountApplication;
         _errorService = errorService;
@@ -58,17 +58,7 @@ public class TransactionApplication : ITransactionApplication
             if (account is null) return;
         }
 
-        //TODO - Adapter
-        var entity = new Transaction(form.Location,
-            form.Description,
-            form.TotalPrice,
-            form.TransactionDate,
-            form.ExpenseCategories,
-            paymentMethod,
-            form.TransactionType,
-            account?.Id,
-            form.Installment);
-
+        var entity = _adapter.ConvertToDomain(form, paymentMethod, account?.Id);
         entity.BindUser(userId);
 
         await _repository.AddAsync(entity);
@@ -106,12 +96,12 @@ public class TransactionApplication : ITransactionApplication
         var expense = await FindByIdAsync(id, userId);
         if (expense is null) return;
 
-        var entityForm = _mapper.Map<TransactionForm>(expense);
+        var entityForm = _adapter.ConvertToForm(expense);
 
         patchForm.ApplyTo(entityForm);
         var paymentMethod = await FindPaymentBydId(entityForm.PaymentMethodId, userId);
         if (paymentMethod == null) return;
-        
+
         Account? account = null;
         if (entityForm.AccountId is not null)
         {
@@ -138,7 +128,7 @@ public class TransactionApplication : ITransactionApplication
         var expense = await FindByIdAsync(id, userId);
         if (expense is null) return null;
 
-        var result = _mapper.Map<TransactionResponse>(expense);
+        var result = _adapter.ConvertToResponse(expense);
         _logger.LogInformation(Messages.LOG_GET_SINGLE_MESSAGE, nameof(TransactionResponse), userId, JsonSerializer.Serialize(result));
         return result;
     }

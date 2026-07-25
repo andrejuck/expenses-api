@@ -1,4 +1,3 @@
-using AutoMapper;
 using Transactions.Api.Helpers;
 using Transactions.Api.PresentationContracts;
 using Transactions.Domain.DataContracts;
@@ -22,7 +21,6 @@ public class UserController : ControllerBase
 
     private readonly IUserRepository _userRepository;
     private readonly IPaginationAdapter _pageAdapter;
-    private readonly IMapper _mapper;
     private readonly ILogger<UserController> _logger;
     private readonly CustomClaimSettings _claimSettings;
     private Guid UserId => UserClaimsHelper.GetUserGuidIdFromClaims(User, _claimSettings);
@@ -30,13 +28,11 @@ public class UserController : ControllerBase
     public UserController(
         IUserRepository userRepository,
         IPaginationAdapter pageAdapter,
-        IMapper mapper,
         ILogger<UserController> logger,
         IOptions<CustomClaimSettings> options)
     {
         _userRepository = userRepository;
         _pageAdapter = pageAdapter;
-        _mapper = mapper;
         _logger = logger;
         _claimSettings = options.Value;
     }
@@ -85,8 +81,7 @@ public class UserController : ControllerBase
     {
         var users = await _userRepository.GetAllPagedAsync<UserResponse>(searchParams, request);
         var totalUsers = await _userRepository.GetAllCountAsync(searchParams);
-        var usersResponse = _mapper.Map<List<UserResponse>>(users);
-        var response = _pageAdapter.ConvertToResponse(request, totalUsers, usersResponse);
+        var response = _pageAdapter.ConvertToResponse(request, totalUsers, users);
 
         _logger.LogInformation(Messages.LOG_GET_PAGED_MULTIPLE_MESSAGE, nameof(UserResponse), users.Count, totalUsers, UserId);
         return Ok(response);

@@ -1,16 +1,15 @@
 using Transactions.Domain.Models.Enum;
 
-namespace Transactions.Domain.Models;
+namespace Transactions.Domain.Models.PaymentMethod;
 
 public class PaymentMethod : BaseUserEntity
 {
-    public PaymentMethod() { }
     public PaymentMethod(string name, PaymentType paymentType, bool? isDefault)
     {
         Name = name;
         PaymentType = paymentType;
         IsActive = true;
-        IsDefault = isDefault is null ? false : isDefault.Value;
+        IsDefault = isDefault ?? false;
     }
 
     public string Name { get; private set; }

@@ -89,7 +89,6 @@ if (builder.Environment.IsDevelopment())
 }
 
 builder.Services.AddMongoDbContext(mongoConn);
-builder.Services.AddAutoMapper(typeof(Program));
 builder.Services.AddGraphQL();
 
 // Configure JWT Authentication

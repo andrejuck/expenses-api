@@ -1,10 +1,11 @@
-using AutoMapper;
 using Libs.Auth.Models.Config;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using NUnit.Framework;
+using Transactions.Api.Adapters;
 using Transactions.Api.Application;
+using Transactions.Api.DataContracts.Adapters;
 using Transactions.Api.PresentationContracts.Forms;
 using Transactions.Domain.DataContracts;
 using Transactions.Domain.Models;
@@ -20,7 +21,7 @@ namespace Transactions.Tests.Applications;
 public class ModuleApplicationTests
 {
     private IModuleRepository _repository = null!;
-    private IMapper _mapper = null!;
+    private IModuleAdapter _adapter = null!;
     private Libs.Api.ErrorHandling.IErrorService _errorService = null!;
     private ModuleApplication _sut = null!;
 
@@ -30,12 +31,12 @@ public class ModuleApplicationTests
     public void SetUp()
     {
         _repository = Substitute.For<IModuleRepository>();
-        _mapper = Substitute.For<IMapper>();
+        _adapter = new ModuleAdapter();
         _errorService = ErrorServiceTestFactory.CreateStateful();
 
         _sut = new ModuleApplication(
             _repository,
-            _mapper,
+            _adapter,
             _errorService,
             Substitute.For<ILogger<ModuleApplication>>(),
             Options.Create(new CustomClaimSettings()));
@@ -47,18 +48,16 @@ public class ModuleApplicationTests
     public async Task Given_a_unique_module_name_When_creating_a_module_Then_it_is_created()
     {
         _repository.FindByNameAsync("Transactions Manager").Returns((Module?)null);
-        _mapper.Map<Module>(Arg.Any<ModuleForm>()).Returns(new Module("Transactions Manager", _adminId));
 
         await _sut.CreateModuleAsync(ValidForm(), _adminId);
 
-        await _repository.Received(1).AddAsync(Arg.Any<Module>());
+        await _repository.Received(1).AddAsync(Arg.Is<Module>(m => m.Name == "Transactions Manager" && m.CreatedBy == _adminId));
     }
 
     [Test]
     public async Task Given_a_module_name_that_already_exists_When_creating_a_module_Then_creation_is_rejected()
     {
         _repository.FindByNameAsync("Transactions Manager").Returns(new Module("Transactions Manager", _adminId));
-        _mapper.Map<Module>(Arg.Any<ModuleForm>()).Returns(new Module("Transactions Manager", _adminId));
 
         await _sut.CreateModuleAsync(ValidForm(), _adminId);
 

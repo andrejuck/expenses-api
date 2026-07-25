@@ -2,6 +2,7 @@ using Transactions.Domain.DataContracts;
 using Transactions.Domain.Models;
 using Libs.Api.Infra;
 using MongoDB.Driver;
+using Transactions.Domain.Models.PaymentMethod;
 
 namespace Transactions.Infra.Repositories;
 
@@ -25,14 +26,14 @@ public class PaymentMethodRepository : BaseMongoRepository<PaymentMethod>, IPaym
         return _filterBuilder.Eq(a => a.UserId, userId);
     }
 
-    public async Task<PaymentMethod> FindByIdAsync(Guid id, Guid userId)
+    public async Task<PaymentMethod?> FindByIdAsync(Guid id, Guid userId)
     {
         var filter = _filterBuilder.And(IdFilter(id), UserIdFilter(userId));
 
         return await _dbContext.PaymentMethods.Find(filter).FirstOrDefaultAsync();
     }
 
-    public async Task<PaymentMethod> FindByNameAsync(string name, Guid userId)
+    public async Task<PaymentMethod?> FindByNameAsync(string name, Guid userId)
     {
         var filter = _filterBuilder.Eq(x => x.Name, name);
 

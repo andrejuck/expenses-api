@@ -5,6 +5,7 @@ using Libs.Api.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
+using Transactions.Domain.Models.PaymentMethod;
 using Transactions.Domain.Models.Transaction;
 
 namespace Transactions.Infra.Repositories;

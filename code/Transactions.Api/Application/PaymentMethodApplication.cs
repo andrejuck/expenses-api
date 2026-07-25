@@ -1,4 +1,4 @@
-using AutoMapper;
+using Transactions.Api.DataContracts.Adapters;
 using Transactions.Api.DataContracts.Applications;
 using Transactions.Api.Helpers;
 using Transactions.Api.PresentationContracts.Forms;
@@ -7,44 +7,44 @@ using Transactions.Domain.DataContracts;
 using Transactions.Domain.Models;
 using Libs.Api.ErrorHandling;
 using Microsoft.AspNetCore.JsonPatch;
-using MongoDB.Bson;
 using System.Net;
 using System.Text.Json;
+using Transactions.Domain.Models.PaymentMethod;
 
 namespace Transactions.Api.Application;
 
 public class PaymentMethodApplication : IPaymentMethodApplication
 {
     private readonly IPaymentMethodRepository _paymentRepository;
-    private readonly IMapper _mapper;
+    private readonly IPaymentMethodAdapter _adapter;
     private readonly IErrorService _errorService;
     private readonly ILogger<PaymentMethodApplication> _logger;
 
     public PaymentMethodApplication(
         IPaymentMethodRepository paymentRepository,
-        IMapper mapper,
+        IPaymentMethodAdapter adapter,
         IErrorService errorService,
         ILogger<PaymentMethodApplication> logger)
     {
         _paymentRepository = paymentRepository;
-        _mapper = mapper;
+        _adapter = adapter;
         _errorService = errorService;
         _logger = logger;
     }
 
-    public async Task<PaymentMethodResponse> FetchByIdAsync(Guid id, Guid userId)
+    public async Task<PaymentMethodResponse?> FetchByIdAsync(Guid id, Guid userId)
     {
         var payment = await FindPaymentBydIdAsync(id, userId);
         if (payment is null) return null;
 
-        var response = _mapper.Map<PaymentMethodResponse>(payment);
+        var response = _adapter.ConvertToResponse(payment);
         return response;
     }
 
     public async Task<List<PaymentMethodResponse>> FetchByUserAsync(Guid userId)
     {
         var payments = await _paymentRepository.FindAllByUserIdAsync(userId);
-        var result = _mapper.Map<List<PaymentMethodResponse>>(payments);
+        var result = _adapter.ConvertToResponse(payments);
         _logger.LogInformation(Messages.LOG_GET_PAGED_MULTIPLE_MESSAGE, nameof(PaymentMethodResponse), payments.Count, userId, JsonSerializer.Serialize(result));
         return result;
     }
@@ -54,7 +54,7 @@ public class PaymentMethodApplication : IPaymentMethodApplication
         var payment = await FindPaymentBydIdAsync(id, userId);
         if (payment is null) return;
 
-        var paymentEntityForm = _mapper.Map<PaymentMethodForm>(payment);
+        var paymentEntityForm = _adapter.ConvertToForm(payment);
 
         patch.ApplyTo(paymentEntityForm);
         payment.PrepareToUpdate(paymentEntityForm.Name, paymentEntityForm.PaymentType, paymentEntityForm.IsActive);
@@ -65,7 +65,7 @@ public class PaymentMethodApplication : IPaymentMethodApplication
 
     public async Task CreateNewPaymentMethodAsync(Guid userId, PaymentMethodForm form)
     {
-        var entity = _mapper.Map<PaymentMethod>(form);
+        var entity = _adapter.ConvertToDomain(form);
 
         if (await _paymentRepository.FindByNameAsync(form.Name, userId) is not null)
         {
@@ -87,7 +87,7 @@ public class PaymentMethodApplication : IPaymentMethodApplication
         _logger.LogInformation(Messages.LOG_CREATED_MESSAGE, nameof(PaymentMethod), userId, JsonSerializer.Serialize(entity));
     }
 
-    private async Task<PaymentMethod> FindPaymentBydIdAsync(Guid id, Guid userId)
+    private async Task<PaymentMethod?> FindPaymentBydIdAsync(Guid id, Guid userId)
     {
         var payment = await _paymentRepository.FindByIdAsync(id, userId);
 

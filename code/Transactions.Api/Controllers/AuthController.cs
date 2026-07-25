@@ -1,5 +1,5 @@
-﻿using AutoMapper;
-using Transactions.Api.DataContracts;
+﻿using Transactions.Api.DataContracts;
+using Transactions.Api.DataContracts.Adapters;
 using Transactions.Api.Dtos;
 using Transactions.Api.PresentationContracts;
 using Transactions.Api.Settings;
@@ -28,7 +28,7 @@ namespace Transactions.Api.Controllers
         private readonly IConfiguration _configuration;
         private readonly EmailingSettings _emailSettings;
         private readonly CustomClaimSettings _claimSettings;
-        private readonly IMapper _mapper;
+        private readonly IUserAdapter _adapter;
         private readonly byte[] _key;
         private readonly ILogger<AuthController> _logger;
 
@@ -38,7 +38,7 @@ namespace Transactions.Api.Controllers
             IEmailService emailService,
             IOptions<EmailingSettings> settings,
             IOptions<CustomClaimSettings> claimSettings,
-            IMapper mapper,
+            IUserAdapter adapter,
             ILogger<AuthController> logger)
         {
             _configuration = configuration;
@@ -47,7 +47,7 @@ namespace Transactions.Api.Controllers
             _emailService = emailService;
             _emailSettings = settings.Value;
             _claimSettings = claimSettings.Value;
-            _mapper = mapper;
+            _adapter = adapter;
             _logger = logger;
         }
 
@@ -109,7 +109,7 @@ namespace Transactions.Api.Controllers
             await _userRepository.UpdateAsync(user);
 
             var stringToken = CreateJwtToken(user);
-            var response = _mapper.Map<UserResponse>(user);
+            var response = _adapter.ConvertToResponse(user);
             response.Token = stringToken;
 
             _logger.LogInformation(AuthMessages.SUCCESS_LOGIN, dto.Email);
