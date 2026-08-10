@@ -12,4 +12,5 @@ public class PaymentMethodForm
     public PaymentType PaymentType { get; set; }
     public bool IsActive { get; set; }
     public bool IsDefault { get; set; }
+    public Guid? AccountId { get; set; }
 }

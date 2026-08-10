@@ -7,7 +7,7 @@ namespace Transactions.Api.DataContracts.Adapters;
 
 public interface ITransactionAdapter
 {
-    Transaction ConvertToDomain(TransactionForm form, PaymentMethod paymentMethod, Guid? accountId);
+    Transaction ConvertToDomain(TransactionForm form, PaymentMethod paymentMethod);
     TransactionResponse ConvertToResponse(Transaction domain);
     TransactionForm ConvertToForm(Transaction domain);
 }

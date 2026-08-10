@@ -5,6 +5,7 @@ using Libs.Api.Serializers;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Conventions;
 using Transactions.Domain.Models.Accounts;
+using Transactions.Domain.Models.PaymentMethod;
 
 namespace Transactions.Api.ExtensionMethods;
 
@@ -35,5 +36,10 @@ public static class DbContextExtension
             new IgnoreExtraElementsConvention(true)
         };
         ConventionRegistry.Register("IgnoreExtraElements", conventionPack, t => true);
+        BsonClassMap.RegisterClassMap<PaymentMethod>(cm =>
+        {
+            cm.AutoMap();
+            cm.MapCreator(p => new PaymentMethod(p.Name, p.PaymentType, p.AccountId, p.IsDefault));
+        });
     }
 }

@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="juck.libs.api" Version="1.0.0-alpha.20" />
+    <PackageReference Include="juck.libs.api" Version="1.0.0-alpha.21" />
     <PackageReference Include="juck.libs.auth" Version="1.0.0-alpha.5" />
     <PackageReference Include="MongoDB.Bson" Version="3.10.0" />
     <PackageReference Include="MongoDB.Driver" Version="3.10.0" />

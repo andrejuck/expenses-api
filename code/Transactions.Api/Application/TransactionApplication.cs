@@ -50,15 +50,7 @@ public class TransactionApplication : ITransactionApplication
         var paymentMethod = await FindPaymentBydId(form.PaymentMethodId, userId);
         if (paymentMethod == null) return;
 
-        Account? account = null;
-        if (form.AccountId is not null)
-        {
-            account = await _accountApplication.FindByIdAsync(form.AccountId.Value, userId);
-
-            if (account is null) return;
-        }
-
-        var entity = _adapter.ConvertToDomain(form, paymentMethod, account?.Id);
+        var entity = _adapter.ConvertToDomain(form, paymentMethod);
         entity.BindUser(userId);
 
         await _repository.AddAsync(entity);
@@ -102,21 +94,12 @@ public class TransactionApplication : ITransactionApplication
         var paymentMethod = await FindPaymentBydId(entityForm.PaymentMethodId, userId);
         if (paymentMethod == null) return;
 
-        Account? account = null;
-        if (entityForm.AccountId is not null)
-        {
-            account = await _accountApplication.FindByIdAsync(entityForm.AccountId.Value, userId);
-
-            if (account is null) return;
-        }
-
         expense.PrepareToUpdate(entityForm.Location,
             entityForm.Description,
             entityForm.TotalPrice,
             entityForm.TransactionDate,
             entityForm.ExpenseCategories,
             paymentMethod,
-            account?.Id,
             entityForm.Installment);
 
         await _repository.UpdateAsync(expense);

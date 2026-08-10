@@ -31,6 +31,7 @@ public class PaymentMethodController : ControllerBase
     [HttpPost]
     [ProducesResponseType((int)HttpStatusCode.Accepted)]
     [ProducesResponseType((int)HttpStatusCode.Conflict)]
+    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     public async Task<ActionResult> CreatePaymentMethod([FromBody] PaymentMethodForm form)
     {
@@ -41,6 +42,7 @@ public class PaymentMethodController : ControllerBase
     [HttpPatch("{id}")]
     [ProducesResponseType((int)HttpStatusCode.Accepted)]
     [ProducesResponseType((int)HttpStatusCode.NotFound)]
+    [ProducesResponseType((int)HttpStatusCode.BadRequest)]
     [ProducesResponseType((int)HttpStatusCode.InternalServerError)]
     public async Task<ActionResult> UpdatePaymentMethod(
         Guid id,

@@ -20,7 +20,6 @@ public class AccountApplicationTests
 {
     private IAccountRepository _repository = null!;
     private IFamilyRepository _familyRepository = null!;
-    private IExpenseRepository _expenseRepository = null!;
     private Libs.Api.ErrorHandling.IErrorService _errorService = null!;
     private AccountApplication _sut = null!;
 
@@ -31,14 +30,12 @@ public class AccountApplicationTests
     {
         _repository = Substitute.For<IAccountRepository>();
         _familyRepository = Substitute.For<IFamilyRepository>();
-        _expenseRepository = Substitute.For<IExpenseRepository>();
         _errorService = ErrorServiceTestFactory.CreateStateful();
 
         _sut = new AccountApplication(
             new AccountAdapter(),
             _repository,
             _familyRepository,
-            _expenseRepository,
             _errorService,
             Substitute.For<ILogger<AccountApplication>>());
     }
@@ -122,33 +119,7 @@ public class AccountApplicationTests
         Assert.That(existing.Name, Is.EqualTo("Conta Renomeada"));
         await _repository.Received(1).UpdateAsync(existing);
     }
-
-    [Test]
-    public async Task Given_an_account_linked_to_an_expense_When_deleting_Then_deletion_is_rejected()
-    {
-        var existing = new Account("Conta Pessoal", AccountType.Personal, 0);
-        _repository.FindByIdAsync(existing.Id, _userId).Returns(existing);
-        _expenseRepository.GetAnyWithinAccountAsync(existing.Id, _userId).Returns(true);
-
-        await _sut.DeleteByIdAsync(existing.Id, _userId);
-
-        Assert.That(existing.DeletedAt, Is.Null);
-        await _repository.DidNotReceive().UpdateAsync(Arg.Any<Account>());
-    }
-
-    [Test]
-    public async Task Given_an_account_with_no_linked_expenses_When_deleting_Then_it_is_marked_as_deleted()
-    {
-        var existing = new Account("Conta Pessoal", AccountType.Personal, 0);
-        _repository.FindByIdAsync(existing.Id, _userId).Returns(existing);
-        _expenseRepository.GetAnyWithinAccountAsync(existing.Id, _userId).Returns(false);
-
-        await _sut.DeleteByIdAsync(existing.Id, _userId);
-
-        Assert.That(existing.DeletedAt, Is.Not.Null);
-        await _repository.Received(1).UpdateAsync(existing);
-    }
-
+    
     [Test]
     public async Task Given_personal_and_family_shared_accounts_When_fetching_all_accounts_Then_both_are_returned()
     {

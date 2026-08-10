@@ -9,7 +9,7 @@ namespace Transactions.Api.Adapters;
 public class PaymentMethodAdapter : IPaymentMethodAdapter
 {
     public PaymentMethod ConvertToDomain(PaymentMethodForm form) =>
-        new(form.Name, form.PaymentType, form.IsDefault);
+        new(form.Name, form.PaymentType, form.AccountId, form.IsDefault);
 
     public PaymentMethodForm ConvertToForm(PaymentMethod domain) =>
         new()

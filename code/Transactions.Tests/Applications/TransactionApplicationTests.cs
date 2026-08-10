@@ -50,7 +50,7 @@ public class TransactionApplicationTests
             Substitute.For<ILogger<TransactionApplication>>());
     }
 
-    private static PaymentMethod CreditCard() => new("Cartão", PaymentType.CreditCard, false);
+    private static PaymentMethod CreditCard() => new("Cartão", PaymentType.CreditCard, null, false);
 
     private static TransactionForm ValidForm(Guid paymentMethodId, Guid? accountId = null) => new()
     {
@@ -58,8 +58,7 @@ public class TransactionApplicationTests
         TotalPrice = 150,
         TransactionDate = DateTime.Today,
         PaymentMethodId = paymentMethodId,
-        TransactionType = TransactionType.Expense,
-        AccountId = accountId
+        TransactionType = TransactionType.Expense
     };
 
     [Test]
@@ -69,19 +68,6 @@ public class TransactionApplicationTests
         _paymentRepository.FindByIdAsync(paymentMethodId, _userId).Returns((PaymentMethod?)null);
 
         await _sut.CreateNewTransactionAsync(_userId, ValidForm(paymentMethodId));
-
-        await _repository.DidNotReceive().AddAsync(Arg.Any<Transaction>());
-    }
-
-    [Test]
-    public async Task Given_an_account_id_that_does_not_exist_When_creating_a_transaction_Then_it_is_not_created()
-    {
-        var paymentMethod = CreditCard();
-        var accountId = Guid.NewGuid();
-        _paymentRepository.FindByIdAsync(paymentMethod.Id, _userId).Returns(paymentMethod);
-        _accountApplication.FindByIdAsync(accountId, _userId).Returns((Account?)null);
-
-        await _sut.CreateNewTransactionAsync(_userId, ValidForm(paymentMethod.Id, accountId));
 
         await _repository.DidNotReceive().AddAsync(Arg.Any<Transaction>());
     }

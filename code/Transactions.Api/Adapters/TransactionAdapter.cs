@@ -8,7 +8,7 @@ namespace Transactions.Api.Adapters;
 
 public class TransactionAdapter(IPaymentMethodAdapter paymentMethodAdapter) : ITransactionAdapter
 {
-    public Transaction ConvertToDomain(TransactionForm form, PaymentMethod paymentMethod, Guid? accountId) =>
+    public Transaction ConvertToDomain(TransactionForm form, PaymentMethod paymentMethod) =>
         new(form.Location,
             form.Description,
             form.TotalPrice,
@@ -16,7 +16,6 @@ public class TransactionAdapter(IPaymentMethodAdapter paymentMethodAdapter) : IT
             form.ExpenseCategories,
             paymentMethod,
             form.TransactionType,
-            accountId,
             form.Installment);
 
     public TransactionResponse ConvertToResponse(Transaction domain) =>
@@ -28,7 +27,7 @@ public class TransactionAdapter(IPaymentMethodAdapter paymentMethodAdapter) : IT
             TotalPrice = domain.TotalPrice,
             TransactionDate = domain.TransactionDate,
             ExpenseCategories = domain.ExpenseCategories ?? [],
-            PaymentMethod = domain.PaymentMethod is null ? null! : paymentMethodAdapter.ConvertToResponse(domain.PaymentMethod),
+            PaymentMethod = paymentMethodAdapter.ConvertToResponse(domain.PaymentMethod),
             Installment = domain.Installment,
             UserId = domain.UserId
         };
@@ -43,7 +42,6 @@ public class TransactionAdapter(IPaymentMethodAdapter paymentMethodAdapter) : IT
             ExpenseCategories = domain.ExpenseCategories,
             PaymentMethodId = domain.PaymentMethodId,
             Installment = domain.Installment,
-            TransactionType = domain.TransactionType,
-            AccountId = domain.AccountId
+            TransactionType = domain.TransactionType
         };
 }

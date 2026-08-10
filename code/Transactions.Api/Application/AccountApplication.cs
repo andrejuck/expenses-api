@@ -14,7 +14,6 @@ public class AccountApplication(
     IAccountAdapter adapter,
     IAccountRepository repository,
     IFamilyRepository familyRepository,
-    IExpenseRepository expenseRepository,
     IErrorService errorService,
     ILogger<AccountApplication> logger) : IAccountApplication
 {
@@ -78,9 +77,6 @@ public class AccountApplication(
         var entity = await FindByIdAsync(id, userId);
         if (entity is null) return;
 
-        await ValidateForDeletionAsync(entity.Id, userId);
-        if (errorService.HasErrors) return;
-
         entity.PrepareToDelete();
         await repository.UpdateAsync(entity);
         logger.LogInformation(Messages.LOG_DELETED_MESSAGE, nameof(Account), userId, JsonSerializer.Serialize(entity));
@@ -140,17 +136,5 @@ public class AccountApplication(
         errorService.AddError(nameof(UpdateAccountAsync),
             string.Format(Messages.BAD_REQUEST_FILLED_MUST_BE_EMPTY, nameof(AccountForm.InitialBalance)),
             HttpStatusCode.BadRequest);
-    }
-
-    private async Task<bool> ValidateForDeletionAsync(Guid accountId, Guid userId)
-    {
-        var hasExpenses = await expenseRepository.GetAnyWithinAccountAsync(accountId, userId);
-        if (!hasExpenses) return true;
-
-        errorService.AddError(nameof(ValidateForDeletionAsync),
-            string.Format(Messages.BAD_REQUEST_DELETION_NOT_ALLOWED, nameof(Account), "Account linked to an expense"),
-            HttpStatusCode.BadRequest);
-
-        return !errorService.HasErrors;
     }
 }
