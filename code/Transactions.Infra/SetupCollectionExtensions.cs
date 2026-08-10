@@ -8,7 +8,7 @@ using Transactions.Domain.Models.Transaction;
 
 namespace Transactions.Infra;
 
-public static class SetupCollectionExtentions
+public static class SetupCollectionExtensions
 {
     internal static IMongoCollection<User> SetupCollection(this IMongoCollection<User> collection)
     {

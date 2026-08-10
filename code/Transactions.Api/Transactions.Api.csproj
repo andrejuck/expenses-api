@@ -13,7 +13,7 @@
     <PackageReference Include="Grafana.OpenTelemetry" Version="1.7.0" />
     <PackageReference Include="HotChocolate.AspNetCore" Version="15.0.0" />
     <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="15.0.0" />
-    <PackageReference Include="juck.libs.api" Version="1.0.0-alpha.20" />
+    <PackageReference Include="juck.libs.api" Version="1.0.0-alpha.21" />
     <PackageReference Include="juck.libs.auth" Version="1.0.0-alpha.5" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="8.0.12" />

@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Transactions.Api.Adapters;
 using Transactions.Api.Application;
 using Transactions.Api.DataContracts.Adapters;
+using Transactions.Api.DataContracts.Applications;
 using Transactions.Api.PresentationContracts.Forms;
 using Transactions.Domain.DataContracts;
 using Transactions.Domain.Models;
@@ -22,6 +23,7 @@ public class PaymentMethodApplicationTests
 {
     private IPaymentMethodRepository _repository = null!;
     private IPaymentMethodAdapter _adapter = null!;
+    private IAccountApplication _accountApplication = null!;
     private Libs.Api.ErrorHandling.IErrorService _errorService = null!;
     private PaymentMethodApplication _sut = null!;
 
@@ -31,11 +33,13 @@ public class PaymentMethodApplicationTests
     public void SetUp()
     {
         _repository = Substitute.For<IPaymentMethodRepository>();
+        _accountApplication = Substitute.For<IAccountApplication>();
         _adapter = new PaymentMethodAdapter();
         _errorService = ErrorServiceTestFactory.CreateStateful();
 
         _sut = new PaymentMethodApplication(
             _repository,
+            _accountApplication,
             _adapter,
             _errorService,
             Substitute.For<ILogger<PaymentMethodApplication>>());
@@ -62,7 +66,7 @@ public class PaymentMethodApplicationTests
     [Test]
     public async Task Given_a_name_already_registered_by_the_user_When_creating_a_payment_method_Then_creation_is_rejected()
     {
-        _repository.FindByNameAsync("Cartão Nubank", _userId).Returns(new PaymentMethod("Cartão Nubank", PaymentType.CreditCard, false));
+        _repository.FindByNameAsync("Cartão Nubank", _userId).Returns(new PaymentMethod("Cartão Nubank", PaymentType.CreditCard, null, false));
 
         await _sut.CreateNewPaymentMethodAsync(_userId, ValidForm());
 
@@ -72,7 +76,7 @@ public class PaymentMethodApplicationTests
     [Test]
     public async Task Given_the_current_users_registered_cards_When_fetching_by_user_Then_only_that_users_cards_are_returned()
     {
-        var ownCards = new List<PaymentMethod> { new("Cartão Nubank", PaymentType.CreditCard, false) };
+        var ownCards = new List<PaymentMethod> { new("Cartão Nubank", PaymentType.CreditCard, null, false) };
         _repository.FindAllByUserIdAsync(_userId).Returns(ownCards);
 
         var result = await _sut.FetchByUserAsync(_userId);
@@ -95,7 +99,7 @@ public class PaymentMethodApplicationTests
     [Test]
     public async Task Given_an_own_payment_method_When_updating_its_name_Then_the_change_is_persisted()
     {
-        var existing = new PaymentMethod("Cartão Antigo", PaymentType.CreditCard, false);
+        var existing = new PaymentMethod("Cartão Antigo", PaymentType.CreditCard, null, false);
         _repository.FindByIdAsync(existing.Id, _userId).Returns(existing);
 
         var patch = new JsonPatchDocument<PaymentMethodForm>();

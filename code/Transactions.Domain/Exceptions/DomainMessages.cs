@@ -16,4 +16,6 @@ public static class DomainMessages
     public const string FAMILY_INVALID_MEMBERS_QUANTITY = "A family must have at least 1 member and a maximum of 5 members";
     public const string FAMILY_INVALID_ACCOUNTS_QUANTITY = "A family must have at least 1 shared account";
     public const string FAMILY_INVALID_ACCOUNTS_TYPE = "A family should not have personal accounts";
+    
+    public const string PAYMENT_METHOD_DEFAULT_ALREADY_EXISTS = "A default payment method already exists";
 }

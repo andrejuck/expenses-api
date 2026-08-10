@@ -117,16 +117,6 @@ public class ExpenseRepository(DBContext dbContext)
         return pagedResult;
     }
 
-    public async Task<bool> GetAnyWithinAccountAsync(Guid accountId, Guid userId)
-    {
-        var filter = _filterBuilder.And(
-            _filterBuilder.Eq(x => x.AccountId, accountId),
-            _filterBuilder.Eq(x => x.UserId, userId)
-        );
-        
-        return await Collection.Find(filter).AnyAsync();
-    }
-
     public async Task<List<string>> GetAllUserCategories(Guid userId)
     {
         var expenses = await Collection

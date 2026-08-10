@@ -1,5 +1,4 @@
 using Transactions.Domain.DataContracts;
-using Transactions.Domain.Models;
 using Libs.Api.Infra;
 using MongoDB.Driver;
 using Transactions.Domain.Models.PaymentMethod;
@@ -33,11 +32,31 @@ public class PaymentMethodRepository : BaseMongoRepository<PaymentMethod>, IPaym
         return await _dbContext.PaymentMethods.Find(filter).FirstOrDefaultAsync();
     }
 
-    public async Task<PaymentMethod?> FindByNameAsync(string name, Guid userId)
+    public async Task<PaymentMethod?> FindByNameAsync(string name, Guid userId, Guid? currentPaymentMethodId = null)
     {
-        var filter = _filterBuilder.Eq(x => x.Name, name);
+        var filter = _filterBuilder.And(UserIdFilter(userId), _filterBuilder.Eq(x => x.Name, name));
+        if (currentPaymentMethodId.HasValue)
+        {
+            filter = _filterBuilder.And(
+                filter,
+                _filterBuilder.Ne(x => x.Id, currentPaymentMethodId.Value));
+        }
 
-        return await _dbContext.PaymentMethods.Find(_filterBuilder.And(UserIdFilter(userId), filter)).FirstOrDefaultAsync();
+        return await _dbContext.PaymentMethods.Find(filter).FirstOrDefaultAsync();
+    }
+
+    public async Task<bool> ExistsDefaultAsync(Guid userId, Guid? currentPaymentMethodId)
+    {
+        var filter = UserIdFilter(userId);
+        var defaultFilter = _filterBuilder.And(filter, _filterBuilder.Eq(x => x.IsDefault, true));
+        if (currentPaymentMethodId.HasValue)
+        {
+            filter = _filterBuilder.And(
+                defaultFilter,
+                _filterBuilder.Ne(x => x.Id, currentPaymentMethodId.Value));
+        }
+        
+        return await _dbContext.PaymentMethods.Find(filter).AnyAsync();
     }
 
     public async Task<PaymentMethod> UpdateAsync(PaymentMethod entity)

@@ -1,3 +1,5 @@
+using Transactions.Api.PresentationContracts.Accounts;
+
 namespace Transactions.Api.PresentationContracts.PaymentMethods;
 
 public class PaymentMethodResponse
@@ -7,4 +9,5 @@ public class PaymentMethodResponse
     public string PaymentType { get; set; }
     public bool IsActive { get; set; }
     public Guid UserId { get; set; }
+    public AccountResponse? AccountResponse { get; set; } 
 }

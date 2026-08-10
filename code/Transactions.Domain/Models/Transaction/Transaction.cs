@@ -13,8 +13,7 @@ public class Transaction : BaseUserEntity
         DateTime transactionDate,
         List<string>? expenseCategories,
         PaymentMethod.PaymentMethod paymentMethod,
-        TransactionType transactionType, 
-        Guid? accountId, 
+        TransactionType transactionType,
         int? installment = null)
     {
         Location = location;
@@ -24,7 +23,6 @@ public class Transaction : BaseUserEntity
         ExpenseCategories = expenseCategories;
         PaymentMethodId = paymentMethod.Id;
         TransactionType = transactionType;
-        AccountId = accountId;
         Installment = installment;
 
         Validate(paymentMethod);
@@ -39,7 +37,6 @@ public class Transaction : BaseUserEntity
     public PaymentMethod.PaymentMethod PaymentMethod { get; private set; }
     public int? Installment { get; private set; }
     public TransactionType TransactionType { get; private set; }
-    public Guid? AccountId { get; private set; }
 
     public void PrepareToUpdate(string? location,
         string description,
@@ -47,7 +44,6 @@ public class Transaction : BaseUserEntity
         DateTime transactionDate,
         List<string>? expenseCategories,
         PaymentMethod.PaymentMethod paymentMethod,
-        Guid? accountId,
         int? installment = null)
     {
         Location = location;
@@ -57,7 +53,6 @@ public class Transaction : BaseUserEntity
         ExpenseCategories = expenseCategories;
         PaymentMethodId = paymentMethod.Id;
         Installment = installment;
-        AccountId = accountId;
 
         SetUpdatedAt();
         Validate(paymentMethod);
@@ -82,8 +77,7 @@ public class Transaction : BaseUserEntity
                 TransactionDate,
                 ExpenseCategories, 
                 paymentMethod,
-                TransactionType,
-                AccountId);
+                TransactionType);
             expenses.Add(expense);
         }
 
